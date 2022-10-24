@@ -1,4 +1,4 @@
-use crate::{dbconfig, error, error::Error::*, mode::*, DBPool};
+use crate::{dbconfig, error, error::Error::*, model::*, DBPool};
 use chrono::prelude::*;
 use mobc_postgres::tokio_postgres;
 use tokio_postgres::Row;

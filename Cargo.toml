@@ -13,3 +13,4 @@ serde_derive = "1.0"
 thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 mobc-postgres = { version = "0.7.0", features = ["with-chrono-0_4"] }
+log4rs="1.2.0"

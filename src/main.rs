@@ -9,7 +9,7 @@ mod dao_column;
 mod dbconfig;
 mod error;
 mod handler_column;
-mod mode;
+mod model;
 mod route;
 
 type Result<T> = std::result::Result<T, Rejection>;
@@ -18,6 +18,8 @@ type DBPool = Pool<PgConnectionManager<NoTls>>;
 
 #[tokio::main]
 async fn main() {
+    log4rs::init_file("log4rs.yml", Default::default()).unwrap();
+
     let db_pool = dbconfig::create_pool().unwrap();
 
     let db = dbconfig::init_db(&db_pool).await;

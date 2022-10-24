@@ -1,4 +1,4 @@
-use crate::{dao_column, dbconfig, error::Error::*, mode::*, DBPool, Result};
+use crate::{dao_column, dbconfig, error::Error::*, model::*, DBPool, Result};
 use serde_derive::Deserialize;
 use warp::{http::StatusCode, reject, reply::json, Reply};
 

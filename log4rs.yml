@@ -1,0 +1,23 @@
+appenders:
+  default:
+    kind: console
+    encoder:
+      kind: pattern
+      pattern: '{h({d(%H:%M:%S)})} - {m}{n}'
+  file_appender:
+    kind: rolling_file
+    path: logs/step/step.log
+    policy:
+      trigger:
+        kind: size
+        limit: 30 mb
+      roller:
+        kind: fixed_window
+        pattern: logs/step/step_{}.gz
+        count: 5
+        base: 1
+root:
+  level: debug
+  appenders:
+    - default
+    - file_appender
