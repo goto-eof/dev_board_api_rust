@@ -5,10 +5,10 @@ use std::convert::Infallible;
 use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
 
+mod controller_column;
 mod dao_column;
 mod database_config;
 mod error_manager;
-mod handler_column;
 mod models;
 mod routes;
 
@@ -27,7 +27,7 @@ async fn main() {
 
     let health_route = warp::path!("health")
         .and(with_db(db_pool.clone()))
-        .and_then(handler_column::health_handler);
+        .and_then(controller_column::health_handler);
     let routes = health_route
         .or(get_routes(db_pool))
         .with(warp::cors().allow_any_origin())
