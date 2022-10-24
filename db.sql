@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS db_items
     itm_name VARCHAR(255),
     itm_type VARCHAR(255),
     itm_code VARCHAR(10),
+    itm_description TEXT,
     created_at timestamp with time zone DEFAULT (now() at time zone 'utc')
 );
