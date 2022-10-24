@@ -6,16 +6,20 @@ appenders:
       pattern: '{h({d(%H:%M:%S)})} - {m}{n}'
   file_appender:
     kind: rolling_file
-    path: logs/step/step.log
+    append: true
+    path: 'logs/log.log'
+    encoder:
+      pattern: '{h({d(%m-%d-%Y %H:%M:%S)})} - {m}{n}'
     policy:
+      kind: compound
       trigger:
         kind: size
-        limit: 30 mb
+        limit: 10mb
       roller:
         kind: fixed_window
-        pattern: logs/step/step_{}.gz
-        count: 5
         base: 1
+        count: 100
+        pattern: 'logs/log{}.log'
 root:
   level: debug
   appenders:
