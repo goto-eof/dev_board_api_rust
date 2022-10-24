@@ -1,0 +1,15 @@
+[package]
+name = "dev-board"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1.0.87"
+tokio = { version = "1.21.2", features = ["macros"] }
+warp = "0.3.3"
+mobc = "0.7.0"
+serde = {version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
+thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+mobc-postgres = { version = "0.7.0", features = ["with-chrono-0_4"] }
