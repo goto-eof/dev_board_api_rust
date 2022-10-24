@@ -1,16 +1,16 @@
 use mobc::{Connection, Pool};
 use mobc_postgres::{tokio_postgres, PgConnectionManager};
-use route::get_routes;
+use routes::get_routes;
 use std::convert::Infallible;
 use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
 
 mod dao_column;
-mod dbconfig;
-mod error;
+mod database_config;
+mod error_manager;
 mod handler_column;
-mod model;
-mod route;
+mod models;
+mod routes;
 
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
@@ -20,9 +20,9 @@ type DBPool = Pool<PgConnectionManager<NoTls>>;
 async fn main() {
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
 
-    let db_pool = dbconfig::create_pool().unwrap();
+    let db_pool = database_config::create_pool().unwrap();
 
-    let db = dbconfig::init_db(&db_pool).await;
+    let db = database_config::init_db(&db_pool).await;
     println!("{:?}", db);
 
     let health_route = warp::path!("health")
@@ -31,7 +31,7 @@ async fn main() {
     let routes = health_route
         .or(get_routes(db_pool))
         .with(warp::cors().allow_any_origin())
-        .recover(error::handle_rejection);
+        .recover(error_manager::handle_rejection);
 
     warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
 }

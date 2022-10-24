@@ -1,15 +1,15 @@
-use crate::{dbconfig, error, error::Error::*, model::*, DBPool};
+use crate::{database_config, error_manager, error_manager::Error::*, models::*, DBPool};
 use chrono::prelude::*;
 use mobc_postgres::tokio_postgres;
 use tokio_postgres::Row;
 
-type Result<T> = std::result::Result<T, error::Error>;
+type Result<T> = std::result::Result<T, error_manager::Error>;
 
 const TABLE: &str = "db_column_items";
 const SELECT_FIELDS: &str = "ctm_id, ctm_name, created_at";
 
 pub async fn fetch_all(db_pool: &DBPool, search: Option<String>) -> Result<Vec<DbColumnItems>> {
-    let con = dbconfig::get_db_con(db_pool).await?;
+    let con = database_config::get_db_con(db_pool).await?;
     let where_clause = match search {
         Some(_) => "WHERE ctm_name like $1",
         None => "",
@@ -29,7 +29,7 @@ pub async fn fetch_all(db_pool: &DBPool, search: Option<String>) -> Result<Vec<D
 }
 
 pub async fn create(db_pool: &DBPool, body: DbColumnItemsRequest) -> Result<DbColumnItems> {
-    let con = dbconfig::get_db_con(db_pool).await?;
+    let con = database_config::get_db_con(db_pool).await?;
     let query = format!("INSERT INTO {} (ctm_name) VALUES ($1) RETURNING *", TABLE);
     let row = con
         .query_one(query.as_str(), &[&body.ctm_name])
@@ -41,9 +41,10 @@ pub async fn create(db_pool: &DBPool, body: DbColumnItemsRequest) -> Result<DbCo
 pub async fn update(
     db_pool: &DBPool,
     id: i32,
+
     body: DbColumnItemsUpdateRequest,
 ) -> Result<DbColumnItems> {
-    let con = dbconfig::get_db_con(db_pool).await?;
+    let con = database_config::get_db_con(db_pool).await?;
     let query = format!("UPDATE {} SET ctm_name = $1 WHERE ctm_id = $2", TABLE);
     println!("{}", &query);
     con.execute(query.as_str(), &[&body.ctm_name, &id])
@@ -60,7 +61,7 @@ pub async fn update(
 }
 
 pub async fn delete(db_pool: &DBPool, id: i32) -> Result<u64> {
-    let con = dbconfig::get_db_con(db_pool).await?;
+    let con = database_config::get_db_con(db_pool).await?;
     let query = format!("DELETE FROM {} WHERE ctm_id = $1", TABLE);
     con.execute(query.as_str(), &[&id])
         .await

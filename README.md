@@ -1,6 +1,6 @@
 # dev_board_rust
 
-### Run project 
+### Run project
 
 ```
 cargo run

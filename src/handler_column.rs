@@ -1,4 +1,4 @@
-use crate::{dao_column, dbconfig, error::Error::*, model::*, DBPool, Result};
+use crate::{dao_column, database_config, error_manager::Error::*, models::*, DBPool, Result};
 use serde_derive::Deserialize;
 use warp::{http::StatusCode, reject, reply::json, Reply};
 
@@ -8,7 +8,7 @@ pub struct SearchQuery {
 }
 
 pub async fn health_handler(db_pool: DBPool) -> Result<impl Reply> {
-    let db = dbconfig::get_db_con(&db_pool)
+    let db = database_config::get_db_con(&db_pool)
         .await
         .map_err(|e| reject::custom(e))?;
     db.execute("SELECT 1", &[])
