@@ -5,9 +5,10 @@ use std::convert::Infallible;
 use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
 
-mod db;
+mod dao_column;
+mod dbconfig;
 mod error;
-mod handler;
+mod handler_column;
 mod mode;
 mod route;
 
@@ -17,14 +18,14 @@ type DBPool = Pool<PgConnectionManager<NoTls>>;
 
 #[tokio::main]
 async fn main() {
-    let db_pool = db::create_pool().unwrap();
+    let db_pool = dbconfig::create_pool().unwrap();
 
-    let db = db::init_db(&db_pool).await;
+    let db = dbconfig::init_db(&db_pool).await;
     println!("{:?}", db);
 
     let health_route = warp::path!("health")
         .and(with_db(db_pool.clone()))
-        .and_then(handler::health_handler);
+        .and_then(handler_column::health_handler);
     let routes = health_route
         .or(get_routes(db_pool))
         .with(warp::cors().allow_any_origin())
