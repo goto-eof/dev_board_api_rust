@@ -1,6 +1,16 @@
 version: '3.3'
 
 services:
+  www:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+     - "8000:8000"
+    links:
+      - postgres
+    depends_on:
+      - postgres
   postgres:
     image: postgres:14-alpine
     ports:
@@ -9,3 +19,4 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
+
