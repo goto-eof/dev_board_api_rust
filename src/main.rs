@@ -6,12 +6,19 @@ use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
 use RoutesColumn::get_routes;
 
+#[allow(non_snake_case)]
 mod ControllerApp;
+#[allow(non_snake_case)]
 mod ControllerColumn;
+#[allow(non_snake_case)]
 mod DaoColumn;
+#[allow(non_snake_case)]
 mod DatabaseConfig;
+#[allow(non_snake_case)]
 mod ErrorManager;
+#[allow(non_snake_case)]
 mod RoutesColumn;
+#[allow(non_snake_case)]
 mod StructColumns;
 
 type GenericResult<T> = std::result::Result<T, Rejection>;
