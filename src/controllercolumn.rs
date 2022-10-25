@@ -27,7 +27,7 @@ pub struct SearchIntQuery {
     id: Option<i32>,
 }
 
-pub async fn health_handler(db_pool: DBPool) -> crate::Result<impl Reply> {
+pub async fn health_handler(db_pool: DBPool) -> crate::GenericResult<impl Reply> {
     let db = DatabaseConfig::get_db_con(&db_pool)
         .await
         .map_err(|e| reject::custom(e))?;
@@ -37,7 +37,7 @@ pub async fn health_handler(db_pool: DBPool) -> crate::Result<impl Reply> {
     Ok(StatusCode::OK)
 }
 
-pub async fn get_by_id(query: SearchIntQuery, db_pool: DBPool) -> crate::Result<impl Reply> {
+pub async fn get_by_id(query: SearchIntQuery, db_pool: DBPool) -> crate::GenericResult<impl Reply> {
     debug!("SEARCH QUERY: {:?}", &query);
     let model = DaoColumn::get_by_id(&db_pool, query.id)
         .await
@@ -45,7 +45,7 @@ pub async fn get_by_id(query: SearchIntQuery, db_pool: DBPool) -> crate::Result<
     Ok(json::<_>(&DbColumnItemsResponse::of(model)))
 }
 
-pub async fn list_column_items_handler(db_pool: DBPool) -> crate::Result<impl Reply> {
+pub async fn list_column_items_handler(db_pool: DBPool) -> crate::GenericResult<impl Reply> {
     let model = DaoColumn::fetch_all(&db_pool)
         .await
         .map_err(|e| reject::custom(e))?;
@@ -60,7 +60,7 @@ pub async fn list_column_items_handler(db_pool: DBPool) -> crate::Result<impl Re
 pub async fn create_column_items_handler(
     body: DbColumnItemsRequest,
     db_pool: DBPool,
-) -> crate::Result<impl Reply> {
+) -> crate::GenericResult<impl Reply> {
     Ok(json(&DbColumnItemsResponse::of(
         DaoColumn::create(&db_pool, body)
             .await
@@ -72,7 +72,7 @@ pub async fn update_column_items_handler(
     id: i32,
     body: DbColumnItemsUpdateRequest,
     db_pool: DBPool,
-) -> crate::Result<impl Reply> {
+) -> crate::GenericResult<impl Reply> {
     Ok(json(&DbColumnItemsResponse::of(
         DaoColumn::update(&db_pool, id, body)
             .await
@@ -80,7 +80,10 @@ pub async fn update_column_items_handler(
     )))
 }
 
-pub async fn delete_column_items_handler(id: i32, db_pool: DBPool) -> crate::Result<impl Reply> {
+pub async fn delete_column_items_handler(
+    id: i32,
+    db_pool: DBPool,
+) -> crate::GenericResult<impl Reply> {
     DaoColumn::delete(&db_pool, id)
         .await
         .map_err(|e| reject::custom(e))?;

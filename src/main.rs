@@ -1,5 +1,4 @@
 use dotenv::dotenv;
-use log::debug;
 use mobc::{Connection, Pool};
 use mobc_postgres::{tokio_postgres, PgConnectionManager};
 use std::convert::Infallible;
@@ -14,7 +13,7 @@ mod ErrorManager;
 mod RoutesColumn;
 mod StructColumns;
 
-type Result<T> = std::result::Result<T, Rejection>;
+type GenericResult<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
 type DBPool = Pool<PgConnectionManager<NoTls>>;
 
@@ -22,7 +21,6 @@ type DBPool = Pool<PgConnectionManager<NoTls>>;
 async fn main() {
     dotenv().ok();
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
-    debug!("Yahoooooo!");
     let db_pool = DatabaseConfig::create_pool().unwrap();
 
     let db = DatabaseConfig::init_db(&db_pool).await;
