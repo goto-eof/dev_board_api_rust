@@ -14,7 +14,7 @@ Start server:
 cargo run
 ```
 
-## Docker
+### Docker
 
 ```
 docker-compoer up
