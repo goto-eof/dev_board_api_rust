@@ -1,0 +1,6 @@
+target
+.env
+logs
+.vscode
+test
+README.md

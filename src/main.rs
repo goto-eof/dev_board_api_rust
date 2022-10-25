@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use mobc::{Connection, Pool};
 use mobc_postgres::{tokio_postgres, PgConnectionManager};
 use routes_column::get_routes;
@@ -11,13 +12,13 @@ mod database_config;
 mod error_manager;
 mod routes_column;
 mod structs_column;
-
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
 type DBPool = Pool<PgConnectionManager<NoTls>>;
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
 
     let db_pool = database_config::create_pool().unwrap();
@@ -33,7 +34,7 @@ async fn main() {
         .with(warp::cors().allow_any_origin())
         .recover(error_manager::handle_rejection);
 
-    warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }
 
 fn with_db(db_pool: DBPool) -> impl Filter<Extract = (DBPool,), Error = Infallible> + Clone {
