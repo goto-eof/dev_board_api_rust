@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{DBPool, DaoColumn, DatabaseConfig, ErrorManager::Error::*, StructColumns::*};
+use crate::{DBPool, DaoColumn, StructColumns::*};
 use log::debug;
 use serde_derive::Deserialize;
 use warp::{http::StatusCode, reject, reply::json, Reply};
@@ -25,16 +25,6 @@ impl FromStr for SearchIntQuery {
 #[derive(Deserialize, Debug)]
 pub struct SearchIntQuery {
     id: Option<i32>,
-}
-
-pub async fn health_handler(db_pool: DBPool) -> crate::GenericResult<impl Reply> {
-    let db = DatabaseConfig::get_db_con(&db_pool)
-        .await
-        .map_err(|e| reject::custom(e))?;
-    db.execute("SELECT 1", &[])
-        .await
-        .map_err(|e| reject::custom(DBQueryError(e)))?;
-    Ok(StatusCode::OK)
 }
 
 pub async fn get_by_id(query: SearchIntQuery, db_pool: DBPool) -> crate::GenericResult<impl Reply> {

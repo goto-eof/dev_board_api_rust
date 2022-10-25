@@ -6,6 +6,7 @@ use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
 use RoutesColumn::get_routes;
 
+mod ControllerApp;
 mod ControllerColumn;
 mod DaoColumn;
 mod DatabaseConfig;
@@ -28,7 +29,7 @@ async fn main() {
 
     let health_route = warp::path!("health")
         .and(with_db(db_pool.clone()))
-        .and_then(ControllerColumn::health_handler);
+        .and_then(ControllerApp::health_handler);
     let routes = health_route
         .or(get_routes(db_pool))
         .with(warp::cors().allow_any_origin())

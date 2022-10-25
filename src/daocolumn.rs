@@ -1,6 +1,5 @@
 use crate::{DBPool, DatabaseConfig, ErrorManager, ErrorManager::Error::*, StructColumns::*};
 use chrono::prelude::*;
-use log::debug;
 use mobc_postgres::tokio_postgres;
 use tokio_postgres::Row;
 
@@ -9,17 +8,14 @@ type Result<T> = std::result::Result<T, ErrorManager::Error>;
 const TABLE: &str = "db_column_items";
 const SELECT_FIELDS: &str = "ctm_id, ctm_name, created_at";
 
-pub async fn get_by_id(db_pool: &DBPool, search: Option<i32>) -> Result<DbColumnItems> {
+pub async fn get_by_id(db_pool: &DBPool, id: Option<i32>) -> Result<DbColumnItems> {
     let con = DatabaseConfig::get_db_con(db_pool).await?;
 
     let query = format!(
         "SELECT {} FROM {} WHERE ctm_id = $1 ORDER BY created_at DESC",
         SELECT_FIELDS, TABLE
     );
-
-    debug!("SEARCH: {:?}", search);
-    debug!("QUERY: {}", query);
-    let q = con.query_one(query.as_str(), &[&search.unwrap()]).await;
+    let q = con.query_one(query.as_str(), &[&id.unwrap()]).await;
     let row = q.map_err(DBQueryError)?;
 
     Ok(row_to_item(&row))
