@@ -1,5 +1,6 @@
 use crate::{database_config, error_manager, error_manager::Error::*, structs_column::*, DBPool};
 use chrono::prelude::*;
+use log::debug;
 use mobc_postgres::tokio_postgres;
 use tokio_postgres::Row;
 
@@ -8,21 +9,31 @@ type Result<T> = std::result::Result<T, error_manager::Error>;
 const TABLE: &str = "db_column_items";
 const SELECT_FIELDS: &str = "ctm_id, ctm_name, created_at";
 
-pub async fn fetch_all(db_pool: &DBPool, search: Option<String>) -> Result<Vec<DbColumnItems>> {
+pub async fn get_by_id(db_pool: &DBPool, search: Option<i32>) -> Result<DbColumnItems> {
     let con = database_config::get_db_con(db_pool).await?;
-    let where_clause = match search {
-        Some(_) => "WHERE ctm_name like $1",
-        None => "",
-    };
+
     let query = format!(
-        "SELECT {} FROM {} {} ORDER BY created_at DESC",
-        SELECT_FIELDS, TABLE, where_clause
+        "SELECT {} FROM {} WHERE ctm_id = $1 ORDER BY created_at DESC",
+        SELECT_FIELDS, TABLE
     );
 
-    let q = match search {
-        Some(v) => con.query(query.as_str(), &[&v]).await,
-        None => con.query(query.as_str(), &[]).await,
-    };
+    debug!("SEARCH: {:?}", search);
+    debug!("QUERY: {}", query);
+    let q = con.query_one(query.as_str(), &[&search.unwrap()]).await;
+    let row = q.map_err(DBQueryError)?;
+
+    Ok(row_to_item(&row))
+}
+
+pub async fn fetch_all(db_pool: &DBPool) -> Result<Vec<DbColumnItems>> {
+    let con = database_config::get_db_con(db_pool).await?;
+
+    let query = format!(
+        "SELECT {} FROM {} ORDER BY created_at DESC",
+        SELECT_FIELDS, TABLE
+    );
+    let q = con.query(query.as_str(), &[]).await;
+
     let rows = q.map_err(DBQueryError)?;
 
     Ok(rows.iter().map(|r| row_to_item(&r)).collect())

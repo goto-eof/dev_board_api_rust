@@ -25,10 +25,10 @@ pub struct DbColumnItemsResponse {
 }
 
 impl DbColumnItemsResponse {
-    pub fn of(todo: DbColumnItems) -> DbColumnItemsResponse {
+    pub fn of(db_column: DbColumnItems) -> DbColumnItemsResponse {
         DbColumnItemsResponse {
-            ctm_id: todo.ctm_id,
-            ctm_name: todo.ctm_name,
+            ctm_id: db_column.ctm_id,
+            ctm_name: db_column.ctm_name,
         }
     }
 }
