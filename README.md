@@ -2,6 +2,14 @@
 
 ### Run project
 
+Start DBMS container:
+
+```
+docker-compose -f docker-compose-postgres.yml up
+```
+
+Start server:
+
 ```
 cargo run
 ```
