@@ -1,4 +1,4 @@
-# dev_board_rust
+# Development board API (Rust)
 
 ### Run project
 
