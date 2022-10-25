@@ -1,7 +1,6 @@
-use crate::{DBPool, DatabaseConfig, ErrorManager, ErrorManager::Error::*, StructColumns::*};
-use chrono::prelude::*;
-use mobc_postgres::tokio_postgres;
-use tokio_postgres::Row;
+use crate::{
+    DBPool, DatabaseConfig, ErrorManager, ErrorManager::Error::*, MapperColumn::*, StructColumns::*,
+};
 
 type Result<T> = std::result::Result<T, ErrorManager::Error>;
 
@@ -73,15 +72,4 @@ pub async fn delete(db_pool: &DBPool, id: i32) -> Result<u64> {
     con.execute(query.as_str(), &[&id])
         .await
         .map_err(DBQueryError)
-}
-
-fn row_to_item(row: &Row) -> DbColumnItems {
-    let ctm_id: i32 = row.get(0);
-    let ctm_name: String = row.get(1);
-    let created_at: DateTime<Utc> = row.get(2);
-    DbColumnItems {
-        ctm_id,
-        ctm_name,
-        created_at,
-    }
 }

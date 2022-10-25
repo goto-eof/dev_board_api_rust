@@ -17,6 +17,8 @@ mod DatabaseConfig;
 #[allow(non_snake_case)]
 mod ErrorManager;
 #[allow(non_snake_case)]
+mod MapperColumn;
+#[allow(non_snake_case)]
 mod RoutesColumn;
 #[allow(non_snake_case)]
 mod StructColumns;
