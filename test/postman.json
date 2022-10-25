@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "all",
+			"name": "get_all",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -25,13 +25,33 @@
 			"response": []
 		},
 		{
+			"name": "get_by_id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/column/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"column",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "create",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"ctm_name\": \"ciao\"\n\n}",
+					"raw": "{\n    \"ctm_name\": \"ciao\"\n\n\n}",
 					"options": {
 						"raw": {
 							"language": "json"

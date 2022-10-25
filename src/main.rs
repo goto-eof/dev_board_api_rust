@@ -13,6 +13,7 @@ mod DatabaseConfig;
 mod ErrorManager;
 mod RoutesColumn;
 mod StructColumns;
+
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
 type DBPool = Pool<PgConnectionManager<NoTls>>;
