@@ -1,6 +1,6 @@
 use mobc::{Connection, Pool};
 use mobc_postgres::{tokio_postgres, PgConnectionManager};
-use routes::get_routes;
+use routes_column::get_routes;
 use std::convert::Infallible;
 use tokio_postgres::NoTls;
 use warp::{Filter, Rejection};
@@ -9,8 +9,8 @@ mod controller_column;
 mod dao_column;
 mod database_config;
 mod error_manager;
-mod models;
-mod routes;
+mod routes_column;
+mod structs_column;
 
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
