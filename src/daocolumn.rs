@@ -1,16 +1,16 @@
-use crate::{database_config, error_manager, error_manager::Error::*, structs_column::*, DBPool};
+use crate::{DBPool, DatabaseConfig, ErrorManager, ErrorManager::Error::*, StructColumns::*};
 use chrono::prelude::*;
 use log::debug;
 use mobc_postgres::tokio_postgres;
 use tokio_postgres::Row;
 
-type Result<T> = std::result::Result<T, error_manager::Error>;
+type Result<T> = std::result::Result<T, ErrorManager::Error>;
 
 const TABLE: &str = "db_column_items";
 const SELECT_FIELDS: &str = "ctm_id, ctm_name, created_at";
 
 pub async fn get_by_id(db_pool: &DBPool, search: Option<i32>) -> Result<DbColumnItems> {
-    let con = database_config::get_db_con(db_pool).await?;
+    let con = DatabaseConfig::get_db_con(db_pool).await?;
 
     let query = format!(
         "SELECT {} FROM {} WHERE ctm_id = $1 ORDER BY created_at DESC",
@@ -26,7 +26,7 @@ pub async fn get_by_id(db_pool: &DBPool, search: Option<i32>) -> Result<DbColumn
 }
 
 pub async fn fetch_all(db_pool: &DBPool) -> Result<Vec<DbColumnItems>> {
-    let con = database_config::get_db_con(db_pool).await?;
+    let con = DatabaseConfig::get_db_con(db_pool).await?;
 
     let query = format!(
         "SELECT {} FROM {} ORDER BY created_at DESC",
@@ -40,7 +40,7 @@ pub async fn fetch_all(db_pool: &DBPool) -> Result<Vec<DbColumnItems>> {
 }
 
 pub async fn create(db_pool: &DBPool, body: DbColumnItemsRequest) -> Result<DbColumnItems> {
-    let con = database_config::get_db_con(db_pool).await?;
+    let con = DatabaseConfig::get_db_con(db_pool).await?;
     let query = format!("INSERT INTO {} (ctm_name) VALUES ($1) RETURNING *", TABLE);
     let row = con
         .query_one(query.as_str(), &[&body.ctm_name])
@@ -55,7 +55,7 @@ pub async fn update(
 
     body: DbColumnItemsUpdateRequest,
 ) -> Result<DbColumnItems> {
-    let con = database_config::get_db_con(db_pool).await?;
+    let con = DatabaseConfig::get_db_con(db_pool).await?;
     let query = format!("UPDATE {} SET ctm_name = $1 WHERE ctm_id = $2", TABLE);
     println!("{}", &query);
     con.execute(query.as_str(), &[&body.ctm_name, &id])
@@ -72,7 +72,7 @@ pub async fn update(
 }
 
 pub async fn delete(db_pool: &DBPool, id: i32) -> Result<u64> {
-    let con = database_config::get_db_con(db_pool).await?;
+    let con = DatabaseConfig::get_db_con(db_pool).await?;
     let query = format!("DELETE FROM {} WHERE ctm_id = $1", TABLE);
     con.execute(query.as_str(), &[&id])
         .await

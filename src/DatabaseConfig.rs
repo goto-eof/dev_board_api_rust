@@ -1,4 +1,4 @@
-use crate::{error_manager, error_manager::Error::*, DBCon, DBPool};
+use crate::{DBCon, DBPool, ErrorManager, ErrorManager::Error::*};
 use log::debug;
 use mobc::Pool;
 
@@ -7,7 +7,7 @@ use std::fs;
 use std::str::FromStr;
 use std::time::Duration;
 use tokio_postgres::{Config, Error, NoTls};
-type Result<T> = std::result::Result<T, error_manager::Error>;
+type Result<T> = std::result::Result<T, ErrorManager::Error>;
 
 const INIT_SQL: &str = "./db.sql";
 const DB_POOL_MAX_OPEN: u64 = 32;
