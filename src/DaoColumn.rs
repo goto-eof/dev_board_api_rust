@@ -5,28 +5,26 @@ use sea_orm::DeleteResult;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
 use serde::Serialize;
-type GenericResult<T> = std::result::Result<T, ()>;
 #[derive(Serialize)]
-pub enum DBErrType {
+pub enum DaoErrorType {
     Error,
     Warning,
-    Info,
 }
 #[derive(Serialize)]
-pub struct DBError {
+pub struct DaoError {
     code: i32,
-    err_type: DBErrType,
+    err_type: DaoErrorType,
     message: String,
 }
 
-pub async fn get_by_id(id: i32) -> Result<db_column::Model, DBError> {
+pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
     let db = DB_POOOOOOL.get().await;
     let item = db_column::Entity::find_by_id(id).one(db).await;
 
     if item.is_err() {
-        return Err(DBError {
+        return Err(DaoError {
             code: 1,
-            err_type: DBErrType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", item.err()),
         });
     }
@@ -34,9 +32,9 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DBError> {
     let opt = item.unwrap();
 
     if opt.is_none() {
-        return Err(DBError {
+        return Err(DaoError {
             code: 2,
-            err_type: DBErrType::Warning,
+            err_type: DaoErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -44,20 +42,31 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DBError> {
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> GenericResult<Vec<db_column::Model>> {
+pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
     let db = DB_POOOOOOL.get().await;
-    let models: Vec<db_column::Model> = db_column::Entity::find().all(db).await.unwrap();
+    let result = db_column::Entity::find().all(db).await;
+
+    if result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    let models = result.unwrap();
+
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> GenericResult<db_column::Model> {
+pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
     let db = DB_POOOOOOL.get().await;
     let model = db_column::ActiveModel::from_json(json_data);
     let inserted_model = model.unwrap().insert(db).await.unwrap();
     Ok(inserted_model)
 }
 
-pub async fn update(id: i32, json_data: serde_json::Value) -> GenericResult<db_column::Model> {
+pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
     let db = DB_POOOOOOL.get().await;
     let item: db_column::Model = db_column::Entity::find_by_id(id)
         .one(db)
@@ -70,7 +79,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> GenericResult<db_c
     Ok(item_active_model.update(db).await.unwrap())
 }
 
-pub async fn delete(id: i32) -> GenericResult<bool> {
+pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let db = DB_POOOOOOL.get().await;
 
     let item: Option<db_column::Model> = db_column::Entity::find_by_id(id).one(db).await.unwrap();
