@@ -4,18 +4,44 @@ use sea_orm::ActiveModelTrait;
 use sea_orm::DeleteResult;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
+use serde::Serialize;
 type GenericResult<T> = std::result::Result<T, ()>;
+#[derive(Serialize)]
+pub enum DBErrType {
+    Error,
+    Warning,
+    Info,
+}
+#[derive(Serialize)]
+pub struct DBError {
+    code: i32,
+    err_type: DBErrType,
+    message: String,
+}
 
-pub async fn get_by_id(id: i32) -> GenericResult<db_column::Model> {
+pub async fn get_by_id(id: i32) -> Result<db_column::Model, DBError> {
     let db = DB_POOOOOOL.get().await;
+    let item = db_column::Entity::find_by_id(id).one(db).await;
 
-    let item: db_column::Model = db_column::Entity::find_by_id(id)
-        .one(db)
-        .await
-        .unwrap()
-        .unwrap();
+    if item.is_err() {
+        return Err(DBError {
+            code: 1,
+            err_type: DBErrType::Error,
+            message: format!("DB Error: {:?}", item.err()),
+        });
+    }
 
-    Ok(item)
+    let opt = item.unwrap();
+
+    if opt.is_none() {
+        return Err(DBError {
+            code: 2,
+            err_type: DBErrType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    Ok(opt.unwrap())
 }
 
 pub async fn get_all() -> GenericResult<Vec<db_column::Model>> {

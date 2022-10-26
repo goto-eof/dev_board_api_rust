@@ -3,7 +3,10 @@ use warp::{reply::json, Reply};
 
 pub async fn get(id: i32) -> crate::GenericResult<impl Reply> {
     let model = DaoColumn::get_by_id(id).await;
-    Ok(json::<_>(&model))
+    match model {
+        Ok(res) => Ok(json::<_>(&res)),
+        Err(err) => Ok(json::<_>(&err)),
+    }
 }
 
 pub async fn get_all() -> crate::GenericResult<impl Reply> {
