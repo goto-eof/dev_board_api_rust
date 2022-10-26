@@ -2,8 +2,7 @@ use warp::{Filter, Rejection, Reply};
 
 use crate::ControllerColumn;
 
-pub fn get_routes(// db_pool: Pool<PgConnectionManager<NoTls>>,
-) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+pub fn get_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let db_column = warp::path("column");
     db_column
         .and(warp::get())

@@ -10,6 +10,8 @@ mod ControllerColumn;
 #[allow(non_snake_case)]
 mod DaoColumn;
 #[allow(non_snake_case)]
+mod ErrorStructs;
+#[allow(non_snake_case)]
 mod RoutesColumn;
 
 use sea_orm::DbConn;
