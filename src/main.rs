@@ -1,9 +1,8 @@
 use async_once::AsyncOnce;
 use dotenv::dotenv;
-use entity::post;
 use log::debug;
-use sea_orm::{ActiveModelTrait, ConnectOptions, Set};
-use std::{convert::Infallible, time::Duration};
+use sea_orm::ConnectOptions;
+use std::time::Duration;
 use warp::{Filter, Rejection};
 use RoutesColumn::get_routes;
 
@@ -13,8 +12,7 @@ mod ControllerColumn;
 mod DaoColumn;
 #[allow(non_snake_case)]
 mod RoutesColumn;
-#[allow(non_snake_case)]
-mod StructColumns;
+
 use migration::{DbErr, Migrator, MigratorTrait};
 use sea_orm::{Database, DbConn};
 
@@ -42,9 +40,7 @@ pub async fn establish_connection() -> Result<DbConn, DbErr> {
         .sqlx_logging(true)
         .sqlx_logging_level(log::LevelFilter::Debug);
     let db = Database::connect(opt).await?;
-    // .expect("Failed to setup the database");
     Migrator::up(&db, None).await?;
-    // .expect("Failed to run migrations for tests");
     debug!("DB Connection OK");
     Ok(db)
 }

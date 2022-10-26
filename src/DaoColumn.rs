@@ -39,9 +39,9 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> GenericResult<db_c
         .unwrap()
         .unwrap();
     let mut item_active_model: db_column::ActiveModel = item.into();
-    item_active_model.set_from_json(json_data);
-    let result: db_column::Model = item_active_model.update(db).await.unwrap();
-    Ok(result)
+    #[warn(unused_variables)]
+    let result = item_active_model.set_from_json(json_data);
+    Ok(item_active_model.update(db).await.unwrap())
 }
 
 pub async fn delete(id: i32) -> GenericResult<bool> {

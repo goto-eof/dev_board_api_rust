@@ -1,5 +1,5 @@
 use crate::DaoColumn;
-use warp::{reject, reply::json, Reply};
+use warp::{reply::json, Reply};
 
 pub async fn get(id: i32) -> crate::GenericResult<impl Reply> {
     let model = DaoColumn::get_by_id(id).await;
