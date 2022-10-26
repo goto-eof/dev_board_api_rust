@@ -1,4 +1,4 @@
-use crate::DB_POOOOOOL;
+use crate::DB_POOL;
 use entity::db_column;
 use sea_orm::ActiveModelTrait;
 use sea_orm::EntityTrait;
@@ -17,7 +17,7 @@ pub struct DaoError {
 }
 
 pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
-    let db = DB_POOOOOOL.get().await;
+    let db = DB_POOL.get().await;
     let result = db_column::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
@@ -42,7 +42,7 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
 }
 
 pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
-    let db = DB_POOOOOOL.get().await;
+    let db = DB_POOL.get().await;
     let result = db_column::Entity::find().all(db).await;
 
     if result.is_err() {
@@ -59,7 +59,7 @@ pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
 }
 
 pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
-    let db = DB_POOOOOOL.get().await;
+    let db = DB_POOL.get().await;
     let result = db_column::ActiveModel::from_json(json_data);
 
     if result.is_err() {
@@ -86,7 +86,7 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
 }
 
 pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
-    let db = DB_POOOOOOL.get().await;
+    let db = DB_POOL.get().await;
     let result = db_column::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
@@ -137,7 +137,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::
 }
 
 pub async fn delete(id: i32) -> Result<bool, DaoError> {
-    let db = DB_POOOOOOL.get().await;
+    let db = DB_POOL.get().await;
 
     let result = db_column::Entity::find_by_id(id).one(db).await;
 

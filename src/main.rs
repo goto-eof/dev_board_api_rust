@@ -20,7 +20,7 @@ type GenericResult<T> = std::result::Result<T, Rejection>;
 extern crate lazy_static;
 
 lazy_static! {
-    static ref DB_POOOOOOL: AsyncOnce<DbConn> = AsyncOnce::new(async {
+    static ref DB_POOL: AsyncOnce<DbConn> = AsyncOnce::new(async {
         let db = ConfigurationDatabase::establish_connection().await;
         db.unwrap()
     });
