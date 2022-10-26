@@ -51,7 +51,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"ctm_name\": \"ciao\"\n\n\n}",
+					"raw": "{\n    \"ctm_name\": \"ciao\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
