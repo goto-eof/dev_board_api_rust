@@ -1,35 +1,10 @@
-use std::str::FromStr;
-
 use crate::{DBPool, DaoColumn, StructColumns::*};
 use log::debug;
-use serde_derive::Deserialize;
 use warp::{http::StatusCode, reject, reply::json, Reply};
 
-pub struct MioError;
-impl FromStr for SearchIntQuery {
-    type Err = MioError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "error" => Err(MioError),
-            _ => {
-                let id = s.parse::<i32>();
-                Ok(SearchIntQuery {
-                    id: Some(id.unwrap()),
-                })
-            }
-        }
-    }
-}
-
-#[derive(Deserialize, Debug)]
-pub struct SearchIntQuery {
-    id: Option<i32>,
-}
-
-pub async fn get_by_id(query: SearchIntQuery, db_pool: DBPool) -> crate::GenericResult<impl Reply> {
-    debug!("SEARCH QUERY: {:?}", &query);
-    let model = DaoColumn::get_by_id(&db_pool, query.id)
+pub async fn get_by_id(id: i32, db_pool: DBPool) -> crate::GenericResult<impl Reply> {
+    debug!("SEARCH QUERY: {:?}", id);
+    let model = DaoColumn::get_by_id(&db_pool, id)
         .await
         .map_err(|e| reject::custom(e))?;
     Ok(json::<_>(&DbColumnItemsResponse::of(model)))
