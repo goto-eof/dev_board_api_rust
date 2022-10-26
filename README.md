@@ -29,3 +29,9 @@ http://127.0.0.1:8000
 ### Postman
 
 Import postman collection file from test/postma.json in your postman workspace.
+
+### Technologies
+
+- sea-orm
+- tokyo
+- postgres
