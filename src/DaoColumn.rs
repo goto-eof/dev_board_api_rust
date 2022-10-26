@@ -1,10 +1,10 @@
-use crate::{ErrorManager, DB_POOOOOOL};
+use crate::DB_POOOOOOL;
 use entity::db_column;
 use sea_orm::ActiveModelTrait;
 use sea_orm::DeleteResult;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
-type GenericResult<T> = std::result::Result<T, ErrorManager::Error>;
+type GenericResult<T> = std::result::Result<T, ()>;
 
 pub async fn get_by_id(id: i32) -> GenericResult<db_column::Model> {
     let db = DB_POOOOOOL.get().await;

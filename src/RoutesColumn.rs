@@ -1,8 +1,6 @@
-use mobc::Pool;
-use mobc_postgres::{tokio_postgres::NoTls, PgConnectionManager};
 use warp::{Filter, Rejection, Reply};
 
-use crate::{with_db, ControllerColumn};
+use crate::ControllerColumn;
 
 pub fn get_routes(// db_pool: Pool<PgConnectionManager<NoTls>>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
