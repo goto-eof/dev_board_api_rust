@@ -32,6 +32,7 @@ Import postman collection file from test/postma.json in your postman workspace.
 
 ### Technologies
 
+- warp
 - sea-orm
-- tokyo
+- tokio
 - postgres
