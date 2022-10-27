@@ -6,8 +6,8 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "db_column_items")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub ctm_id: i32,
-    pub ctm_name: Option<String>,
+    pub id: i32,
+    pub name: Option<String>,
     pub created_at: Option<DateTimeWithTimeZone>,
 }
 

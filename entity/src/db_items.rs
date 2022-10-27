@@ -6,12 +6,12 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "db_items")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub itm_id: i32,
-    pub itm_name: Option<String>,
-    pub itm_type: Option<String>,
-    pub itm_code: Option<String>,
+    pub id: i32,
+    pub name: Option<String>,
+    pub t_type: Option<String>,
+    pub code: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub itm_description: Option<String>,
+    pub description: Option<String>,
     pub created_at: Option<DateTimeWithTimeZone>,
     pub updated_at: Option<DateTimeWithTimeZone>,
 }

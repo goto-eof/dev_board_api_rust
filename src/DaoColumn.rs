@@ -1,5 +1,9 @@
 use crate::ErrorStructs::DaoError;
 use crate::DB_POOL;
+use chrono::DateTime;
+use chrono::FixedOffset;
+use chrono::NaiveDate;
+use chrono::Utc;
 use entity::db_column;
 use sea_orm::ActiveModelTrait;
 use sea_orm::EntityTrait;
@@ -59,7 +63,11 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
         });
     }
 
-    let model = result.unwrap();
+    let mut model = result.unwrap();
+
+    let dat = Utc::now().naive_utc();
+    model.created_at = sea_orm::Set(Some(dat));
+    model.updated_at = sea_orm::Set(Some(dat));
 
     let result = model.insert(db).await;
 
