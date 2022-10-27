@@ -184,7 +184,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ciao\",\n    \"t_type\": \"bug\",\n    \"code\": \"ABC\",\n    \"description\":\"Mega Bug\",\n    \"column_id\": 24\n}",
+							"raw": "{\n    \"name\": \"ciao\",\n    \"t_type\": \"bug\",\n    \"code\": \"1\",\n    \"status\": \"TODO\",\n    \"description\":\"Mega Bug\",\n    \"column_id\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -212,7 +212,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ciao\",\n    \"t_type\": \"bug\",\n    \"code\": \"ABC\",\n    \"description\":\"Super Mega Bug\",\n    \"column_id\": 24\n}",
+							"raw": "{\n    \"name\": \"ciao\",\n    \"t_type\": \"bug\",\n    \"code\": \"1\",\n    \"status\": \"TODO\",\n    \"description\":\"Mega Supa Bug\",\n    \"column_id\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -220,7 +220,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/item/6",
+							"raw": "http://localhost:8000/item/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -228,7 +228,7 @@
 							"port": "8000",
 							"path": [
 								"item",
-								"6"
+								"3"
 							]
 						}
 					},

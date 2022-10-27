@@ -8,9 +8,10 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub column_id: i32,
-    pub name: Option<String>,
-    pub t_type: Option<String>,
-    pub code: Option<String>,
+    pub name: String,
+    pub t_type: String,
+    pub code: String,
+    pub status: String,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
     pub created_at: Option<DateTime>,

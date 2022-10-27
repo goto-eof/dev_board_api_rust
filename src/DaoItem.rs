@@ -2,9 +2,13 @@ use crate::Structs::DaoError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
+use log::debug;
 use sea_orm::ActiveModelTrait;
+use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
+use sea_orm::FromQueryResult;
 use sea_orm::ModelTrait;
+use sea_orm::QuerySelect;
 
 pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
     let db = DB_POOL.get().await;
@@ -63,8 +67,18 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoE
     let mut model = result.unwrap();
 
     let dat = Utc::now().naive_utc();
+
     model.created_at = sea_orm::Set(Some(dat));
     model.updated_at = sea_orm::Set(Some(dat));
+
+    let max_id_result = get_max_id().await;
+
+    match max_id_result {
+        Ok(value) => model.code = sea_orm::Set(format!("{}", value)),
+        Err(err) => {
+            return Err(err);
+        }
+    }
 
     let result = model.insert(db).await;
 
@@ -77,6 +91,39 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoE
     }
 
     Ok(result.unwrap())
+}
+
+#[derive(FromQueryResult, Debug)]
+struct CountResult {
+    max: Option<i32>,
+}
+
+pub async fn get_max_id() -> Result<i32, DaoError> {
+    let db = DB_POOL.get().await;
+
+    let result = db_item::Entity::find()
+        .select_only()
+        .column_as(db_item::Column::Id.max(), "max")
+        .into_model::<CountResult>()
+        .one(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: crate::Structs::DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+    let count = result.unwrap().unwrap();
+
+    if count.max.is_none() {
+        return Ok(0);
+    }
+
+    debug!("{:?}", count);
+
+    Ok(count.max.unwrap())
 }
 
 pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Model, DaoError> {
