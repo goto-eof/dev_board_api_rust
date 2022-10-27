@@ -11,3 +11,8 @@ pub struct DaoError {
     pub err_type: DaoErrorType,
     pub message: String,
 }
+
+#[derive(Serialize)]
+pub struct Response<T> {
+    pub result: T,
+}

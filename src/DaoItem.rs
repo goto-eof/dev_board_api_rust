@@ -1,14 +1,14 @@
 use crate::Structs::DaoError;
 use crate::DB_POOL;
 use chrono::Utc;
-use entity::db_column;
+use entity::db_item;
 use sea_orm::ActiveModelTrait;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
 
-pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
+pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
     let db = DB_POOL.get().await;
-    let result = db_column::Entity::find_by_id(id).one(db).await;
+    let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DaoError {
@@ -31,9 +31,9 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
+pub async fn get_all() -> Result<Vec<db_item::Model>, DaoError> {
     let db = DB_POOL.get().await;
-    let result = db_column::Entity::find().all(db).await;
+    let result = db_item::Entity::find().all(db).await;
 
     if result.is_err() {
         return Err(DaoError {
@@ -48,9 +48,9 @@ pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
+pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoError> {
     let db = DB_POOL.get().await;
-    let result = db_column::ActiveModel::from_json(json_data);
+    let result = db_item::ActiveModel::from_json(json_data);
 
     if result.is_err() {
         return Err(DaoError {
@@ -79,9 +79,9 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
     Ok(result.unwrap())
 }
 
-pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
+pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Model, DaoError> {
     let db = DB_POOL.get().await;
-    let result = db_column::Entity::find_by_id(id).one(db).await;
+    let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DaoError {
@@ -101,7 +101,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::
         });
     }
 
-    let mut item_active_model: db_column::ActiveModel = opt.unwrap().into();
+    let mut item_active_model: db_item::ActiveModel = opt.unwrap().into();
 
     let result = item_active_model.set_from_json(json_data);
 
@@ -136,7 +136,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_column::
 pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let db = DB_POOL.get().await;
 
-    let result = db_column::Entity::find_by_id(id).one(db).await;
+    let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DaoError {

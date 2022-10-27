@@ -1,20 +1,28 @@
 use async_once::AsyncOnce;
 use dotenv::dotenv;
-use warp::{Filter, Rejection};
-use RoutesColumn::get_routes;
+use sea_orm::DbConn;
+use warp::{Filter, Rejection, Reply};
+use RoutesColumn::get_column_routes;
+use RoutesItem::get_item_routes;
 
 #[allow(non_snake_case)]
 mod ConfigurationDatabase;
 #[allow(non_snake_case)]
 mod ControllerColumn;
 #[allow(non_snake_case)]
+mod ControllerCommon;
+#[allow(non_snake_case)]
+mod ControllerItem;
+#[allow(non_snake_case)]
 mod DaoColumn;
 #[allow(non_snake_case)]
-mod ErrorStructs;
+mod DaoItem;
 #[allow(non_snake_case)]
 mod RoutesColumn;
-
-use sea_orm::DbConn;
+#[allow(non_snake_case)]
+mod RoutesItem;
+#[allow(non_snake_case)]
+mod Structs;
 
 type GenericResult<T> = std::result::Result<T, Rejection>;
 
@@ -30,11 +38,30 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
+    init_env();
+    init_logging();
+    init_db().await;
+    init_server().await;
+}
+
+fn init_env() {
     dotenv().ok();
+}
+
+fn init_logging() {
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
+}
 
-    let hello = warp::path("hi").map(|| "Hello, World!");
-    let routes = hello.or(get_routes()).with(warp::cors().allow_any_origin());
+async fn init_db() {
+    DB_POOL.get().await;
+}
 
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    get_column_routes()
+        .or(get_item_routes())
+        .with(warp::cors().allow_any_origin())
+}
+
+async fn init_server() {
+    warp::serve(init_routes()).run(([0, 0, 0, 0], 8000)).await;
 }

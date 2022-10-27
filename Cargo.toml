@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"]  }
+tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread", "parking_lot"]  }
 warp = "0.3.3"
 serde_json = "1.0.87"
 serde = {version = "1.0.147", features = ["derive"] }
@@ -19,6 +19,7 @@ entity = { path = "entity" }
 migration = { path = "migration" }
 lazy_static="1.4.0"
 async_once="0.2.6"
+parking_lot = "0.12.1"
 
 [workspace]
 members = [".", "entity", "migration"]
