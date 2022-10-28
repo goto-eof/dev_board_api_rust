@@ -45,5 +45,4 @@ Import postman collection file from test/postma.json in your postman workspace.
 
 ### Post scriptum
 
-- I constantly udpate the postman.json collection present in the `test` directory
 - this pplication was tested on macOS and Linux
