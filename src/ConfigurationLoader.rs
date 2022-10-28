@@ -11,7 +11,7 @@ pub struct Settings {
 }
 impl Settings {
     pub fn init_configuration() -> Result<Self, ConfigError> {
-        debug!("Initializing settings...");
+        debug!("Initializing settings....");
         let environment = env::var("DEV_BOARD_ENV").unwrap_or_else(|_| "development".into());
         let filename = format!("configuration/{}", environment);
         debug!("loading setting file {}...", &filename);
