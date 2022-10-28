@@ -14,14 +14,21 @@ appenders:
       kind: compound
       trigger:
         kind: size
-        limit: 10mb
+        limit: 30mb
       roller:
         kind: fixed_window
         base: 1
         count: 100
         pattern: 'logs/log{}.log'
 root:
-  level: debug
+  level: off
   appenders:
     - default
     - file_appender
+loggers:
+  dev_board:
+    level: debug
+    appenders:
+      - default
+      - file_appender
+    additive: false

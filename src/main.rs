@@ -1,5 +1,6 @@
 use async_once::AsyncOnce;
 use dotenv::dotenv;
+use log::debug;
 use sea_orm::DbConn;
 use warp::{Filter, Rejection, Reply};
 use RoutesColumn::get_column_routes;
@@ -45,7 +46,6 @@ lazy_static! {
 async fn main() {
     init_env();
     init_logging();
-    Settings::init_configuration().unwrap();
     init_db().await;
     init_server().await;
 }
@@ -69,6 +69,7 @@ fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone
 }
 
 async fn init_server() {
+    debug!("server run on port {}", SETTINGS.server_port);
     warp::serve(init_routes())
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;
