@@ -1,5 +1,4 @@
 use async_once::AsyncOnce;
-use dotenv::dotenv;
 use log::debug;
 use sea_orm::DbConn;
 use warp::{Filter, Rejection, Reply};
@@ -44,14 +43,9 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    init_env();
     init_logging();
     init_db().await;
     init_server().await;
-}
-
-fn init_env() {
-    dotenv().ok();
 }
 
 fn init_logging() {

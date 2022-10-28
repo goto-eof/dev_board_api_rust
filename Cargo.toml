@@ -14,7 +14,6 @@ thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 log4rs="1.2.0"
 log = "0.4.17"  
-dotenv = "0.15.0"
 entity = { path = "src/entity" }
 migration = { path = "src/migration" }
 lazy_static="1.4.0"

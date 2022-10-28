@@ -1,4 +1,4 @@
 {
-    "db_uri" : "postgres://postgres:postgres@postgres_service:5432/postgres",
+    "db_uri" : "postgres://postgres:postgres@127.0.0.1:5432/postgres",
     "server_port":  8013
 }
