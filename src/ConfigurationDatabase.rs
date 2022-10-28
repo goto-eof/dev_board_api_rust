@@ -3,13 +3,13 @@ use migration::{DbErr, Migrator, MigratorTrait};
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DbConn};
 
-const DOCKER_DB_URI: &str = "postgres://postgres:postgres@postgres_service:5432/postgres";
+use crate::SETTINGS;
 
 pub async fn establish_connection() -> Result<DbConn, DbErr> {
     let database_uri_result = std::env::var("DATABASE_URL");
     let database_uri = match database_uri_result {
         Ok(value) => value,
-        Err(_) => DOCKER_DB_URI.to_owned(),
+        Err(_) => SETTINGS.db_uri.to_owned(),
     };
     let opt = ConnectOptions::new(database_uri.to_owned());
     // opt.max_connections(100)
