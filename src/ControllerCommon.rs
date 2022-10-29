@@ -7,7 +7,10 @@ pub fn generate_response<T: Serialize>(
     data: Result<T, DaoError>,
 ) -> crate::GenericResult<impl Reply> {
     match data {
-        Ok(result) => Ok(json::<_>(&Response { result: &result })),
+        Ok(result) => Ok(json::<_>(&Response {
+            success: true,
+            result: &result,
+        })),
         Err(err) => Ok(json::<_>(&err)),
     }
 }

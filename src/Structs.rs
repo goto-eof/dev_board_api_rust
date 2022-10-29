@@ -14,5 +14,6 @@ pub struct DaoError {
 
 #[derive(Serialize)]
 pub struct Response<T> {
+    pub success: bool,
     pub result: T,
 }
