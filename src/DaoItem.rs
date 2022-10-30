@@ -8,6 +8,8 @@ use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
 use sea_orm::FromQueryResult;
 use sea_orm::ModelTrait;
+use sea_orm::QueryFilter;
+use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
 
 pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
@@ -38,6 +40,28 @@ pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
 pub async fn get_all() -> Result<Vec<db_item::Model>, DaoError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find().all(db).await;
+
+    if result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: crate::Structs::DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    let models = result.unwrap();
+
+    Ok(models)
+}
+
+pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, DaoError> {
+    let db = DB_POOL.get().await;
+
+    let result = db_item::Entity::find()
+        .filter(db_item::Column::ColumnId.eq(parent_id))
+        .order_by_asc(db_item::Column::Id)
+        .all(db)
+        .await;
 
     if result.is_err() {
         return Err(DaoError {

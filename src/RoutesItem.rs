@@ -11,6 +11,12 @@ pub fn get_item_routes() -> impl Filter<Extract = impl Reply, Error = Rejection>
         .and_then(ControllerItem::get)
         .or(db_column
             .and(warp::get())
+            .and(warp::path("parent"))
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and_then(ControllerItem::get_by_parent_id))
+        .or(db_column
+            .and(warp::get())
             .and(warp::path::end())
             .and_then(ControllerItem::get_all))
         .or(db_column
