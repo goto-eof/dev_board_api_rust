@@ -2,9 +2,12 @@ use crate::Structs::DaoError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_column;
+use entity::db_item;
 use sea_orm::ActiveModelTrait;
+use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
+use sea_orm::QueryFilter;
 
 pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
     let db = DB_POOL.get().await;
@@ -154,6 +157,32 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
             err_type: crate::Structs::DaoErrorType::Warning,
             message: format!("Item not found"),
         });
+    }
+
+    let items_result = db_item::Entity::find()
+        .filter(db_item::Column::ColumnId.eq(id))
+        .all(db)
+        .await;
+
+    if items_result.is_err() {
+        return Err(DaoError {
+            code: 2,
+            err_type: crate::Structs::DaoErrorType::Warning,
+            message: format!("Error while retrieving items"),
+        });
+    }
+
+    let items = items_result.unwrap();
+
+    for item in items.into_iter() {
+        let item_result = item.delete(db).await;
+        if item_result.is_err() {
+            return Err(DaoError {
+                code: 2,
+                err_type: crate::Structs::DaoErrorType::Warning,
+                message: format!("Error while deleting item"),
+            });
+        }
     }
 
     let result = opt.unwrap().delete(db).await;
