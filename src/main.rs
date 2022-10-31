@@ -1,12 +1,15 @@
+use crate::ConfigurationLoader::Settings;
 use async_once::AsyncOnce;
 use log::debug;
 use sea_orm::DbConn;
-use warp::{Filter, Rejection, Reply};
+use warp::http::HeaderValue;
+use warp::hyper::HeaderMap;
+use warp::hyper::Method;
+use warp::Filter;
+use warp::Rejection;
+use warp::Reply;
 use RoutesColumn::get_column_routes;
 use RoutesItem::get_item_routes;
-
-use crate::ConfigurationLoader::Settings;
-
 #[allow(non_snake_case)]
 mod ConfigurationDatabase;
 #[allow(non_snake_case)]
@@ -57,9 +60,44 @@ async fn init_db() {
 }
 
 fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    let any_origin_3 = warp::cors()
+        .allow_any_origin()
+        .allow_headers(vec![
+            "Access-Control-Allow-Headers",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers",
+            "Origin",
+            "Accept",
+            "X-Requested-With",
+            "Content-Type",
+        ])
+        .allow_methods(&[
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+            Method::OPTIONS,
+            Method::HEAD,
+        ]);
+
+    let mut headers = HeaderMap::new();
+    headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
+    headers.insert(
+        "Access-Control-Allow-Headers",
+        HeaderValue::from_static("*"),
+    );
+    headers.insert(
+        "Access-Control-Allow-Methods",
+        HeaderValue::from_static("*"),
+    );
+
     get_column_routes()
         .or(get_item_routes())
-        .with(warp::cors().allow_any_origin())
+        .or(warp::options().map(warp::reply))
+        .with(any_origin_3)
+        .with(warp::log("api"))
+        .with(warp::reply::with::headers(headers))
 }
 
 async fn init_server() {
