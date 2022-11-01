@@ -2,7 +2,6 @@ use crate::Structs::DaoError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
-use log::debug;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -144,8 +143,6 @@ pub async fn get_max_id() -> Result<i32, DaoError> {
     if count.max.is_none() {
         return Ok(0);
     }
-
-    debug!("{:?}", count);
 
     Ok(count.max.unwrap())
 }

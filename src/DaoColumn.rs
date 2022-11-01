@@ -6,8 +6,10 @@ use entity::db_item;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
+use sea_orm::FromQueryResult;
 use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
+use sea_orm::QuerySelect;
 
 pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
     let db = DB_POOL.get().await;
@@ -51,6 +53,37 @@ pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
     Ok(models)
 }
 
+#[derive(FromQueryResult, Debug)]
+struct CountResult {
+    max: Option<i32>,
+}
+
+pub async fn get_max_id() -> Result<i32, DaoError> {
+    let db = DB_POOL.get().await;
+
+    let result = db_column::Entity::find()
+        .select_only()
+        .column_as(db_column::Column::Id.max(), "max")
+        .into_model::<CountResult>()
+        .one(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: crate::Structs::DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+    let count = result.unwrap().unwrap();
+
+    if count.max.is_none() {
+        return Ok(0);
+    }
+
+    Ok(count.max.unwrap())
+}
+
 pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
     let db = DB_POOL.get().await;
     let result = db_column::ActiveModel::from_json(json_data);
@@ -63,11 +96,24 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
         });
     }
 
+    let max_id_result = get_max_id().await;
+
+    if max_id_result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: crate::Structs::DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    let max_id = max_id_result.unwrap();
+
     let mut model = result.unwrap();
 
     let dat = Utc::now().naive_utc();
     model.created_at = sea_orm::Set(Some(dat));
     model.updated_at = sea_orm::Set(Some(dat));
+    model.order = sea_orm::Set(max_id);
 
     let result = model.insert(db).await;
 

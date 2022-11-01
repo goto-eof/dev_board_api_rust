@@ -1,11 +1,11 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub enum DaoErrorType {
     Error,
     Warning,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct DaoError {
     pub code: i32,
     pub err_type: DaoErrorType,
