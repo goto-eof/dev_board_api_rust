@@ -68,6 +68,7 @@ struct MandatoryResult {
     value: i64,
 }
 
+#[allow(unused)]
 pub async fn get_max_id() -> Result<i32, DaoError> {
     let db = DB_POOL.get().await;
 
