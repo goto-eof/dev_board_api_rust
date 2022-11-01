@@ -11,7 +11,7 @@ docker-compose -f docker-compose-postgres.yml up
 Start server:
 
 ```
-cargo run
+cargo run -- migrate refresh
 ```
 
 The server will be reacheable at:
