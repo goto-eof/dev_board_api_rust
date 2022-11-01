@@ -17,18 +17,21 @@ pub fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Rejectio
             .and(warp::post())
             .and(warp::path::end())
             .and(warp::body::json())
+            .and(warp::body::content_length_limit(1024 * 16))
             .and_then(ControllerColumn::insert))
         .or(db_column
             .and(warp::put())
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
             .and(warp::body::json())
+            .and(warp::body::content_length_limit(1024 * 16))
             .and_then(ControllerColumn::update))
         .or(db_column
             .and(warp::put())
-            .and(warp::path::param::<i32>())
-            .and(warp::path::param::<i32>())
+            .and(warp::path("swap"))
             .and(warp::path::end())
+            .and(warp::body::json())
+            .and(warp::body::content_length_limit(1024 * 16))
             .and_then(ControllerColumn::swap))
         .or(db_column
             .and(warp::delete())

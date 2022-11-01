@@ -1,4 +1,5 @@
 use crate::Structs::DaoError;
+use crate::Structs::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_column;
@@ -165,10 +166,15 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
     Ok(result.unwrap())
 }
 
-pub async fn swap(idA: i32, idB: i32) -> Result<bool, DaoError> {
+pub async fn swap(swap_request: SwapRequest) -> Result<bool, DaoError> {
     let db = DB_POOL.get().await;
-    let result_a = db_column::Entity::find_by_id(idA).one(db).await;
-    let result_b = db_column::Entity::find_by_id(idB).one(db).await;
+
+    let result_a = db_column::Entity::find_by_id(swap_request.id_a)
+        .one(db)
+        .await;
+    let result_b = db_column::Entity::find_by_id(swap_request.id_b)
+        .one(db)
+        .await;
 
     if result_a.is_err() {
         return Err(DaoError {

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug)]
 pub enum DaoErrorType {
@@ -16,4 +16,10 @@ pub struct DaoError {
 pub struct Response<T> {
     pub success: bool,
     pub result: T,
+}
+
+#[derive(Clone, Deserialize)]
+pub struct SwapRequest {
+    pub id_a: i32,
+    pub id_b: i32,
 }
