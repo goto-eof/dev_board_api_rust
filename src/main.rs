@@ -1,7 +1,9 @@
 use crate::ConfigurationLoader::Settings;
 use async_once::AsyncOnce;
 use log::debug;
+use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
+use sea_orm::Statement;
 use warp::http::HeaderValue;
 use warp::hyper::HeaderMap;
 use warp::hyper::Method;
@@ -56,7 +58,19 @@ fn init_logging() {
 }
 
 async fn init_db() {
-    DB_POOL.get().await;
+    debug!("Checking DB connection...");
+    let db = DB_POOL.get().await;
+    let result = db
+        .query_all(Statement::from_string(
+            sea_orm::DatabaseBackend::Postgres,
+            "SELECT 1 from db_column limit 1;".to_owned(),
+        ))
+        .await;
+    if result.is_err() {
+        debug!("[DB RESULT] Connection to [DB FAILED]: {:?}", result.err());
+    } else {
+        debug!("[DB RESULT] DB Connection [OK]: {:?}", result.unwrap())
+    }
 }
 
 fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
