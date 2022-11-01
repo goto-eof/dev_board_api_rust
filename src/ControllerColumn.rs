@@ -20,6 +20,10 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> crate::GenericResu
     ControllerCommon::generate_response(DaoColumn::update(id, json_data).await)
 }
 
+pub async fn swap(idA: i32, idB: i32) -> crate::GenericResult<impl Reply> {
+    ControllerCommon::generate_response(DaoColumn::swap(idA, idB).await)
+}
+
 pub async fn delete(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoColumn::delete(id).await)
 }

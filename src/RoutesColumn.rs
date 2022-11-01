@@ -25,6 +25,12 @@ pub fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Rejectio
             .and(warp::body::json())
             .and_then(ControllerColumn::update))
         .or(db_column
+            .and(warp::put())
+            .and(warp::path::param::<i32>())
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and_then(ControllerColumn::swap))
+        .or(db_column
             .and(warp::delete())
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
