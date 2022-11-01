@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(DbColumn::Name).string().not_null())
+                    .col(ColumnDef::new(DbColumn::Order).integer().not_null())
                     .col(ColumnDef::new(DbColumn::CreatedAt).timestamp().not_null())
                     .col(ColumnDef::new(DbColumn::UpdatedAt).timestamp().not_null())
                     .to_owned(),
@@ -38,6 +39,7 @@ enum DbColumn {
     Table,
     Id,
     Name,
+    Order,
     CreatedAt,
     UpdatedAt,
 }
