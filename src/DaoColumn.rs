@@ -61,7 +61,7 @@ pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
 
 #[derive(FromQueryResult, Debug)]
 struct OptionResult {
-    value: Option<i32>,
+    value: Option<i64>,
 }
 
 #[derive(FromQueryResult, Debug)]
@@ -70,12 +70,12 @@ struct MandatoryResult {
 }
 
 #[allow(unused)]
-pub async fn get_max_id() -> Result<i32, DaoError> {
+pub async fn get_next_order_number() -> Result<i64, DaoError> {
     let db = DB_POOL.get().await;
 
     let result = db_column::Entity::find()
         .select_only()
-        .column_as(db_column::Column::Id.max(), "value")
+        .column_as(db_column::Column::Order.max(), "value")
         .into_model::<OptionResult>()
         .one(db)
         .await;
@@ -93,9 +93,10 @@ pub async fn get_max_id() -> Result<i32, DaoError> {
         return Ok(0);
     }
 
-    Ok(count.value.unwrap())
+    Ok(count.value.unwrap() + 1)
 }
 
+#[allow(unused)]
 pub async fn get_count() -> Result<i64, DaoError> {
     let db = DB_POOL.get().await;
 
@@ -134,17 +135,17 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, Da
         });
     }
 
-    let count_result = get_count().await;
+    let next_order_number = get_next_order_number().await;
 
-    if count_result.is_err() {
+    if next_order_number.is_err() {
         return Err(DaoError {
             code: 1,
             err_type: crate::Structs::DaoErrorType::Error,
-            message: format!("DB Error count2(): {:?}", count_result.err()),
+            message: format!("DB Error count2(): {:?}", next_order_number.err()),
         });
     }
 
-    let count = count_result.unwrap();
+    let count = next_order_number.unwrap();
 
     let mut model = result.unwrap();
 
