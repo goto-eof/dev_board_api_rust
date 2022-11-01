@@ -69,7 +69,7 @@ async fn init_db() {
     if result.is_err() {
         debug!("[DB RESULT] Connection to [DB FAILED]: {:?}", result.err());
     } else {
-        debug!("[DB RESULT] DB Connection [OK]: {:?}", result.unwrap())
+        debug!("[DB RESULT] DB Connection [OK]")
     }
 }
 
