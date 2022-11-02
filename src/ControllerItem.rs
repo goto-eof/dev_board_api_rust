@@ -1,6 +1,7 @@
 use crate::{
     ControllerCommon,
     DaoItem::{self},
+    Structs::SwapRequest,
 };
 use warp::Reply;
 
@@ -22,6 +23,10 @@ pub async fn insert(json_data: serde_json::Value) -> crate::GenericResult<impl R
 
 pub async fn update(id: i32, json_data: serde_json::Value) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoItem::update(id, json_data).await)
+}
+
+pub async fn swap(swap_request: SwapRequest) -> crate::GenericResult<impl Reply> {
+    ControllerCommon::generate_response(DaoItem::swap(swap_request).await)
 }
 
 pub async fn delete(id: i32) -> crate::GenericResult<impl Reply> {

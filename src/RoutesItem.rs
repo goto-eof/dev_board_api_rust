@@ -31,6 +31,13 @@ pub fn get_item_routes() -> impl Filter<Extract = impl Reply, Error = Rejection>
             .and(warp::body::json())
             .and_then(ControllerItem::update))
         .or(db_column
+            .and(warp::put())
+            .and(warp::path("swap"))
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and(warp::body::content_length_limit(1024 * 16))
+            .and_then(ControllerItem::swap))
+        .or(db_column
             .and(warp::delete())
             .and(warp::path::param::<i32>())
             .and(warp::path::end())

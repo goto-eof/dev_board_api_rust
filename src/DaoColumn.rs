@@ -41,6 +41,7 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DaoError> {
 
 pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
     let db = DB_POOL.get().await;
+
     let result = db_column::Entity::find()
         .order_by_asc(db_column::Column::Order)
         .all(db)

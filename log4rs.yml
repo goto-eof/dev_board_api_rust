@@ -21,7 +21,7 @@ appenders:
         count: 100
         pattern: 'logs/log{}.log'
 root:
-  level: off
+  level: debug
   appenders:
     - default
     - file_appender

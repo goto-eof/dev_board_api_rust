@@ -12,6 +12,7 @@ pub struct Model {
     pub t_type: String,
     pub code: String,
     pub status: String,
+    pub order: i64,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
     pub created_at: Option<DateTime>,
