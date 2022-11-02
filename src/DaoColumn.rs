@@ -1,9 +1,12 @@
+use crate::Structs::BoardFullResponse;
+use crate::Structs::BoardsFullResponse;
 use crate::Structs::DaoError;
 use crate::Structs::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_column;
 use entity::db_item;
+use migration::DbErr;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -58,6 +61,42 @@ pub async fn get_all() -> Result<Vec<db_column::Model>, DaoError> {
     let models = result.unwrap();
 
     Ok(models)
+}
+
+pub async fn get_all_with_items() -> Result<BoardsFullResponse, DaoError> {
+    let db = DB_POOL.get().await;
+
+    let result: Result<Vec<(db_column::Model, Vec<db_item::Model>)>, DbErr> =
+        db_column::Entity::find()
+            .find_with_related(db_item::Entity)
+            .order_by_asc(db_column::Column::Order)
+            .all(db)
+            .await;
+
+    if result.is_err() {
+        return Err(DaoError {
+            code: 1,
+            err_type: crate::Structs::DaoErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    let models = result.unwrap();
+
+    let mut boards_result: Vec<BoardFullResponse> = Vec::new();
+    for board_tuple in models {
+        let board_struct: BoardFullResponse = BoardFullResponse {
+            column: board_tuple.0,
+            items: board_tuple.1,
+        };
+        boards_result.push(board_struct);
+    }
+
+    let full_response: BoardsFullResponse = BoardsFullResponse {
+        columns: boards_result,
+    };
+
+    Ok(full_response)
 }
 
 #[derive(FromQueryResult, Debug)]

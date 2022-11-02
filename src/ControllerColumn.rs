@@ -13,6 +13,10 @@ pub async fn get_all() -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoColumn::get_all().await)
 }
 
+pub async fn get_all_with_items() -> crate::GenericResult<impl Reply> {
+    ControllerCommon::generate_response(DaoColumn::get_all_with_items().await)
+}
+
 pub async fn insert(json_data: serde_json::Value) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoColumn::create(json_data).await)
 }

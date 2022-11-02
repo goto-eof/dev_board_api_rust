@@ -14,6 +14,11 @@ pub fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Rejectio
             .and(warp::path::end())
             .and_then(ControllerColumn::get_all))
         .or(db_column
+            .and(warp::get())
+            .and(warp::path("plus-items"))
+            .and(warp::path::end())
+            .and_then(ControllerColumn::get_all_with_items))
+        .or(db_column
             .and(warp::post())
             .and(warp::path::end())
             .and(warp::body::json())
