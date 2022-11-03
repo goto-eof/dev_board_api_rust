@@ -109,7 +109,6 @@ struct MandatoryResult {
     value: i64,
 }
 
-#[allow(unused)]
 pub async fn get_next_order_number() -> Result<i64, DaoError> {
     let db = DB_POOL.get().await;
 
@@ -134,33 +133,6 @@ pub async fn get_next_order_number() -> Result<i64, DaoError> {
     }
 
     Ok(count.value.unwrap() + 1)
-}
-
-#[allow(unused)]
-pub async fn get_count() -> Result<i64, DaoError> {
-    let db = DB_POOL.get().await;
-
-    let result = db_column::Entity::find()
-        .select_only()
-        .column_as(db_column::Column::Id.count(), "value")
-        .into_model::<MandatoryResult>()
-        .one(db)
-        .await;
-
-    if result.is_err() {
-        return Err(DaoError {
-            code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
-            message: format!("DB Error get_count(): {:?}", result.err()),
-        });
-    }
-    let count_opt = result.unwrap();
-
-    if count_opt.is_none() {
-        return Ok(0);
-    }
-
-    Ok(count_opt.unwrap().value)
 }
 
 pub async fn create(json_data: serde_json::Value) -> Result<db_column::Model, DaoError> {
