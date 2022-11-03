@@ -104,11 +104,6 @@ struct OptionResult {
     value: Option<i64>,
 }
 
-#[derive(FromQueryResult, Debug)]
-struct MandatoryResult {
-    value: i64,
-}
-
 pub async fn get_next_order_number() -> Result<i64, DaoError> {
     let db = DB_POOL.get().await;
 
