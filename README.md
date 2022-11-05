@@ -43,6 +43,10 @@ Import postman collection file from test/postma.json in your postman workspace.
 - tokio
 - postgres
 
+### DB schema
+
+![db schema](db-schema.png)
+
 ### Post scriptum
 
 - this pplication was tested on macOS and Linux
