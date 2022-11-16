@@ -12,13 +12,13 @@ pub struct Model {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::db_role_user::Entity")]
+    #[sea_orm(has_many = "super::db_user_role::Entity")]
     RoleUser,
 }
 

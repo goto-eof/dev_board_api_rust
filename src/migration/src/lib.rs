@@ -8,7 +8,7 @@ mod m20221105_000002_create_table_db_role;
 mod m20221105_000004_create_table_db_user_role;
 mod m20221105_000005_create_table_db_role_permission;
 pub struct Migrator;
-
+// sea-orm-cli generate entity -u postgres://postgres:postgres@localhost:5432/postgres -o entity/src
 #[async_trait::async_trait]
 impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {

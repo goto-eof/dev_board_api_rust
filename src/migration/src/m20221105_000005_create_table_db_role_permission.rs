@@ -1,4 +1,4 @@
-use entity::{db_column, db_item, db_permission, db_role, db_role_permission};
+use entity::{db_permission, db_role, db_role_permission};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -19,7 +19,6 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(DbRolePermission::Name).string().not_null())
                     .col(
                         ColumnDef::new(DbRolePermission::PermissionId)
                             .integer()

@@ -3,12 +3,12 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "db_role_permission")]
+#[sea_orm(table_name = "db_user_role")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: String,
-    pub permission_id: i32,
+    pub user_id: i32,
     pub role_id: i32,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
@@ -17,14 +17,6 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::db_permission::Entity",
-        from = "Column::PermissionId",
-        to = "super::db_permission::Column::Id",
-        on_update = "NoAction",
-        on_delete = "NoAction"
-    )]
-    DbPermission,
-    #[sea_orm(
         belongs_to = "super::db_role::Entity",
         from = "Column::RoleId",
         to = "super::db_role::Column::Id",
@@ -32,17 +24,25 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     DbRole,
-}
-
-impl Related<super::db_permission::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::DbPermission.def()
-    }
+    #[sea_orm(
+        belongs_to = "super::db_user::Entity",
+        from = "Column::UserId",
+        to = "super::db_user::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    DbUser,
 }
 
 impl Related<super::db_role::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::DbRole.def()
+    }
+}
+
+impl Related<super::db_user::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DbUser.def()
     }
 }
 

@@ -1,5 +1,7 @@
 use crate::ConfigurationLoader::Settings;
+use ::function_name::named;
 use async_once::AsyncOnce;
+use dev_board::is_authenticated;
 use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
@@ -10,12 +12,18 @@ use warp::hyper::Method;
 use warp::Filter;
 use warp::Rejection;
 use warp::Reply;
+use PermissionUtil::init_permissions;
 use RoutesColumn::get_column_routes;
 use RoutesItem::get_item_routes;
+use RoutesUser::get_user_routes;
+#[allow(non_snake_case)]
+mod AuthenticationUtil;
 #[allow(non_snake_case)]
 mod ConfigurationDatabase;
 #[allow(non_snake_case)]
 mod ConfigurationLoader;
+#[allow(non_snake_case)]
+mod ControllerAuth;
 #[allow(non_snake_case)]
 mod ControllerColumn;
 #[allow(non_snake_case)]
@@ -23,13 +31,25 @@ mod ControllerCommon;
 #[allow(non_snake_case)]
 mod ControllerItem;
 #[allow(non_snake_case)]
+mod ControllerUser;
+#[allow(non_snake_case)]
 mod DaoColumn;
 #[allow(non_snake_case)]
 mod DaoItem;
 #[allow(non_snake_case)]
+mod DaoPermission;
+#[allow(non_snake_case)]
+mod DaoRole;
+#[allow(non_snake_case)]
+mod DaoUser;
+#[allow(non_snake_case)]
+mod PermissionUtil;
+#[allow(non_snake_case)]
 mod RoutesColumn;
 #[allow(non_snake_case)]
 mod RoutesItem;
+#[allow(non_snake_case)]
+mod RoutesUser;
 #[allow(non_snake_case)]
 mod Structs;
 
@@ -50,14 +70,22 @@ lazy_static! {
 async fn main() {
     init_logging();
     init_db().await;
+    init_permissions(DB_POOL.get().await).await;
+    init_admin().await;
+    init_test();
     init_server().await;
 }
+
+fn init_test() {}
 
 fn init_logging() {
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
 }
 
+#[named]
+#[is_authenticated]
 async fn init_db() {
+    println!("FN: {:?}", function_name!());
     debug!("Checking DB connection...");
     let db = DB_POOL.get().await;
     let result = db
@@ -73,7 +101,7 @@ async fn init_db() {
     }
 }
 
-fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let any_origin_3 = warp::cors()
         .allow_any_origin()
         .allow_headers(vec![
@@ -107,16 +135,22 @@ fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone
     );
 
     get_column_routes()
-        .or(get_item_routes())
+        .await
+        .or(get_item_routes().await)
+        .or(get_user_routes().await)
         .or(warp::options().map(warp::reply))
         .with(any_origin_3)
         .with(warp::log("api"))
         .with(warp::reply::with::headers(headers))
 }
 
+async fn init_admin() {
+    ControllerUser::init_admin().await;
+}
+
 async fn init_server() {
     debug!("server run on port {}", SETTINGS.server_port);
-    warp::serve(init_routes())
+    warp::serve(init_routes().await)
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;
 }
