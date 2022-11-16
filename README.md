@@ -45,7 +45,7 @@ Import postman collection file from test/postma.json in your postman workspace.
 
 ### DB schema
 
-![db schema](db-schema.png)
+![db schema](db-schema1.png)
 
 ### Post scriptum
 
