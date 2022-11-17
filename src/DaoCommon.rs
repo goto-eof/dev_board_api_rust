@@ -1,3 +1,4 @@
+use bcrypt::hash;
 use chrono::Utc;
 use entity::{db_permission, db_role, db_role_permission, db_user, db_user_role};
 use migration::DbErr;
@@ -28,7 +29,6 @@ pub async fn init_admin() -> () {
                     let data = r#"
                     {
                         "username": "admin",
-                        "password": "password",
                         "email": "admin@admin.com",
                         "first_name": "Admin",
                         "last_name": "Admin"
@@ -40,6 +40,7 @@ pub async fn init_admin() -> () {
                     let dat = Utc::now().naive_utc();
                     result_am.created_at = sea_orm::Set(Some(dat));
                     result_am.updated_at = sea_orm::Set(Some(dat));
+                    result_am.password = Set(hash("password".to_string(), 4).unwrap());
                     let result = result_am.save(txn).await.unwrap();
                     let user_id = result.id.unwrap();
 
