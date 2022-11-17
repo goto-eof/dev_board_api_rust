@@ -77,11 +77,6 @@ pub async fn get_all() -> Result<Vec<db_user::Model>, DaoError> {
     Ok(models)
 }
 
-#[derive(FromQueryResult, Debug)]
-struct OptionResult {
-    value: Option<i64>,
-}
-
 pub async fn create(json_data: serde_json::Value) -> Result<db_user::Model, DaoError> {
     let db = DB_POOL.get().await;
     let result = db_user::ActiveModel::from_json(json_data);

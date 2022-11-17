@@ -9,11 +9,16 @@ use chrono::Utc;
 use entity::db_user;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use serde::{Deserialize, Serialize};
-use warp::Reply;
+use serde_json::json;
+use warp::{
+    http::HeaderValue,
+    hyper::{header, HeaderMap, StatusCode},
+    Rejection, Reply,
+};
 
 use crate::{AuthenticationUtil, ControllerCommon, Structs::DaoError, DB_POOL};
 
-pub async fn login(login_data: LoginData) -> crate::GenericResult<impl Reply> {
+pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let db = DB_POOL.get().await;
     let user = db_user::Entity::find()
         .filter(db_user::Column::Username.eq(login_data.username))
@@ -21,24 +26,29 @@ pub async fn login(login_data: LoginData) -> crate::GenericResult<impl Reply> {
         .await;
     let user = user.unwrap();
     if user.is_none() {
-        return ControllerCommon::generate_response(Err(DaoError {
+        let err = DaoError {
             code: 1,
             err_type: crate::Structs::DaoErrorType::Error,
-            message: format!("DB Error: {:?}", "Invalid username"),
-        }));
+            message: format!("DB Error: {:?}", "Invalid username/password"),
+        };
+        let json = json!(err);
+        return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
     }
     let user = user.unwrap();
     let check_password = verify(login_data.password, &user.password).unwrap();
     if check_password {
-        return ControllerCommon::generate_response(Ok(JwtReponse {
-            jwt: AuthenticationUtil::generate_jwt(user.id).unwrap(),
-        }));
+        let jwt = AuthenticationUtil::generate_jwt(user.id).unwrap();
+        let json = json!(user);
+        return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
-    return ControllerCommon::generate_response(Err(DaoError {
+
+    let err = DaoError {
         code: 1,
         err_type: crate::Structs::DaoErrorType::Error,
-        message: format!("DB Error: {:?}", "Invalid password"),
-    }));
+        message: format!("DB Error: {:?}", "Invalid username/password"),
+    };
+    let json = json!(err);
+    return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
 }
 #[derive(Debug, Serialize)]
 pub struct JwtReponse {
@@ -51,6 +61,26 @@ pub struct RegistrationData {
     pub email: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+}
+
+pub fn generate_response_with_cookie(
+    response: serde_json::Value,
+    jwt: Option<String>,
+    status_code: StatusCode,
+) -> Result<impl Reply, Rejection> {
+    let reply = warp::reply::json(&response);
+    let reply = warp::reply::with_status(reply, status_code);
+
+    let mut cookies = HeaderMap::new();
+    let cookie_str = format!("jwt={}; Path=/; HttpOnly; Max-Age=1209600", jwt.unwrap());
+    cookies.append(
+        header::SET_COOKIE,
+        HeaderValue::from_str(cookie_str.as_str()).unwrap(),
+    );
+    let mut response = reply.into_response();
+    let headers = response.headers_mut();
+    headers.extend(cookies);
+    Ok(response)
 }
 
 pub async fn register(registration_data: RegistrationData) -> crate::GenericResult<impl Reply> {
