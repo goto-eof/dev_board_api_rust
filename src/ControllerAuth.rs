@@ -71,15 +71,18 @@ pub fn generate_response_with_cookie(
     let reply = warp::reply::json(&response);
     let reply = warp::reply::with_status(reply, status_code);
 
-    let mut cookies = HeaderMap::new();
-    let cookie_str = format!("jwt={}; Path=/; HttpOnly; Max-Age=1209600", jwt.unwrap());
-    cookies.append(
-        header::SET_COOKIE,
-        HeaderValue::from_str(cookie_str.as_str()).unwrap(),
-    );
     let mut response = reply.into_response();
-    let headers = response.headers_mut();
-    headers.extend(cookies);
+
+    if jwt.is_some() {
+        let mut cookies = HeaderMap::new();
+        let cookie_str = format!("jwt={}; Path=/; HttpOnly; Max-Age=1209600", jwt.unwrap());
+        cookies.append(
+            header::SET_COOKIE,
+            HeaderValue::from_str(cookie_str.as_str()).unwrap(),
+        );
+        let headers = response.headers_mut();
+        headers.extend(cookies);
+    }
     Ok(response)
 }
 
