@@ -26,18 +26,13 @@ pub async fn init_admin() -> () {
                 let user_admin_opt = user_admin_result.unwrap();
 
                 if user_admin_opt.is_none() {
-                    let data = r#"
-                    {
-                        "username": "admin",
-                        "email": "admin@admin.com",
-                        "first_name": "Admin",
-                        "last_name": "Admin"
-                    }"#;
-
-                    let json_data = serde_json::from_str(data).unwrap();
-                    let mut result_am = db_user::ActiveModel::from_json(json_data).unwrap();
+                    let mut result_am = db_user::ActiveModel::new();
 
                     let dat = Utc::now().naive_utc();
+                    result_am.username = Set("admin".to_string());
+                    result_am.email = Set("admin@admin.com".to_string());
+                    result_am.first_name = Set("Admin".to_string());
+                    result_am.last_name = Set("Admin".to_string());
                     result_am.created_at = sea_orm::Set(Some(dat));
                     result_am.updated_at = sea_orm::Set(Some(dat));
                     result_am.password = Set(hash("password".to_string(), 4).unwrap());
