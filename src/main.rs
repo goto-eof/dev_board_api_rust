@@ -1,7 +1,6 @@
 use crate::ConfigurationLoader::Settings;
 use ::function_name::named;
 use async_once::AsyncOnce;
-use dev_board::is_authenticated;
 use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
@@ -83,7 +82,6 @@ fn init_logging() {
 }
 
 #[named]
-#[is_authenticated]
 async fn init_db() {
     println!("FN: {:?}", function_name!());
     debug!("Checking DB connection...");
