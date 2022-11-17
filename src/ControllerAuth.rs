@@ -123,7 +123,7 @@ pub async fn register(registration_data: RegistrationData) -> crate::GenericResu
     }
     let user = user.save(db).await;
 
-    // TODO assign permissions
+    // TODO assign role to user
 
     if user.is_err() {
         return ControllerCommon::generate_response(Err(DaoError {

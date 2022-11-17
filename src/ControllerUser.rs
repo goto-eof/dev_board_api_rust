@@ -4,38 +4,6 @@ use crate::{
 };
 use warp::Reply;
 
-pub async fn init_admin() -> () {
-    let user_admin_result = DaoUser::get_by_name("admin".to_string()).await;
-    if user_admin_result.is_err() {
-        return;
-    }
-
-    let user_admin_opt = user_admin_result.unwrap();
-
-    if user_admin_opt.is_none() {
-        let data = r#"
-    {
-        "username": "admin",
-        "password": "password",
-        "email": "admin@admin.com",
-        "first_name": "Admin",
-        "last_name": "Admin"
-    }"#;
-
-        let value = serde_json::from_str(data).unwrap();
-        let result = DaoUser::create(value).await;
-        print!("{:?}", result);
-
-        let role = r#"
-        {"name": "admin"}
-        "#;
-
-        let permission_ = r#"
-        {"name": "admin"}
-        "#;
-    }
-}
-
 pub async fn get_user(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoUser::get_by_id(id).await)
 }

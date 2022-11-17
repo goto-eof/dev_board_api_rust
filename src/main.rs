@@ -2,9 +2,11 @@ use crate::ConfigurationLoader::Settings;
 use ::function_name::named;
 use async_once::AsyncOnce;
 use log::debug;
+use migration::DbErr;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
+use sea_orm::TransactionTrait;
 use warp::http::HeaderValue;
 use warp::hyper::HeaderMap;
 use warp::hyper::Method;
@@ -33,6 +35,8 @@ mod ControllerItem;
 mod ControllerUser;
 #[allow(non_snake_case)]
 mod DaoColumn;
+#[allow(non_snake_case)]
+mod DaoCommon;
 #[allow(non_snake_case)]
 mod DaoItem;
 #[allow(non_snake_case)]
@@ -70,7 +74,7 @@ async fn main() {
     init_logging();
     init_db().await;
     init_permissions(DB_POOL.get().await).await;
-    init_admin().await;
+    DaoCommon::init_admin().await;
     init_test();
     init_server().await;
 }
@@ -140,10 +144,6 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
         .with(any_origin_3)
         .with(warp::log("api"))
         .with(warp::reply::with::headers(headers))
-}
-
-async fn init_admin() {
-    ControllerUser::init_admin().await;
 }
 
 async fn init_server() {

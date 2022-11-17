@@ -73,7 +73,6 @@ impl MigrationTrait for Migration {
 enum DbRolePermission {
     Table,
     Id,
-    Name,
     RoleId,
     PermissionId,
     CreatedAt,
