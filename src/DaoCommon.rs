@@ -55,6 +55,7 @@ pub async fn init_admin() -> () {
                     result_am.user_id = Set(user_id);
                     let result = result_am.save(txn).await.unwrap();
 
+                    // giving all permissions to admin
                     let permissions = db_permission::Entity::find().all(txn).await.unwrap();
                     for permission in permissions {
                         let mut am = db_role_permission::ActiveModel::new();
