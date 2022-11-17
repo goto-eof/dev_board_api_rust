@@ -6,7 +6,7 @@ use sea_orm::{
     TransactionTrait,
 };
 
-use crate::{DaoUser, DB_POOL};
+use crate::DB_POOL;
 
 pub async fn init_admin() -> () {
     let db = DB_POOL.get().await;
@@ -75,4 +75,7 @@ pub async fn init_admin() -> () {
             })
         })
         .await;
+    if result.is_err() {
+        println!("{:?}", result);
+    }
 }
