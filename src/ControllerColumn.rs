@@ -3,7 +3,6 @@ use crate::{
     DaoColumn::{self},
     Structs::SwapRequest,
 };
-use dev_board::is_authenticated;
 use warp::Reply;
 
 pub async fn get_column(id: i32) -> crate::GenericResult<impl Reply> {

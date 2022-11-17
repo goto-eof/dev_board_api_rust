@@ -38,7 +38,7 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let check_password = verify(login_data.password, &user.password).unwrap();
     if check_password {
         let jwt = AuthenticationUtil::generate_jwt(user.id).unwrap();
-        let json = json!(user);
+        let json = json!(user.email);
         return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
 

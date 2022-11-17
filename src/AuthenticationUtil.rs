@@ -13,6 +13,7 @@ struct Claims {
     sub: i32,
     exp: usize,
 }
+// TODO move it in the configuration file
 const JWT_SECRET: &str = "ciao mondo";
 
 pub async fn auth_validator(
@@ -59,20 +60,6 @@ pub async fn auth_validator(
                 .all(db).await.unwrap();
 
 
-                println!("___UP__{:?}", user_permissions);
-            
-               
-               
-            //     let user_role_result = db_user_role::Entity::find().filter(db_user_role::Column::UserId.eq(userId))
-            //         .one(db)
-            //         .await;
-            //     let role_id = user_role_result.unwrap().unwrap().role_id;
-
-            //  let permissions_result = db_role_permission::Entity::find().filter(db_role_permission::Column::RoleId.eq(role_id)).all(db).await;
-            // if permissions_result.is_err(){
-            //         return  Err(warp::reject::custom(Unauthorized{error_message: "User not found".to_string()}));
-            // }
-            // let permissions = permissions_result.unwrap();
 for user_permission in user_permissions {
     println!("___UP__{:?} {:?}", user_permission.name , permission_name);
 if permission_name == user_permission.name   {
