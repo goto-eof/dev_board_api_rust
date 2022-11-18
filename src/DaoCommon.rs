@@ -76,3 +76,51 @@ pub async fn init_admin() -> () {
         println!("{:?}", result);
     }
 }
+
+pub async fn init_user_role() -> () {
+    let db = DB_POOL.get().await;
+
+    let result = db
+        .transaction::<_, (), DbErr>(|txn| {
+            Box::pin(async move {
+                let result = db_role::Entity::find()
+                    .filter(db_role::Column::Name.eq("user"))
+                    .one(txn)
+                    .await;
+                if result.unwrap().is_none() {
+                    let dat = Utc::now().naive_utc();
+                    // inserting role
+                    let mut result_am = db_role::ActiveModel::new();
+                    result_am.name = sea_orm::Set("user".to_string());
+                    result_am.created_at = sea_orm::Set(Some(dat));
+                    result_am.updated_at = sea_orm::Set(Some(dat));
+                    let result = result_am.save(txn).await.unwrap();
+                    let role_id = result.id.unwrap();
+
+                    // TODO load list from config file
+                    let black_list: Vec<&str> = vec![];
+
+                    // giving all permissions to user, except those that are in the blacklist
+                    let permissions = db_permission::Entity::find().all(txn).await.unwrap();
+                    for permission in permissions {
+                        if black_list.contains(&permission.name.as_str()) {
+                            continue;
+                        }
+                        let mut am = db_role_permission::ActiveModel::new();
+                        am.created_at = sea_orm::Set(Some(dat));
+                        am.updated_at = sea_orm::Set(Some(dat));
+                        am.role_id = Set(role_id);
+                        am.permission_id = Set(permission.id);
+
+                        am.save(txn).await.unwrap();
+                    }
+                    return Ok(());
+                }
+                return Ok(());
+            })
+        })
+        .await;
+    if result.is_err() {
+        println!("{:?}", result);
+    }
+}

@@ -75,6 +75,7 @@ async fn main() {
     init_db().await;
     init_permissions(DB_POOL.get().await).await;
     DaoCommon::init_admin().await;
+    DaoCommon::init_user_role().await;
     init_test();
     init_server().await;
 }
