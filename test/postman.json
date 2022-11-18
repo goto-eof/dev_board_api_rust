@@ -169,6 +169,26 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "get_by_username",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8013/column/admin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"column",
+								"admin"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
