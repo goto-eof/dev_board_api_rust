@@ -28,6 +28,37 @@
 					"response": []
 				},
 				{
+					"name": "get_all_and_items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "cookie",
+								"value": "ciao",
+								"type": "default"
+							},
+							{
+								"key": "token",
+								"value": "token ",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8013/column/plus-items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"column",
+								"plus-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "get_by_id",
 					"request": {
 						"method": "GET",
@@ -51,10 +82,16 @@
 					"name": "create",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjIyLCJleHAiOjE2Njg2MzUwMjV9.Xhp-4OghkTr6lUCLJXS4jmGEN-5OIKWyutcKoaI_zvo6bv-ayF71P3rnui9Tll8QXDeKXxRL8lBKTRHhgAr4-Q",
+								"type": "default"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ciao\"\n}",
+							"raw": "{\n    \"name\": \"test\",\n    \"order\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -119,7 +156,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8013/column/1",
+							"raw": "http://localhost:8013/column/17",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -127,7 +164,7 @@
 							"port": "8013",
 							"path": [
 								"column",
-								"1"
+								"17"
 							]
 						}
 					},
@@ -184,7 +221,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ciao\",\n    \"t_type\": \"bug\",\n    \"code\": \"1\",\n    \"status\": \"TODO\",\n    \"description\":\"Mega Bug\",\n    \"column_id\": 1\n}",
+							"raw": "{\n    \"name\": \"implement server side\",\n    \"t_type\": \"task\",\n    \"code\": \"1\",\n    \"status\": \"TODO\",\n    \"description\":\"Mega Bug\",\n    \"column_id\": 3\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -258,6 +295,69 @@
 							"path": [
 								"item",
 								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"mario.rossi\",\n    \"password\": \"pikacphù\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"user",
+								"login"
 							]
 						}
 					},
