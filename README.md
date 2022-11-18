@@ -47,7 +47,16 @@ Import postman collection file from test/postma.json in your postman workspace.
 
 ![db schema](db-schema1.png)
 
+### Default user
+
+```
+username: admin
+password: password
+```
+
 ### Post scriptum
 
 - this pplication was tested on macOS and Linux
 - [here](https://github.com/goto-eof/dev_board_react) you can find the front-end application
+
+
