@@ -1,5 +1,7 @@
 # Development board API (Rust)
 
+[here](https://github.com/goto-eof/dev_board_react) you can find the front-end application
+
 ### Run project
 
 Start DBMS container:
@@ -54,9 +56,20 @@ username: admin
 password: password
 ```
 
+### TODO
+
+- be/fe - optimize front-end/back-end in order to understand better if it is a server down issue or the user is not logged in (show a toast for example). Improve json response on the backend side (uniform responses);
+- fe - optimize login and registration forms of the front-end;
+- fe - hide login and register buttons when user is logged in;
+- be - optimize server responses (CORS error when user is not authorized);
+- be - refactor;
+- be - implement controllers for permission and role tables (the idea is to have an control panel where it is possible to assign roles and permissions to users);
+- be - manage better code unwrapping;
+- be - improve security;
+- ~~be - fix column/item swapping~~;
+
 ### Post scriptum
 
 - this pplication was tested on macOS and Linux
-- [here](https://github.com/goto-eof/dev_board_react) you can find the front-end application
 
 

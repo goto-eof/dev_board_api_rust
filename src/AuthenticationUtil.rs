@@ -19,7 +19,7 @@ pub async fn auth_validator(
 ) -> impl Filter<Extract = ((),), Error = Rejection> + Clone {
     let permission_name = warp::any().map(move || permission_name.clone());
 
-    return warp::cookie::optional::<String>("jwt")
+    return warp::cookie::optional::<String>("token")
         .and(warp::header::optional::<String>("Authorization"))
         .and(permission_name)
         .and_then(
@@ -29,7 +29,7 @@ pub async fn auth_validator(
                 let decoded = decode::<Claims>(
                     &tokeen,
                     &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
-                    &Validation::new(jsonwebtoken::Algorithm::HS512),
+                    &Validation::new(jsonwebtoken::Algorithm::HS256),
                 );
                 let db = DB_POOL.get().await;
 
@@ -67,14 +67,14 @@ return  Err(warp::reject::custom(Unauthorized{error_message: "Permission not fou
 
 pub fn generate_jwt(user_id: i32) -> Result<String, Error> {
     let expiration = Utc::now()
-        .checked_add_signed(chrono::Duration::seconds(60)).unwrap()
+        .checked_add_signed(chrono::Duration::seconds(60*100*5*10)).unwrap()
         .timestamp();
 
     let claims = Claims {
         sub: user_id.to_owned(),
         exp: expiration as usize,
     };
-    let header = Header::new(Algorithm::HS512);
+    let header = Header::new(Algorithm::HS256);
     encode(
         &header,
         &claims,

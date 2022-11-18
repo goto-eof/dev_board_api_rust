@@ -80,7 +80,7 @@ pub fn generate_response_with_cookie(
     if jwt.is_some() {
         let mut cookies = HeaderMap::new();
         let cookie_str = format!(
-            "jwt={}; SameSite=None; Path=/; Secure; Max-Age=1209600",
+            "token={}; SameSite=None; expires=Fri, 31 Dec 9999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
             jwt.unwrap()
         );
         cookies.append(

@@ -68,8 +68,9 @@ pub async fn get_all_with_items() -> Result<BoardsFullResponse, DaoError> {
 
     let result: Result<Vec<(db_column::Model, Vec<db_item::Model>)>, DbErr> =
         db_column::Entity::find()
-            .find_with_related(db_item::Entity)
             .order_by_asc(db_column::Column::Order)
+            .find_with_related(db_item::Entity)
+            .order_by_asc(db_item::Column::Order)
             .all(db)
             .await;
 
