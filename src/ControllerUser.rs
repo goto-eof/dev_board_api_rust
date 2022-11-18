@@ -8,8 +8,8 @@ pub async fn get_user(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoUser::get_by_id(id).await)
 }
 
-pub async fn get_user_by_name(name: String) -> crate::GenericResult<impl Reply> {
-    ControllerCommon::generate_response(DaoUser::get_by_name(name).await)
+pub async fn get_by_username(name: String) -> crate::GenericResult<impl Reply> {
+    ControllerCommon::generate_response(DaoUser::get_by_username(name).await)
 }
 
 pub async fn get_all_users() -> crate::GenericResult<impl Reply> {

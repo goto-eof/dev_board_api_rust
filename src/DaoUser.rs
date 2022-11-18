@@ -3,7 +3,6 @@ use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
 use entity::db_user;
-use migration::DbErr;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -36,7 +35,7 @@ pub async fn get_by_id(id: i32) -> Result<db_user::Model, DaoError> {
     Ok(opt.unwrap())
 }
 
-pub async fn get_by_name(username: String) -> Result<Option<db_user::Model>, DaoError> {
+pub async fn get_by_username(username: String) -> Result<Option<db_user::Model>, DaoError> {
     let db = DB_POOL.get().await;
     let result = db_user::Entity::find()
         .filter(db_user::Column::Username.eq(username))

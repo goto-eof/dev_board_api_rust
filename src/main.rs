@@ -2,13 +2,9 @@ use crate::ConfigurationLoader::Settings;
 use ::function_name::named;
 use async_once::AsyncOnce;
 use log::debug;
-use migration::DbErr;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
-use sea_orm::TransactionTrait;
-use warp::http::HeaderValue;
-use warp::hyper::HeaderMap;
 use warp::hyper::Method;
 use warp::Filter;
 use warp::Rejection;
@@ -74,8 +70,8 @@ async fn main() {
     init_logging();
     init_db().await;
     init_permissions(DB_POOL.get().await).await;
-    DaoCommon::init_admin().await;
-    DaoCommon::init_user_role().await;
+    DaoCommon::init_admin().await; // default superuser
+    DaoCommon::init_user_role().await; // this role is assigned when a new user is created
     init_test();
     init_server().await;
 }
