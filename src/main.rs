@@ -106,15 +106,38 @@ async fn init_db() {
 
 async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let any_origin_3 = warp::cors()
-        .allow_any_origin()
+        // .allow_any_origin()
+        .allow_origin("http://localhost:3000")
         .allow_headers(vec![
             "Access-Control-Allow-Headers",
             "Access-Control-Request-Method",
             "Access-Control-Request-Headers",
             "Origin",
             "Accept",
+            "Content-Type",
+            "Accept-Encoding",
+            "Accept-Language",
+            "Cache-Control",
+            "Connection",
+            "Host",
+            "Pragma",
+            "Referer",
+            "User-Agent",
             "X-Requested-With",
             "Content-Type",
+            "Cookie",
+            "sec-ch-ua",
+            "sec-ch-ua-mobile",
+            "sec-ch-ua-platform",
+            "Sec-Fetch-Dest",
+            "Sec-Fetch-Mode",
+            "Sec-Fetch-Site",
+            "Sec-Fetch-User",
+            "Sec-WebSocket-Extensions",
+            "Sec-WebSocket-Key",
+            "Sec-WebSocket-Version",
+            "Upgrade-Insecure-Requests",
+            "Upgrade",
         ])
         .allow_methods(&[
             Method::GET,
@@ -124,27 +147,34 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
             Method::DELETE,
             Method::OPTIONS,
             Method::HEAD,
-        ]);
+        ])
+        .allow_credentials(true);
 
-    let mut headers = HeaderMap::new();
-    headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
-    headers.insert(
-        "Access-Control-Allow-Headers",
-        HeaderValue::from_static("*"),
-    );
-    headers.insert(
-        "Access-Control-Allow-Methods",
-        HeaderValue::from_static("*"),
-    );
-
+    // let mut headers = HeaderMap::new();
+    // // headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
+    // headers.insert(
+    //     "Access-Control-Allow-Origin",
+    //     HeaderValue::from_static("http://localhost:3000"),
+    // );
+    // headers.insert(
+    //     "Access-Control-Allow-Headers",
+    //     HeaderValue::from_static("*"),
+    // );
+    // headers.insert(
+    //     "Access-Control-Allow-Credentials",
+    //     HeaderValue::from_static("true"),
+    // );
+    // headers.insert(
+    //     "Access-Control-Allow-Methods",
+    //     HeaderValue::from_static("*"),
+    // );
     get_column_routes()
         .await
         .or(get_item_routes().await)
         .or(get_user_routes().await)
-        .or(warp::options().map(warp::reply))
-        .with(any_origin_3)
+        .with(&any_origin_3)
         .with(warp::log("api"))
-        .with(warp::reply::with::headers(headers))
+    // .with(warp::reply::with::headers(headers))
 }
 
 async fn init_server() {

@@ -20,7 +20,7 @@ use warp::{
     Rejection, Reply,
 };
 
-use crate::{AuthenticationUtil, ControllerCommon, Structs::DaoError, DB_POOL};
+use crate::{AuthenticationUtil, Structs::DaoError, DB_POOL};
 
 pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let db = DB_POOL.get().await;
@@ -79,7 +79,7 @@ pub fn generate_response_with_cookie(
 
     if jwt.is_some() {
         let mut cookies = HeaderMap::new();
-        let cookie_str = format!("jwt={}; Path=/; HttpOnly; Max-Age=1209600", jwt.unwrap());
+        let cookie_str = format!("jwt={}; Max-Age=1209600", jwt.unwrap());
         cookies.append(
             header::SET_COOKIE,
             HeaderValue::from_str(cookie_str.as_str()).unwrap(),
@@ -90,7 +90,7 @@ pub fn generate_response_with_cookie(
     Ok(response)
 }
 
-pub async fn register(registration_data: RegistrationData) -> crate::GenericResult<impl Reply> {
+pub async fn register(registration_data: RegistrationData) -> Result<impl Reply, Rejection> {
     let db = DB_POOL.get().await;
 
     let result = db
@@ -156,21 +156,26 @@ pub async fn register(registration_data: RegistrationData) -> crate::GenericResu
     if result.is_ok() {
         let result = result.unwrap();
         if result.0.is_some() {
-            return ControllerCommon::generate_response(Ok(JwtReponse {
-                jwt: AuthenticationUtil::generate_jwt(result.0.unwrap()).unwrap(),
-            }));
+            let user_id = result.0.unwrap();
+            let jwt = AuthenticationUtil::generate_jwt(user_id).unwrap();
+            let json = json!(user_id);
+            return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
         } else {
-            return ControllerCommon::generate_response(Err(DaoError {
+            let err = DaoError {
                 code: 1,
                 err_type: crate::Structs::DaoErrorType::Error,
                 message: format!("DB Error: {:?}", result.1.unwrap()),
-            }));
+            };
+            let json = json!(err);
+            return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
         }
     }
 
-    return ControllerCommon::generate_response(Err(DaoError {
+    let err = DaoError {
         code: 1,
         err_type: crate::Structs::DaoErrorType::Error,
-        message: format!("DB Error: {:?}", result.err()),
-    }));
+        message: format!("DB Error: {:?}", result.err().unwrap()),
+    };
+    let json = json!(err);
+    return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
 }

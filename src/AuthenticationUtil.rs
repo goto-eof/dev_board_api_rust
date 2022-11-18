@@ -21,13 +21,13 @@ pub async fn auth_validator(
 ) -> impl Filter<Extract = ((),), Error = Rejection> + Clone {
     let permission_name = warp::any().map(move || permission_name.clone());
 
-    return warp::cookie::optional::<String>("Authorization")
+    return warp::cookie::optional::<String>("jwt")
         .and(warp::header::optional::<String>("Authorization"))
         .and(permission_name)
         .and_then(
             move |token: Option<String>, authorization: Option<String>, permission_name| async move {
                 let tokeen = token.unwrap_or(authorization.unwrap_or("".to_string()));
-                println!("token: {}", tokeen);
+                println!("token: {}", tokeen,);
                 let decoded = decode::<Claims>(
                     &tokeen,
                     &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
@@ -36,7 +36,7 @@ pub async fn auth_validator(
                 let db = DB_POOL.get().await;
 
                 if decoded.is_err() {
-                    return Err(reject::custom(Unauthorized{error_message: "Invalid token".to_string()}));
+                    return Err(reject::custom(Unauthorized{error_message: "Invalid token (0)".to_string()}));
                 }
                 let user_id = decoded.unwrap().claims.sub; 
                
