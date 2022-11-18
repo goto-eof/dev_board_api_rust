@@ -20,10 +20,10 @@ The server will be reacheable at:
 http://127.0.0.1:8013
 ```
 
-### Docker
+### Docker (production)
 
 ```
-docker-compoer up
+docker-compoer -f docker-compose-production.yml up
 ```
 
 The server will be reacheable at:
