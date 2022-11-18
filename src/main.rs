@@ -109,6 +109,7 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
         // .allow_any_origin()
         .allow_origin("http://localhost:3000")
         .allow_headers(vec![
+            "Access-Control-Allow-Credentials",
             "Access-Control-Allow-Headers",
             "Access-Control-Request-Method",
             "Access-Control-Request-Headers",
@@ -138,8 +139,9 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
             "Sec-WebSocket-Version",
             "Upgrade-Insecure-Requests",
             "Upgrade",
+            "Authorization",
         ])
-        .allow_methods(&[
+        .allow_methods(vec![
             Method::GET,
             Method::POST,
             Method::PUT,
@@ -150,31 +152,12 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
         ])
         .allow_credentials(true);
 
-    // let mut headers = HeaderMap::new();
-    // // headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
-    // headers.insert(
-    //     "Access-Control-Allow-Origin",
-    //     HeaderValue::from_static("http://localhost:3000"),
-    // );
-    // headers.insert(
-    //     "Access-Control-Allow-Headers",
-    //     HeaderValue::from_static("*"),
-    // );
-    // headers.insert(
-    //     "Access-Control-Allow-Credentials",
-    //     HeaderValue::from_static("true"),
-    // );
-    // headers.insert(
-    //     "Access-Control-Allow-Methods",
-    //     HeaderValue::from_static("*"),
-    // );
     get_column_routes()
         .await
         .or(get_item_routes().await)
         .or(get_user_routes().await)
         .with(&any_origin_3)
         .with(warp::log("api"))
-    // .with(warp::reply::with::headers(headers))
 }
 
 async fn init_server() {

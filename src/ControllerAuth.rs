@@ -79,9 +79,12 @@ pub fn generate_response_with_cookie(
 
     if jwt.is_some() {
         let mut cookies = HeaderMap::new();
-        let cookie_str = format!("jwt={}; Max-Age=1209600", jwt.unwrap());
+        let cookie_str = format!(
+            "jwt={}; SameSite=None; Path=/; Secure; Max-Age=1209600",
+            jwt.unwrap()
+        );
         cookies.append(
-            header::SET_COOKIE,
+            "set-cookie",
             HeaderValue::from_str(cookie_str.as_str()).unwrap(),
         );
         let headers = response.headers_mut();
