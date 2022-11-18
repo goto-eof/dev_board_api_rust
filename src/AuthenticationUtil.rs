@@ -1,4 +1,4 @@
-use crate::{DB_POOL};
+use crate::{DB_POOL, SETTINGS};
 use chrono::Utc;
 use entity::{db_user_role, db_role_permission, db_permission};
 use jsonwebtoken::{
@@ -13,11 +13,9 @@ struct Claims {
     sub: i32,
     exp: usize,
 }
-// TODO move it in the configuration file
-const JWT_SECRET: &str = "ciao mondo";
 
 pub async fn auth_validator(
-    permission_name: String,
+    permission_name: String
 ) -> impl Filter<Extract = ((),), Error = Rejection> + Clone {
     let permission_name = warp::any().map(move || permission_name.clone());
 
@@ -30,7 +28,7 @@ pub async fn auth_validator(
                 println!("token: {}", tokeen,);
                 let decoded = decode::<Claims>(
                     &tokeen,
-                    &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
+                    &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
                     &Validation::new(jsonwebtoken::Algorithm::HS512),
                 );
                 let db = DB_POOL.get().await;
@@ -40,8 +38,6 @@ pub async fn auth_validator(
                 }
                 let user_id = decoded.unwrap().claims.sub; 
                
-            println!("___USERID: {}", user_id);
-
              let user_permissions= db_permission::Entity::find()
                .join_rev(
                 JoinType::InnerJoin,
@@ -61,7 +57,6 @@ pub async fn auth_validator(
 
 
 for user_permission in user_permissions {
-    println!("___UP__{:?} {:?}", user_permission.name , permission_name);
 if permission_name == user_permission.name   {
     return Ok(())
 }
@@ -83,7 +78,7 @@ pub fn generate_jwt(user_id: i32) -> Result<String, Error> {
     encode(
         &header,
         &claims,
-        &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
+        &EncodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
     )
 }
 

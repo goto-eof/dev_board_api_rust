@@ -1,4 +1,5 @@
 {
     "db_uri" : "postgres://postgres:postgres@postgres_service:5432/postgres",
-    "server_port":  8013
+    "server_port":  8013,
+    "jwt_secret": "this_is_our_secret"
 }

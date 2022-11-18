@@ -8,6 +8,7 @@ use std::env;
 pub struct Settings {
     pub db_uri: String,
     pub server_port: u16,
+    pub jwt_secret: String,
 }
 impl Settings {
     pub fn init_configuration() -> Result<Self, ConfigError> {
