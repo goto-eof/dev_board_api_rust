@@ -5,7 +5,7 @@
 Start DBMS container:
 
 ```
-docker-compose -f docker-compose-postgres.yml up
+docker-compose up
 ```
 
 Start server:

@@ -1,0 +1,34 @@
+version: '3.6'
+
+services:
+  dev-board:
+    container_name: dev_board_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart:
+      on-failure
+    ports:
+      - "127.0.0.1:8013:8013"
+    links:
+      - "postgres-service"    
+    depends_on:
+        postgres-service:
+          condition: service_started          
+    networks:
+      - default
+  postgres-service:
+      container_name: postgres_service
+      image: postgres:14-alpine
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_DB=postgres
+      healthcheck:
+        test: pg_isready -U postgres         
+      restart:
+        on-failure
+      networks:
+      - default
