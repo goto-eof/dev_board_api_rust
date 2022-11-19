@@ -1,8 +1,11 @@
 [package]
 name = "dev-board"
 authors = ["Andrei Dodu"]
+description = "A dashboard for organizing software development tasks (Kanban flow)"
+webpage = "https://github.com/goto-eof/dev_board_api_rust"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread", "parking_lot", "sync", "time"]  }
@@ -10,7 +13,6 @@ warp = "0.3.3"
 serde_json = "1.0.87"
 serde = {version = "1.0.147", features = ["derive"] }
 serde_derive = "1.0.147"
-thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 log4rs="1.2.0"
 log = "0.4.17"  
@@ -18,18 +20,16 @@ entity = { path = "src/entity" }
 migration = { path = "src/migration" }
 lazy_static="1.4.0"
 async_once="0.2.6"
-parking_lot = "0.12.1"
 config = "0.13.2"
 jsonwebtoken = "8.1.1"
-quote = "1.0.21"
-syn = "1.0.103"
 url="2.3.1"
 bcrypt = "0.13.0"
+
 [workspace]
 members = [".", "src/entity", "src/migration"]
 
 [dependencies.sea-orm]
-version = "0.10.0"
+version = "0.10.3"
 features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros" ]
 default-features = false
 
