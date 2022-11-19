@@ -1,14 +1,7 @@
-#[allow(non_snake_case)]
-pub mod ControllerAuth;
-#[allow(non_snake_case)]
-pub mod ControllerColumn;
-#[allow(non_snake_case)]
-pub mod ControllerCommon;
-#[allow(non_snake_case)]
-pub mod ControllerItem;
-#[allow(non_snake_case)]
-pub mod ControllerPermission;
-#[allow(non_snake_case)]
-pub mod ControllerRole;
-#[allow(non_snake_case)]
-pub mod ControllerUser;
+pub mod controller_auth;
+pub mod controller_column;
+pub mod controller_common;
+pub mod controller_item;
+pub mod controller_permission;
+pub mod controller_role;
+pub mod controller_user;

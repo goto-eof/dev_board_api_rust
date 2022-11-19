@@ -1,5 +1,5 @@
-use crate::structure::Structures::DevBoardGenericError;
-use crate::structure::Structures::Response;
+use crate::structure::structures::DevBoardGenericError;
+use crate::structure::structures::Response;
 use serde::Serialize;
 use warp::{reply::json, Reply};
 pub fn generate_response<T: Serialize>(

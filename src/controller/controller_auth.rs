@@ -3,9 +3,9 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
-use crate::structure::Structures::DevBoardErrorType;
-use crate::structure::Structures::DevBoardGenericError;
-use crate::util::AuthenticationUtil::{self};
+use crate::structure::structures::DevBoardErrorType;
+use crate::structure::structures::DevBoardGenericError;
+use crate::util::util_authentication::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;
 use entity::{db_role, db_user, db_user_role};
@@ -44,7 +44,7 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let user = user.unwrap();
     let check_password = verify(login_data.password, &user.password).unwrap();
     if check_password {
-        let jwt = AuthenticationUtil::generate_jwt(user.id).unwrap();
+        let jwt = util_authentication::generate_jwt(user.id).unwrap();
         let json = json!(user.email);
         return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
@@ -164,7 +164,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         let result = result.unwrap();
         if result.0.is_some() {
             let user_id = result.0.unwrap();
-            let jwt = AuthenticationUtil::generate_jwt(user_id).unwrap();
+            let jwt = util_authentication::generate_jwt(user_id).unwrap();
             let json = json!(user_id);
             return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
         } else {

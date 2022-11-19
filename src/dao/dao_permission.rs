@@ -1,9 +1,9 @@
-use crate::structure::Structures::DevBoardErrorType;
-use crate::structure::Structures::DevBoardGenericError;
+use crate::structure::structures::DevBoardErrorType;
+use crate::structure::structures::DevBoardGenericError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
-use entity::db_role;
+use entity::db_permission;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -11,9 +11,9 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 
-pub async fn get_by_id(id: i32) -> Result<db_role::Model, DevBoardGenericError> {
+pub async fn get_by_id(id: i32) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
-    let result = db_role::Entity::find_by_id(id).one(db).await;
+    let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DevBoardGenericError {
@@ -38,11 +38,30 @@ pub async fn get_by_id(id: i32) -> Result<db_role::Model, DevBoardGenericError> 
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_role::Model>, DevBoardGenericError> {
+pub async fn get_by_name(name: &str) -> Result<Option<db_permission::Model>, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+    let result = db_permission::Entity::find()
+        .filter(db_permission::Column::Name.eq(name))
+        .one(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    Ok(result.unwrap())
+}
+
+pub async fn get_all() -> Result<Vec<db_permission::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
-    let result = db_role::Entity::find()
-        .order_by_asc(db_role::Column::Id)
+    let result = db_permission::Entity::find()
+        .order_by_asc(db_permission::Column::Id)
         .all(db)
         .await;
 
@@ -60,9 +79,11 @@ pub async fn get_all() -> Result<Vec<db_role::Model>, DevBoardGenericError> {
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> Result<db_role::Model, DevBoardGenericError> {
+pub async fn create(
+    json_data: serde_json::Value,
+) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
-    let result = db_role::ActiveModel::from_json(json_data);
+    let result = db_permission::ActiveModel::from_json(json_data);
 
     if result.is_err() {
         return Err(DevBoardGenericError {
@@ -96,9 +117,9 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_role::Model, DevB
 pub async fn update(
     id: i32,
     json_data: serde_json::Value,
-) -> Result<db_role::Model, DevBoardGenericError> {
+) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
-    let result = db_role::Entity::find_by_id(id).one(db).await;
+    let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DevBoardGenericError {
@@ -120,7 +141,7 @@ pub async fn update(
         });
     }
 
-    let mut item_active_model: db_role::ActiveModel = opt.unwrap().into();
+    let mut item_active_model: db_permission::ActiveModel = opt.unwrap().into();
 
     let result = item_active_model.set_from_json(json_data);
 
@@ -155,7 +176,7 @@ pub async fn update(
 pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
-    let result = db_role::Entity::find_by_id(id).one(db).await;
+    let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
         return Err(DevBoardGenericError {

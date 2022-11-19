@@ -1,12 +1,6 @@
-#[allow(non_snake_case)]
-pub mod DaoColumn;
-#[allow(non_snake_case)]
-pub mod DaoCommon;
-#[allow(non_snake_case)]
-pub mod DaoItem;
-#[allow(non_snake_case)]
-pub mod DaoPermission;
-#[allow(non_snake_case)]
-pub mod DaoRole;
-#[allow(non_snake_case)]
-pub mod DaoUser;
+pub mod dao_column;
+pub mod dao_common;
+pub mod dao_item;
+pub mod dao_permission;
+pub mod dao_role;
+pub mod dao_user;

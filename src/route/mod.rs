@@ -1,10 +1,5 @@
-#[allow(non_snake_case)]
-pub mod RoutesColumn;
-#[allow(non_snake_case)]
-pub mod RoutesItem;
-#[allow(non_snake_case)]
-pub mod RoutesPermission;
-#[allow(non_snake_case)]
-pub mod RoutesRole;
-#[allow(non_snake_case)]
-pub mod RoutesUser;
+pub mod routes_column;
+pub mod routes_item;
+pub mod routes_permission;
+pub mod routes_role;
+pub mod routes_user;

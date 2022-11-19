@@ -1,4 +1,4 @@
-use crate::{controller::ControllerPermission, util::AuthenticationUtil::auth_validator};
+use crate::{controller::controller_permission, util::util_authentication::auth_validator};
 use warp::{Filter, Rejection, Reply};
 
 pub async fn get_permission_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone
@@ -10,27 +10,27 @@ pub async fn get_permission_routes() -> impl Filter<Extract = impl Reply, Error 
         .untuple_one()
         .and(warp::path::param::<i32>())
         .and(warp::path::end())
-        .and_then(ControllerPermission::get_permission)
+        .and_then(controller_permission::get_permission)
         .or(db_column
             .and(warp::get())
             .and(auth_validator("get_permission_by_name".to_string()).await)
             .untuple_one()
             .and(warp::path::param::<String>())
             .and(warp::path::end())
-            .and_then(ControllerPermission::get_permission_by_name))
+            .and_then(controller_permission::get_permission_by_name))
         .or(db_column
             .and(warp::get())
             .and(auth_validator("get_all_permissions".to_string()).await)
             .untuple_one()
             .and(warp::path::end())
-            .and_then(ControllerPermission::get_all_permissions))
+            .and_then(controller_permission::get_all_permissions))
         .or(db_column
             .and(warp::post())
             .and(auth_validator("insert_permission".to_string()).await)
             .untuple_one()
             .and(warp::path::end())
             .and(warp::body::json())
-            .and_then(ControllerPermission::insert_permission))
+            .and_then(controller_permission::insert_permission))
         .or(db_column
             .and(warp::put())
             .and(auth_validator("update_permission".to_string()).await)
@@ -38,12 +38,12 @@ pub async fn get_permission_routes() -> impl Filter<Extract = impl Reply, Error 
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
             .and(warp::body::json())
-            .and_then(ControllerPermission::update_permission))
+            .and_then(controller_permission::update_permission))
         .or(db_column
             .and(warp::delete())
             .and(auth_validator("delete_permission".to_string()).await)
             .untuple_one()
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
-            .and_then(ControllerPermission::delete_permission))
+            .and_then(controller_permission::delete_permission))
 }

@@ -1,22 +1,22 @@
-use crate::configuration::ConfigurationDatabase;
-use crate::configuration::ConfigurationLoader::Settings;
-use crate::route::RoutesColumn::get_column_routes;
-use crate::route::RoutesItem::get_item_routes;
-use crate::route::RoutesPermission::get_permission_routes;
-use crate::route::RoutesRole::get_role_routes;
-use crate::route::RoutesUser::get_user_routes;
+use crate::configuration::config_database;
+use crate::configuration::config_loader::Settings;
+use crate::route::routes_column::get_column_routes;
+use crate::route::routes_item::get_item_routes;
+use crate::route::routes_permission::get_permission_routes;
+use crate::route::routes_role::get_role_routes;
+use crate::route::routes_user::get_user_routes;
 use ::function_name::named;
 use async_once::AsyncOnce;
-use dao::DaoCommon;
+use dao::dao_common;
 use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
 use serde_json::json;
-use structure::Structures::DevBoardErrorType;
-use structure::Structures::DevBoardGenericError;
-use util::AuthenticationUtil::Unauthorized;
-use util::PermissionUtil::init_permissions;
+use structure::structures::DevBoardErrorType;
+use structure::structures::DevBoardGenericError;
+use util::util_authentication::Unauthorized;
+use util::util_permission::init_permissions;
 use warp::hyper::Method;
 use warp::hyper::StatusCode;
 use warp::reply;
@@ -38,7 +38,7 @@ extern crate lazy_static;
 lazy_static! {
     static ref SETTINGS: Settings = Settings::init_configuration().unwrap();
     static ref DB_POOL: AsyncOnce<DbConn> = AsyncOnce::new(async {
-        let db = ConfigurationDatabase::establish_connection().await;
+        let db = config_database::establish_connection().await;
         db.unwrap()
     });
 }
@@ -48,8 +48,8 @@ async fn main() {
     init_logging();
     init_db().await;
     init_permissions(DB_POOL.get().await).await;
-    DaoCommon::init_admin().await; // default superuser
-    DaoCommon::init_user_role().await; // this role is assigned when a new user is created
+    dao_common::init_admin().await; // default superuser
+    dao_common::init_user_role().await; // this role is assigned when a new user is created
     init_test();
     init_server().await;
 }

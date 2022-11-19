@@ -1,6 +1,6 @@
-use crate::controller::ControllerAuth;
-use crate::controller::ControllerUser;
-use crate::util::AuthenticationUtil::auth_validator;
+use crate::controller::controller_auth;
+use crate::controller::controller_user;
+use crate::util::util_authentication::auth_validator;
 use warp::{Filter, Rejection, Reply};
 
 pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
@@ -11,41 +11,41 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
         .and(warp::path::end())
         .and(warp::body::json())
         .and(warp::body::content_length_limit(1024 * 16))
-        .and_then(ControllerAuth::register)
+        .and_then(controller_auth::register)
         .or(db_column
             .and(warp::path("login"))
             .and(warp::post())
             .and(warp::path::end())
             .and(warp::body::json())
             .and(warp::body::content_length_limit(1024 * 16))
-            .and_then(ControllerAuth::login))
+            .and_then(controller_auth::login))
         .or(db_column
             .and(warp::get())
             .and(auth_validator("get_user".to_string()).await)
             .untuple_one()
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
-            .and_then(ControllerUser::get_user))
+            .and_then(controller_user::get_user))
         .or(db_column
             .and(warp::get())
             .and(auth_validator("get_by_username".to_string()).await)
             .untuple_one()
             .and(warp::path::param::<String>())
             .and(warp::path::end())
-            .and_then(ControllerUser::get_by_username))
+            .and_then(controller_user::get_by_username))
         .or(db_column
             .and(warp::get())
             .and(auth_validator("get_all_users".to_string()).await)
             .untuple_one()
             .and(warp::path::end())
-            .and_then(ControllerUser::get_all_users))
+            .and_then(controller_user::get_all_users))
         .or(db_column
             .and(warp::post())
             .and(auth_validator("insert_user".to_string()).await)
             .untuple_one()
             .and(warp::path::end())
             .and(warp::body::json())
-            .and_then(ControllerUser::insert_user))
+            .and_then(controller_user::insert_user))
         .or(db_column
             .and(warp::put())
             .and(auth_validator("update_user".to_string()).await)
@@ -53,12 +53,12 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
             .and(warp::body::json())
-            .and_then(ControllerUser::update_user))
+            .and_then(controller_user::update_user))
         .or(db_column
             .and(warp::delete())
             .and(auth_validator("delete_user".to_string()).await)
             .untuple_one()
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
-            .and_then(ControllerUser::delete_user))
+            .and_then(controller_user::delete_user))
 }
