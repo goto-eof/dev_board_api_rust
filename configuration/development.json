@@ -25,7 +25,8 @@
         "Cookie",
         "Upgrade-Insecure-Requests",
         "Upgrade",
-        "Authorization"],
+        "Authorization"
+    ],
     "cors_allowed_methods": [   
         "GET",
         "POST",
@@ -33,5 +34,21 @@
         "DELETE",
         "OPTIONS",
         "HEAD",
-        "PATCH"]
+        "PATCH"
+    ],
+    "application_permissions": [ 
+        "get_column",
+        "get_all_columns",
+        "get_all_columns_with_items",
+        "insert_column",
+        "update_column",
+        "swap_columns",
+        "delete_column",
+        "get_item",
+        "get_items",
+        "insert_item",
+        "update_item",
+        "delete_item",
+        "swap_items"
+    ]    
 }
