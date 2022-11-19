@@ -60,9 +60,6 @@ pub async fn get_all() -> Result<Vec<db_item::Model>, DevBoardGenericError> {
     }
 
     let models = result.unwrap();
-
-    println!("{:?}", models);
-
     Ok(models)
 }
 

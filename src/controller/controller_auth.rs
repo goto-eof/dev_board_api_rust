@@ -161,8 +161,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 if user.is_err() {
                     return Ok((None, Some("Error creating user".to_string())));
                 }
-                let user = user.unwrap();
-                println!("{:?}", user);
+                user.unwrap();
                 let user = User {
                     first_name: user_model.first_name.unwrap(),
                     last_name: user_model.last_name.unwrap(),

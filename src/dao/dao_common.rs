@@ -1,6 +1,7 @@
 use bcrypt::hash;
 use chrono::Utc;
 use entity::{db_permission, db_role, db_role_permission, db_user, db_user_role};
+use log::debug;
 use migration::DbErr;
 use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set,
@@ -73,7 +74,7 @@ pub async fn init_admin() -> () {
         })
         .await;
     if result.is_err() {
-        println!("{:?}", result);
+        debug!("{:?}", result);
     }
 }
 
@@ -121,6 +122,6 @@ pub async fn init_user_role() -> () {
         })
         .await;
     if result.is_err() {
-        println!("{:?}", result);
+        debug!("{:?}", result);
     }
 }
