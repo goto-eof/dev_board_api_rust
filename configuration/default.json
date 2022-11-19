@@ -44,11 +44,32 @@
         "update_column",
         "swap_columns",
         "delete_column",
+       
         "get_item",
         "get_items",
         "insert_item",
         "update_item",
         "delete_item",
-        "swap_items"
+        "swap_items",
+
+        "get_permission",
+        "get_permission_by_name",
+        "get_all_permissions",
+        "insert_permission",
+        "update_permission",
+        "delete_permission",
+        
+        "get_role",
+        "get_all_roles",
+        "insert_role",
+        "update_role",
+        "delete_role",
+        
+        "get_user",
+        "get_by_username",
+        "get_all_users",
+        "insert_user",
+        "update_user",
+        "delete_user"
     ]    
 }
