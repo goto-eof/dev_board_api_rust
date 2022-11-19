@@ -3,6 +3,7 @@ use crate::configuration::config_loader::Settings;
 use crate::route::routes_util::init_routes;
 use async_once::AsyncOnce;
 use configuration::config_database::init_db;
+use configuration::config_logging::init_logging;
 use dao::dao_common;
 use log::debug;
 use sea_orm::DbConn;
@@ -35,10 +36,6 @@ async fn main() {
     dao_common::init_admin().await; // default superuser
     dao_common::init_user_role().await; // this role is assigned when a new user is created
     init_server().await;
-}
-
-fn init_logging() {
-    log4rs::init_file("log4rs.yml", Default::default()).unwrap();
 }
 
 async fn init_server() {
