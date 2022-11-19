@@ -1,5 +1,5 @@
-use crate::structure::structures::DevBoardErrorType;
-use crate::structure::structures::DevBoardGenericError;
+use crate::structure::structure::DevBoardErrorType;
+use crate::structure::structure::DevBoardGenericError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;

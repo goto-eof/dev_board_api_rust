@@ -1,6 +1,6 @@
 use super::controller_common;
 use crate::dao::dao_column;
-use crate::structure::structures::SwapRequest;
+use crate::structure::structure::SwapRequest;
 use warp::Reply;
 
 pub async fn get_column(id: i32) -> crate::GenericResult<impl Reply> {

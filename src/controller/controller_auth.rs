@@ -3,8 +3,8 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
-use crate::structure::structures::DevBoardErrorType;
-use crate::structure::structures::DevBoardGenericError;
+use crate::structure::structure::DevBoardErrorType;
+use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;

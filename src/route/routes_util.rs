@@ -5,7 +5,7 @@ use warp::{
 };
 
 use crate::{
-    structure::structures::{DevBoardErrorType, DevBoardGenericError},
+    structure::structure::{DevBoardErrorType, DevBoardGenericError},
     util::util_authentication::Unauthorized,
 };
 

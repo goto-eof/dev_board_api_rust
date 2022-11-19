@@ -1,6 +1,6 @@
-use crate::structure::structures::DevBoardErrorType;
-use crate::structure::structures::DevBoardGenericError;
-use crate::structure::structures::SwapRequest;
+use crate::structure::structure::DevBoardErrorType;
+use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;

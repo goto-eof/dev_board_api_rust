@@ -1,6 +1,6 @@
 use super::controller_common;
 use crate::dao::dao_item;
-use crate::structure::structures::SwapRequest;
+use crate::structure::structure::SwapRequest;
 use warp::Reply;
 
 pub async fn get_item(id: i32) -> crate::GenericResult<impl Reply> {
