@@ -51,7 +51,6 @@ impl MigrationTrait for Migration {
 enum DbUserRole {
     Table,
     Id,
-    Name,
     UserId,
     RoleId,
     CreatedAt,

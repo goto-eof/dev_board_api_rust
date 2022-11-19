@@ -6,7 +6,6 @@ use entity::db_permission;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
-use sea_orm::FromQueryResult;
 use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
@@ -73,11 +72,6 @@ pub async fn get_all() -> Result<Vec<db_permission::Model>, DaoError> {
     let models = result.unwrap();
 
     Ok(models)
-}
-
-#[derive(FromQueryResult, Debug)]
-struct OptionResult {
-    value: Option<i64>,
 }
 
 pub async fn create(json_data: serde_json::Value) -> Result<db_permission::Model, DaoError> {

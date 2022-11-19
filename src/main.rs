@@ -12,6 +12,8 @@ use warp::Reply;
 use PermissionUtil::init_permissions;
 use RoutesColumn::get_column_routes;
 use RoutesItem::get_item_routes;
+use RoutesPermission::get_permission_routes;
+use RoutesRole::get_role_routes;
 use RoutesUser::get_user_routes;
 #[allow(non_snake_case)]
 mod AuthenticationUtil;
@@ -27,6 +29,10 @@ mod ControllerColumn;
 mod ControllerCommon;
 #[allow(non_snake_case)]
 mod ControllerItem;
+#[allow(non_snake_case)]
+mod ControllerPermission;
+#[allow(non_snake_case)]
+mod ControllerRole;
 #[allow(non_snake_case)]
 mod ControllerUser;
 #[allow(non_snake_case)]
@@ -47,6 +53,10 @@ mod PermissionUtil;
 mod RoutesColumn;
 #[allow(non_snake_case)]
 mod RoutesItem;
+#[allow(non_snake_case)]
+mod RoutesPermission;
+#[allow(non_snake_case)]
+mod RoutesRole;
 #[allow(non_snake_case)]
 mod RoutesUser;
 #[allow(non_snake_case)]
@@ -152,6 +162,8 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
         .await
         .or(get_item_routes().await)
         .or(get_user_routes().await)
+        .or(get_role_routes().await)
+        .or(get_permission_routes().await)
         .with(&any_origin_3)
         .with(warp::log("api"))
 }

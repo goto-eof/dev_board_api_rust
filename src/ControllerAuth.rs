@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use warp::{
     http::HeaderValue,
-    hyper::{header, HeaderMap, StatusCode},
+    hyper::{HeaderMap, StatusCode},
     Rejection, Reply,
 };
 
@@ -105,7 +105,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                             .eq(registration_data.username.clone())
                             .or(db_user::Column::Email.eq(registration_data.email.clone())),
                     )
-                    .one(db)
+                    .one(txn)
                     .await;
                 if user.is_ok() {
                     let user = user.unwrap();
@@ -130,7 +130,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 if registration_data.last_name.is_some() {
                     user.last_name = Set(registration_data.last_name.unwrap());
                 }
-                let user = user.save(db).await;
+                let user = user.save(txn).await;
                 let user = user.unwrap();
 
                 let mut ur_am = db_user_role::ActiveModel::new();
@@ -145,7 +145,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 let dat = Utc::now().naive_utc();
                 ur_am.created_at = sea_orm::Set(Some(dat));
                 ur_am.updated_at = sea_orm::Set(Some(dat));
-                let user = ur_am.save(db).await;
+                let user = ur_am.save(txn).await;
                 if user.is_err() {
                     return Ok((None, Some("Error creating user".to_string())));
                 }

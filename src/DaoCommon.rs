@@ -53,7 +53,7 @@ pub async fn init_admin() -> () {
                     result_am.updated_at = sea_orm::Set(Some(dat));
                     result_am.role_id = Set(role_id);
                     result_am.user_id = Set(user_id);
-                    let result = result_am.save(txn).await.unwrap();
+                    result_am.save(txn).await.unwrap();
 
                     // giving all permissions to admin
                     let permissions = db_permission::Entity::find().all(txn).await.unwrap();

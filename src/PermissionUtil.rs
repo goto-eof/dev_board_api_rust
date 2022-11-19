@@ -5,9 +5,6 @@ use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, DbConn, EntityTrait, QueryFilter,
     TransactionTrait,
 };
-use serde_json::json;
-
-use crate::DaoPermission;
 
 pub async fn init_permissions(db: &DbConn) {
     let result = db
