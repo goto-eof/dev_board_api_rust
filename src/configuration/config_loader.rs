@@ -10,6 +10,9 @@ pub struct Settings {
     pub server_port: u16,
     pub jwt_secret: String,
     pub jwt_ttl: i64,
+    pub cors_allowed_origins: Vec<String>,
+    pub cors_allowed_headers: Vec<String>,
+    pub cors_allowed_methods: Vec<String>,
 }
 impl Settings {
     pub fn init_configuration() -> Result<Self, ConfigError> {

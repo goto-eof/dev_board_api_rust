@@ -6,11 +6,9 @@ use super::{
 use crate::{
     structure::structure::{DevBoardErrorType, DevBoardGenericError},
     util::util_authentication::Unauthorized,
+    SETTINGS,
 };
-use warp::{
-    hyper::{Method, StatusCode},
-    Filter, Rejection, Reply,
-};
+use warp::{hyper::StatusCode, Filter, Rejection, Reply};
 
 pub(crate) async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
     if err.is_not_found() {
@@ -42,51 +40,28 @@ fn generate_response(
 }
 
 pub async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    let cors_allowed_origins: Vec<&str> = SETTINGS
+        .cors_allowed_origins
+        .iter()
+        .map(|s| s as &str)
+        .collect();
+
+    let cors_allowed_headers: Vec<&str> = SETTINGS
+        .cors_allowed_headers
+        .iter()
+        .map(|s| s as &str)
+        .collect();
+
+    let cors_allowed_methods: Vec<&str> = SETTINGS
+        .cors_allowed_methods
+        .iter()
+        .map(|s| s as &str)
+        .collect();
+
     let any_origin_3 = warp::cors()
-        // .allow_any_origin()
-        .allow_origin("http://localhost:3000")
-        .allow_headers(vec![
-            "Access-Control-Allow-Credentials",
-            "Access-Control-Allow-Headers",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers",
-            "Origin",
-            "Accept",
-            "Content-Type",
-            "Accept-Encoding",
-            "Accept-Language",
-            "Cache-Control",
-            "Connection",
-            "Host",
-            "Pragma",
-            "Referer",
-            "User-Agent",
-            "X-Requested-With",
-            "Content-Type",
-            "Cookie",
-            "sec-ch-ua",
-            "sec-ch-ua-mobile",
-            "sec-ch-ua-platform",
-            "Sec-Fetch-Dest",
-            "Sec-Fetch-Mode",
-            "Sec-Fetch-Site",
-            "Sec-Fetch-User",
-            "Sec-WebSocket-Extensions",
-            "Sec-WebSocket-Key",
-            "Sec-WebSocket-Version",
-            "Upgrade-Insecure-Requests",
-            "Upgrade",
-            "Authorization",
-        ])
-        .allow_methods(vec![
-            Method::GET,
-            Method::POST,
-            Method::PUT,
-            Method::PATCH,
-            Method::DELETE,
-            Method::OPTIONS,
-            Method::HEAD,
-        ])
+        .allow_origins(cors_allowed_origins)
+        .allow_headers(cors_allowed_headers)
+        .allow_methods(cors_allowed_methods)
         .allow_credentials(true);
 
     get_column_routes()
