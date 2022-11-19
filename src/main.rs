@@ -1,11 +1,6 @@
 use crate::configuration::config_database;
 use crate::configuration::config_loader::Settings;
-use crate::route::routes_column::get_column_routes;
-use crate::route::routes_item::get_item_routes;
-use crate::route::routes_permission::get_permission_routes;
-use crate::route::routes_role::get_role_routes;
-use crate::route::routes_user::get_user_routes;
-use crate::route::routes_util::handle_rejection;
+use crate::route::routes_util::init_routes;
 use ::function_name::named;
 use async_once::AsyncOnce;
 use dao::dao_common;
@@ -14,10 +9,7 @@ use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
 use util::util_permission::init_permissions;
-use warp::hyper::Method;
-use warp::Filter;
 use warp::Rejection;
-use warp::Reply;
 mod configuration;
 mod controller;
 mod dao;
@@ -70,65 +62,6 @@ async fn init_db() {
     } else {
         debug!("[DB RESULT] DB Connection [OK]")
     }
-}
-
-async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    let any_origin_3 = warp::cors()
-        // .allow_any_origin()
-        .allow_origin("http://localhost:3000")
-        .allow_headers(vec![
-            "Access-Control-Allow-Credentials",
-            "Access-Control-Allow-Headers",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers",
-            "Origin",
-            "Accept",
-            "Content-Type",
-            "Accept-Encoding",
-            "Accept-Language",
-            "Cache-Control",
-            "Connection",
-            "Host",
-            "Pragma",
-            "Referer",
-            "User-Agent",
-            "X-Requested-With",
-            "Content-Type",
-            "Cookie",
-            "sec-ch-ua",
-            "sec-ch-ua-mobile",
-            "sec-ch-ua-platform",
-            "Sec-Fetch-Dest",
-            "Sec-Fetch-Mode",
-            "Sec-Fetch-Site",
-            "Sec-Fetch-User",
-            "Sec-WebSocket-Extensions",
-            "Sec-WebSocket-Key",
-            "Sec-WebSocket-Version",
-            "Upgrade-Insecure-Requests",
-            "Upgrade",
-            "Authorization",
-        ])
-        .allow_methods(vec![
-            Method::GET,
-            Method::POST,
-            Method::PUT,
-            Method::PATCH,
-            Method::DELETE,
-            Method::OPTIONS,
-            Method::HEAD,
-        ])
-        .allow_credentials(true);
-
-    get_column_routes()
-        .await
-        .or(get_item_routes().await)
-        .or(get_user_routes().await)
-        .or(get_role_routes().await)
-        .or(get_permission_routes().await)
-        .recover(handle_rejection)
-        .with(&any_origin_3)
-        .with(warp::log("api"))
 }
 
 async fn init_server() {
