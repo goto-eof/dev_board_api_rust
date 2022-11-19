@@ -71,7 +71,7 @@ password: password
 - ~~be - implement controllers for permission and role tables (the idea is to have a control panel where it is possible to assign roles and permissions to users);~~
 - be - manage better code unwrapping;
 - be - improve security;
-- be - association of kanban flow to user
+- be - association of kanban flow to user (wip)
 - ~~be - fix column/item swapping~~;
 
 ### Post scriptum

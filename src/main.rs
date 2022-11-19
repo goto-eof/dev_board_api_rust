@@ -22,6 +22,7 @@ extern crate lazy_static;
 
 lazy_static! {
     static ref SETTINGS: Settings = Settings::init_configuration().unwrap();
+    // it is not very elegant, but it works
     static ref DB_POOL: AsyncOnce<DbConn> = AsyncOnce::new(async {
         let db = config_database::establish_connection().await;
         db.unwrap()
@@ -39,7 +40,7 @@ async fn main() {
 }
 
 async fn init_server() {
-    debug!("server run on port {}", SETTINGS.server_port);
+    debug!("server is running on port {}", SETTINGS.server_port);
     warp::serve(init_routes().await)
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;

@@ -70,7 +70,13 @@
         "get_all_users",
         "insert_user",
         "update_user",
-        "delete_user"
+        "delete_user",
+
+        "get_board",
+        "get_all_boards",
+        "insert_board",
+        "update_board",
+        "delete_board"
     ],
     "admin_only_permissions": [
         "get_permission",
@@ -92,5 +98,6 @@
         "insert_user",
         "update_user",
         "delete_user"
+
     ]
 }

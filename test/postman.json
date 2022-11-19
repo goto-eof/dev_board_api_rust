@@ -86,11 +86,12 @@
 							{
 								"key": "Authorization",
 								"value": "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTIyMX0.t30KD8V-NUeC-4vNUOX6yvPn5kQ6nyY2UWBbZPM0lC7jDFrgP27IHvtAsQtz3a3qX0agey5q6ZnS5_3w2KC9JA; Path=/; Secure; Expires=Fri, 02 Dec 2022 12:39:21 GMT;",
-								"type": "default"
+								"type": "default",
+								"disabled": true
 							},
 							{
 								"key": "Cookie",
-								"value": "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTIyMX0.t30KD8V-NUeC-4vNUOX6yvPn5kQ6nyY2UWBbZPM0lC7jDFrgP27IHvtAsQtz3a3qX0agey5q6ZnS5_3w2KC9JA; Path=/; Secure; Expires=Fri, 02 Dec 2022 12:39:21 GMT;",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
 								"type": "default"
 							}
 						],
@@ -316,7 +317,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"ctm_name\": \"ciaociao\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -333,6 +334,167 @@
 							"path": [
 								"item",
 								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "board",
+			"item": [
+				{
+					"name": "get_all",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8013/board/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"board",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_by_id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8013/board/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"board",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"board 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/board",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"board"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ciao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/board/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"board",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/board/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"board",
+								"1"
 							]
 						}
 					},

@@ -20,6 +20,7 @@ pub async fn get_item_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and_then(controller_item::get_by_parent_id))
         .or(db_column
             .and(warp::get())
+            .and(warp::path("all"))
             .and(auth_validator("get_items".to_string()).await)
             .untuple_one()
             .and(warp::path::end())

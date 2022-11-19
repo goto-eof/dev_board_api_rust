@@ -35,6 +35,7 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and_then(controller_user::get_by_username))
         .or(db_column
             .and(warp::get())
+            .and(warp::path("all"))
             .and(auth_validator("get_all_users".to_string()).await)
             .untuple_one()
             .and(warp::path::end())

@@ -1,5 +1,5 @@
 use super::{
-    routes_column::get_column_routes, routes_item::get_item_routes,
+    routes_board::get_board_routes, routes_column::get_column_routes, routes_item::get_item_routes,
     routes_permission::get_permission_routes, routes_role::get_role_routes,
     routes_user::get_user_routes,
 };
@@ -70,6 +70,7 @@ pub async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejectio
         .or(get_user_routes().await)
         .or(get_role_routes().await)
         .or(get_permission_routes().await)
+        .or(get_board_routes().await)
         .recover(handle_rejection)
         .with(&any_origin_3)
         .with(warp::log("api"))

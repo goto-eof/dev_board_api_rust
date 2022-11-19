@@ -13,6 +13,7 @@ pub async fn get_role_routes() -> impl Filter<Extract = impl Reply, Error = Reje
         .and_then(controller_role::get_role)
         .or(db_column
             .and(warp::get())
+            .and(warp::path("all"))
             .and(auth_validator("get_all_roles".to_string()).await)
             .untuple_one()
             .and(warp::path::end())
