@@ -63,7 +63,7 @@ password: password
 - fe - hide login and register buttons when user is logged in;
 - fe - improve form validation
 - be - optimize server responses (CORS error when user is not authorized);
-- be - refactor;
+- ~~be - refactor;~~
 - ~~be - implement controllers for permission and role tables (the idea is to have a control panel where it is possible to assign roles and permissions to users);~~
 - be - manage better code unwrapping;
 - be - improve security;
