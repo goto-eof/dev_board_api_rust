@@ -1,6 +1,6 @@
-use crate::structs::Structures::DaoError;
-use crate::structs::Structures::DaoErrorType;
-use crate::structs::Structures::SwapRequest;
+use crate::structure::Structures::DaoError;
+use crate::structure::Structures::DaoErrorType;
+use crate::structure::Structures::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;

@@ -1,5 +1,5 @@
-use crate::structs::Structures::DaoError;
-use crate::structs::Structures::Response;
+use crate::structure::Structures::DaoError;
+use crate::structure::Structures::Response;
 use serde::Serialize;
 use warp::{reply::json, Reply};
 pub fn generate_response<T: Serialize>(

@@ -3,8 +3,8 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
-use crate::structs::Structures::DaoError;
-use crate::structs::Structures::DaoErrorType;
+use crate::structure::Structures::DaoError;
+use crate::structure::Structures::DaoErrorType;
 use crate::util::AuthenticationUtil::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;

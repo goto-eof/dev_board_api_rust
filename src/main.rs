@@ -22,7 +22,7 @@ mod configuration;
 mod controller;
 mod dao;
 mod route;
-mod structs;
+mod structure;
 mod util;
 type GenericResult<T> = std::result::Result<T, Rejection>;
 
