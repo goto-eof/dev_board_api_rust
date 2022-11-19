@@ -1,6 +1,7 @@
-use crate::{ControllerCommon, DaoRole};
-use warp::Reply;
+use crate::dao::DaoRole;
 
+use super::ControllerCommon;
+use warp::Reply;
 pub async fn get_role(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoRole::get_by_id(id).await)
 }

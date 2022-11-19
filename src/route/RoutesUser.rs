@@ -1,6 +1,7 @@
+use crate::controller::ControllerAuth;
+use crate::controller::ControllerUser;
+use crate::AuthenticationUtil::auth_validator;
 use warp::{Filter, Rejection, Reply};
-
-use crate::{AuthenticationUtil::auth_validator, ControllerAuth, ControllerUser};
 
 pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let db_column = warp::path("user");

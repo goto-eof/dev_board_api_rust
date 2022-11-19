@@ -1,6 +1,7 @@
-use crate::{ControllerCommon, DaoPermission};
-use warp::Reply;
+use crate::dao::DaoPermission;
 
+use super::ControllerCommon;
+use warp::Reply;
 pub async fn get_permission(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoPermission::get_by_id(id).await)
 }

@@ -1,7 +1,6 @@
-use crate::{
-    ControllerCommon,
-    DaoUser::{self},
-};
+use crate::dao::DaoUser;
+
+use super::ControllerCommon;
 use warp::Reply;
 
 pub async fn get_user(id: i32) -> crate::GenericResult<impl Reply> {

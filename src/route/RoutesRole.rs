@@ -1,6 +1,6 @@
+use crate::controller::ControllerRole;
+use crate::AuthenticationUtil::auth_validator;
 use warp::{Filter, Rejection, Reply};
-
-use crate::{AuthenticationUtil::auth_validator, ControllerRole};
 
 pub async fn get_role_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let db_column = warp::path("role");

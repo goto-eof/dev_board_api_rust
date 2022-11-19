@@ -1,6 +1,13 @@
+use crate::route::RoutesColumn::get_column_routes;
+use crate::route::RoutesItem::get_item_routes;
+use crate::route::RoutesPermission::get_permission_routes;
+use crate::route::RoutesRole::get_role_routes;
+use crate::route::RoutesUser::get_user_routes;
 use crate::ConfigurationLoader::Settings;
+mod route;
 use ::function_name::named;
 use async_once::AsyncOnce;
+use dao::DaoCommon;
 use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
@@ -10,11 +17,6 @@ use warp::Filter;
 use warp::Rejection;
 use warp::Reply;
 use PermissionUtil::init_permissions;
-use RoutesColumn::get_column_routes;
-use RoutesItem::get_item_routes;
-use RoutesPermission::get_permission_routes;
-use RoutesRole::get_role_routes;
-use RoutesUser::get_user_routes;
 #[allow(non_snake_case)]
 mod AuthenticationUtil;
 #[allow(non_snake_case)]
@@ -22,46 +24,11 @@ mod ConfigurationDatabase;
 #[allow(non_snake_case)]
 mod ConfigurationLoader;
 #[allow(non_snake_case)]
-mod ControllerAuth;
-#[allow(non_snake_case)]
-mod ControllerColumn;
-#[allow(non_snake_case)]
-mod ControllerCommon;
-#[allow(non_snake_case)]
-mod ControllerItem;
-#[allow(non_snake_case)]
-mod ControllerPermission;
-#[allow(non_snake_case)]
-mod ControllerRole;
-#[allow(non_snake_case)]
-mod ControllerUser;
-#[allow(non_snake_case)]
-mod DaoColumn;
-#[allow(non_snake_case)]
-mod DaoCommon;
-#[allow(non_snake_case)]
-mod DaoItem;
-#[allow(non_snake_case)]
-mod DaoPermission;
-#[allow(non_snake_case)]
-mod DaoRole;
-#[allow(non_snake_case)]
-mod DaoUser;
-#[allow(non_snake_case)]
 mod PermissionUtil;
 #[allow(non_snake_case)]
-mod RoutesColumn;
-#[allow(non_snake_case)]
-mod RoutesItem;
-#[allow(non_snake_case)]
-mod RoutesPermission;
-#[allow(non_snake_case)]
-mod RoutesRole;
-#[allow(non_snake_case)]
-mod RoutesUser;
-#[allow(non_snake_case)]
 mod Structs;
-
+mod controller;
+mod dao;
 type GenericResult<T> = std::result::Result<T, Rejection>;
 
 #[macro_use]
