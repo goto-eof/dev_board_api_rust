@@ -85,7 +85,12 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjIyLCJleHAiOjE2Njg2MzUwMjV9.Xhp-4OghkTr6lUCLJXS4jmGEN-5OIKWyutcKoaI_zvo6bv-ayF71P3rnui9Tll8QXDeKXxRL8lBKTRHhgAr4-Q",
+								"value": "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTIyMX0.t30KD8V-NUeC-4vNUOX6yvPn5kQ6nyY2UWBbZPM0lC7jDFrgP27IHvtAsQtz3a3qX0agey5q6ZnS5_3w2KC9JA; Path=/; Secure; Expires=Fri, 02 Dec 2022 12:39:21 GMT;",
+								"type": "default"
+							},
+							{
+								"key": "Cookie",
+								"value": "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTIyMX0.t30KD8V-NUeC-4vNUOX6yvPn5kQ6nyY2UWBbZPM0lC7jDFrgP27IHvtAsQtz3a3qX0agey5q6ZnS5_3w2KC9JA; Path=/; Secure; Expires=Fri, 02 Dec 2022 12:39:21 GMT;",
 								"type": "default"
 							}
 						],
@@ -174,16 +179,29 @@
 					"name": "get_by_username",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTc5Nn0.cEe789SUkgAc-yh825y7QQZLUMX2VcrUhz5i3S3KNvqVoOYd8ceOAXGLq06lulqiY6OSDCyuOrlE_IcoIRp03w; Path=/; Secure; Expires=Fri, 02 Dec 2022 12:48:56 GMT;",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODc3NTIyMX0.t30KD8V-NUeC-4vNUOX6yvPn5kQ6nyY2UWBbZPM0lC7jDFrgP27IHvtAsQtz3a3qX0agey5q6ZnS5_3w2KC9JA",
+								"type": "default",
+								"disabled": true
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8013/column/admin",
+							"raw": "http://localhost:8013/user/get_by_username/admin",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8013",
 							"path": [
-								"column",
+								"user",
+								"get_by_username",
 								"admin"
 							]
 						}
@@ -332,7 +350,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"mario.rossi\",\n    \"password\": \"pikacphù\"\n}",
+							"raw": "{\n    \"username\": \"user6\",\n    \"password\": \"password\",\n    \"email\":\"mario@rossi6.com\",\n    \"first_name\": \"Mario\",\n    \"last_name\": \"Rossi\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -378,6 +396,35 @@
 							"path": [
 								"user",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/not/found",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"not",
+								"found"
 							]
 						}
 					},
