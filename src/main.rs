@@ -5,6 +5,7 @@ use crate::route::routes_item::get_item_routes;
 use crate::route::routes_permission::get_permission_routes;
 use crate::route::routes_role::get_role_routes;
 use crate::route::routes_user::get_user_routes;
+use crate::route::routes_util::handle_rejection;
 use ::function_name::named;
 use async_once::AsyncOnce;
 use dao::dao_common;
@@ -12,18 +13,11 @@ use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
-use serde_json::json;
-use structure::structures::DevBoardErrorType;
-use structure::structures::DevBoardGenericError;
-use util::util_authentication::Unauthorized;
 use util::util_permission::init_permissions;
 use warp::hyper::Method;
-use warp::hyper::StatusCode;
-use warp::reply;
 use warp::Filter;
 use warp::Rejection;
 use warp::Reply;
-
 mod configuration;
 mod controller;
 mod dao;
@@ -142,27 +136,4 @@ async fn init_server() {
     warp::serve(init_routes().await)
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;
-}
-
-async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
-    if err.is_not_found() {
-        Ok(reply::with_status("NOT_FOUND", StatusCode::NOT_FOUND))
-    } else if let Some(e) = err.find::<Unauthorized>() {
-        let generic_error = DevBoardGenericError {
-            success: false,
-            message: e.error_message.to_owned(),
-            code: -1,
-            err_type: DevBoardErrorType::Error,
-        };
-        let resp = json!(generic_error);
-        let res: String = resp.to_string();
-        let boxed = Box::leak(res.into_boxed_str());
-        Ok(reply::with_status(boxed, StatusCode::UNAUTHORIZED))
-    } else {
-        eprintln!("unhandled rejection: {:?}", err);
-        Ok(reply::with_status(
-            "INTERNAL_SERVER_ERROR",
-            StatusCode::INTERNAL_SERVER_ERROR,
-        ))
-    }
 }
