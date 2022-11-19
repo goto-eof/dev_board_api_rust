@@ -1,1 +1,54 @@
-{}
+{
+    "db_uri" : "postgres://postgres:postgres@127.0.0.1:5432/postgres",
+    "server_port":  8013,
+    "jwt_secret": "this_is_our_secret",
+    "jwt_ttl": 3600,
+    "cors_allowed_origins": ["http://localhost:3000"],
+    "cors_allowed_headers": [
+        "Access-Control-Allow-Credentials",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers",
+        "Origin",
+        "Accept",
+        "Content-Type",
+        "Accept-Encoding",
+        "Accept-Language",
+        "Cache-Control",
+        "Connection",
+        "Host",
+        "Pragma",
+        "Referer",
+        "User-Agent",   
+        "X-Requested-With",
+        "Content-Type",
+        "Cookie",
+        "Upgrade-Insecure-Requests",
+        "Upgrade",
+        "Authorization"
+    ],
+    "cors_allowed_methods": [   
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+        "HEAD",
+        "PATCH"
+    ],
+    "application_permissions": [ 
+        "get_column",
+        "get_all_columns",
+        "get_all_columns_with_items",
+        "insert_column",
+        "update_column",
+        "swap_columns",
+        "delete_column",
+        "get_item",
+        "get_items",
+        "insert_item",
+        "update_item",
+        "delete_item",
+        "swap_items"
+    ]    
+}

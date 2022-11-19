@@ -22,7 +22,9 @@ impl Settings {
         let filename = format!("configuration/{}", environment);
         debug!("loading setting file {}...", &filename);
         let settings = Config::builder()
+            // default settings
             .add_source(File::with_name("configuration/default").required(true))
+            // here we override previous setting
             .add_source(File::with_name(&filename).required(true))
             .build()?
             .try_deserialize();
