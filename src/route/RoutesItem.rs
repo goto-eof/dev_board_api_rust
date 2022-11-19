@@ -1,7 +1,6 @@
 use crate::controller::ControllerItem;
-use crate::AuthenticationUtil::auth_validator;
+use crate::util::AuthenticationUtil::auth_validator;
 use warp::{Filter, Rejection, Reply};
-
 pub async fn get_item_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let db_column = warp::path("item");
     db_column

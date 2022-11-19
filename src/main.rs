@@ -1,10 +1,10 @@
+use crate::configuration::ConfigurationDatabase;
+use crate::configuration::ConfigurationLoader::Settings;
 use crate::route::RoutesColumn::get_column_routes;
 use crate::route::RoutesItem::get_item_routes;
 use crate::route::RoutesPermission::get_permission_routes;
 use crate::route::RoutesRole::get_role_routes;
 use crate::route::RoutesUser::get_user_routes;
-use crate::ConfigurationLoader::Settings;
-mod route;
 use ::function_name::named;
 use async_once::AsyncOnce;
 use dao::DaoCommon;
@@ -12,23 +12,18 @@ use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
+use util::PermissionUtil::init_permissions;
 use warp::hyper::Method;
 use warp::Filter;
 use warp::Rejection;
 use warp::Reply;
-use PermissionUtil::init_permissions;
-#[allow(non_snake_case)]
-mod AuthenticationUtil;
-#[allow(non_snake_case)]
-mod ConfigurationDatabase;
-#[allow(non_snake_case)]
-mod ConfigurationLoader;
-#[allow(non_snake_case)]
-mod PermissionUtil;
-#[allow(non_snake_case)]
-mod Structs;
+
+mod configuration;
 mod controller;
 mod dao;
+mod route;
+mod structs;
+mod util;
 type GenericResult<T> = std::result::Result<T, Rejection>;
 
 #[macro_use]

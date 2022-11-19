@@ -1,7 +1,6 @@
 use warp::{Filter, Rejection, Reply};
 
-use crate::controller::ControllerColumn;
-use crate::AuthenticationUtil::auth_validator;
+use crate::{controller::ControllerColumn, util::AuthenticationUtil::auth_validator};
 pub async fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let db_column = warp::path("column");
     db_column

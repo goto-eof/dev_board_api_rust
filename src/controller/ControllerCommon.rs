@@ -1,8 +1,7 @@
+use crate::structs::Structures::DaoError;
+use crate::structs::Structures::Response;
 use serde::Serialize;
 use warp::{reply::json, Reply};
-
-use crate::Structs::{DaoError, Response};
-
 pub fn generate_response<T: Serialize>(
     data: Result<T, DaoError>,
 ) -> crate::GenericResult<impl Reply> {

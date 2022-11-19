@@ -1,5 +1,4 @@
-use crate::controller::ControllerPermission;
-use crate::AuthenticationUtil::auth_validator;
+use crate::{controller::ControllerPermission, util::AuthenticationUtil::auth_validator};
 use warp::{Filter, Rejection, Reply};
 
 pub async fn get_permission_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone

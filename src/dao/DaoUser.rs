@@ -1,4 +1,5 @@
-use crate::Structs::DaoError;
+use crate::structs::Structures::DaoError;
+use crate::structs::Structures::DaoErrorType;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
@@ -17,7 +18,7 @@ pub async fn get_by_id(id: i32) -> Result<db_user::Model, DaoError> {
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -27,7 +28,7 @@ pub async fn get_by_id(id: i32) -> Result<db_user::Model, DaoError> {
     if opt.is_none() {
         return Err(DaoError {
             code: 2,
-            err_type: crate::Structs::DaoErrorType::Warning,
+            err_type: DaoErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -45,7 +46,7 @@ pub async fn get_by_username(username: String) -> Result<Option<db_user::Model>,
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -66,7 +67,7 @@ pub async fn get_all() -> Result<Vec<db_user::Model>, DaoError> {
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -83,7 +84,7 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_user::Model, DaoE
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -99,7 +100,7 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_user::Model, DaoE
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -114,7 +115,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_user::Mo
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -124,7 +125,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_user::Mo
     if opt.is_none() {
         return Err(DaoError {
             code: 2,
-            err_type: crate::Structs::DaoErrorType::Warning,
+            err_type: DaoErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -136,7 +137,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_user::Mo
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -150,7 +151,7 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_user::Mo
         if result.is_err() {
             return Err(DaoError {
                 code: 1,
-                err_type: crate::Structs::DaoErrorType::Error,
+                err_type: DaoErrorType::Error,
                 message: format!("DB Error: {:?}", result.err()),
             });
         }
@@ -167,7 +168,7 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -177,7 +178,7 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     if opt.is_none() {
         return Err(DaoError {
             code: 2,
-            err_type: crate::Structs::DaoErrorType::Warning,
+            err_type: DaoErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -190,7 +191,7 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     if items_result.is_err() {
         return Err(DaoError {
             code: 2,
-            err_type: crate::Structs::DaoErrorType::Warning,
+            err_type: DaoErrorType::Warning,
             message: format!("Error while retrieving items"),
         });
     }
@@ -202,7 +203,7 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
         if item_result.is_err() {
             return Err(DaoError {
                 code: 2,
-                err_type: crate::Structs::DaoErrorType::Warning,
+                err_type: DaoErrorType::Warning,
                 message: format!("Error while deleting item"),
             });
         }
@@ -213,7 +214,7 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     if result.is_err() {
         return Err(DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }

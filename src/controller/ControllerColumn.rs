@@ -1,7 +1,7 @@
-use crate::{dao::DaoColumn, Structs::SwapRequest};
-use warp::Reply;
-
 use super::ControllerCommon;
+use crate::dao::DaoColumn;
+use crate::structs::Structures::SwapRequest;
+use warp::Reply;
 
 pub async fn get_column(id: i32) -> crate::GenericResult<impl Reply> {
     ControllerCommon::generate_response(DaoColumn::get_by_id(id).await)

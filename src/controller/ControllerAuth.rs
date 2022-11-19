@@ -3,7 +3,9 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
-
+use crate::structs::Structures::DaoError;
+use crate::structs::Structures::DaoErrorType;
+use crate::util::AuthenticationUtil::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;
 use entity::{db_role, db_user, db_user_role};
@@ -20,7 +22,7 @@ use warp::{
     Rejection, Reply,
 };
 
-use crate::{AuthenticationUtil, Structs::DaoError, DB_POOL};
+use crate::DB_POOL;
 
 pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let db = DB_POOL.get().await;
@@ -32,7 +34,7 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     if user.is_none() {
         let err = DaoError {
             code: 1,
-            err_type: crate::Structs::DaoErrorType::Error,
+            err_type: DaoErrorType::Error,
             message: format!("DB Error: {:?}", "Invalid username/password"),
         };
         let json = json!(err);
@@ -48,7 +50,7 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
 
     let err = DaoError {
         code: 1,
-        err_type: crate::Structs::DaoErrorType::Error,
+        err_type: DaoErrorType::Error,
         message: format!("DB Error: {:?}", "Invalid username/password"),
     };
     let json = json!(err);
@@ -166,7 +168,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         } else {
             let err = DaoError {
                 code: 1,
-                err_type: crate::Structs::DaoErrorType::Error,
+                err_type: DaoErrorType::Error,
                 message: format!("DB Error: {:?}", result.1.unwrap()),
             };
             let json = json!(err);
@@ -176,7 +178,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
 
     let err = DaoError {
         code: 1,
-        err_type: crate::Structs::DaoErrorType::Error,
+        err_type: DaoErrorType::Error,
         message: format!("DB Error: {:?}", result.err().unwrap()),
     };
     let json = json!(err);
