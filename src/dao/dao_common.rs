@@ -8,7 +8,7 @@ use sea_orm::{
     TransactionTrait,
 };
 
-use crate::DB_POOL;
+use crate::{DB_POOL, SETTINGS};
 
 pub async fn init_admin() -> () {
     let db = DB_POOL.get().await;
@@ -98,13 +98,10 @@ pub async fn init_user_role() -> () {
                     let result = result_am.save(txn).await.unwrap();
                     let role_id = result.id.unwrap();
 
-                    // TODO load list from config file
-                    let black_list: Vec<&str> = vec![];
-
                     // giving all permissions to user, except those that are in the blacklist
                     let permissions = db_permission::Entity::find().all(txn).await.unwrap();
                     for permission in permissions {
-                        if black_list.contains(&permission.name.as_str()) {
+                        if SETTINGS.admin_only_permissions.contains(&permission.name) {
                             continue;
                         }
                         let mut am = db_role_permission::ActiveModel::new();
