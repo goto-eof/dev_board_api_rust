@@ -157,7 +157,7 @@ async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
         let resp = json!(generic_error);
         let res: String = resp.to_string();
         let boxed = Box::leak(res.into_boxed_str());
-        Ok(reply::with_status(boxed, StatusCode::BAD_REQUEST))
+        Ok(reply::with_status(boxed, StatusCode::UNAUTHORIZED))
     } else {
         eprintln!("unhandled rejection: {:?}", err);
         Ok(reply::with_status(
