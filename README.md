@@ -1,5 +1,9 @@
 # Development board API (Rust)
 
+A dashboard for organizing software development tasks (Kanban flow) implemented in Rust
+
+### Front-end
+
 [here](https://github.com/goto-eof/dev_board_react) you can find the front-end application
 
 ### Run project
