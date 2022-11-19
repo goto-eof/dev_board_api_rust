@@ -108,7 +108,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
     let db = DB_POOL.get().await;
 
     let result = db
-        .transaction::<_, (Option<i32>, Option<String>), DbErr>(|txn| {
+        .transaction::<_, (Option<(i32, User)>, Option<String>), DbErr>(|txn| {
             let boxx = Box::pin(async move {
                 let user = db_user::Entity::find()
                     .filter(
@@ -126,7 +126,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 }
                 let hashed_password = hash(registration_data.password, 4).unwrap();
                 let dat = Utc::now().naive_utc();
-                let mut user = db_user::ActiveModel {
+                let mut user_model = db_user::ActiveModel {
                     username: Set(registration_data.username),
                     password: Set(hashed_password),
                     email: Set(registration_data.email),
@@ -136,16 +136,17 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 };
 
                 if registration_data.first_name.is_some() {
-                    user.first_name = Set(registration_data.first_name.unwrap());
+                    user_model.first_name = Set(registration_data.first_name.unwrap());
                 }
                 if registration_data.last_name.is_some() {
-                    user.last_name = Set(registration_data.last_name.unwrap());
+                    user_model.last_name = Set(registration_data.last_name.unwrap());
                 }
-                let user = user.save(txn).await;
-                let user = user.unwrap();
+                let user_model = user_model.save(txn).await;
+                let user_model = user_model.unwrap();
 
+                // assigning role to user
                 let mut ur_am = db_user_role::ActiveModel::new();
-                ur_am.user_id = Set(user.id.unwrap());
+                ur_am.user_id = Set(user_model.id.clone().unwrap());
                 ur_am.role_id = Set(db_role::Entity::find()
                     .filter(db_role::Column::Name.eq("user"))
                     .one(db)
@@ -162,7 +163,13 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 }
                 let user = user.unwrap();
                 println!("{:?}", user);
-                return Ok((Some(user.id.unwrap()), None));
+                let user = User {
+                    first_name: user_model.first_name.unwrap(),
+                    last_name: user_model.last_name.unwrap(),
+                    email: user_model.email.unwrap(),
+                    username: user_model.username.unwrap(),
+                };
+                return Ok((Some((user_model.id.unwrap(), user)), None));
             });
             boxx
         })
@@ -170,9 +177,9 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
     if result.is_ok() {
         let result = result.unwrap();
         if result.0.is_some() {
-            let user_id = result.0.unwrap();
-            let jwt = util_authentication::generate_jwt(user_id).unwrap();
-            let json = json!(user_id);
+            let user = result.0.unwrap();
+            let jwt = util_authentication::generate_jwt(user.0).unwrap();
+            let json = json!(user.1);
             return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
         } else {
             let err = DevBoardGenericError {

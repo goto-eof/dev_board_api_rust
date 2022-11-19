@@ -1,41 +1,44 @@
-use serde_json::json;
-use warp::{
-    hyper::{Method, StatusCode},
-    reply, Filter, Rejection, Reply,
-};
-
-use crate::{
-    structure::structure::{DevBoardErrorType, DevBoardGenericError},
-    util::util_authentication::Unauthorized,
-};
-
 use super::{
     routes_column::get_column_routes, routes_item::get_item_routes,
     routes_permission::get_permission_routes, routes_role::get_role_routes,
     routes_user::get_user_routes,
 };
+use crate::{
+    structure::structure::{DevBoardErrorType, DevBoardGenericError},
+    util::util_authentication::Unauthorized,
+};
+use warp::{
+    hyper::{Method, StatusCode},
+    Filter, Rejection, Reply,
+};
 
 pub(crate) async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
     if err.is_not_found() {
-        Ok(reply::with_status("NOT_FOUND", StatusCode::NOT_FOUND))
+        return generate_response("Not found".to_string(), StatusCode::NOT_FOUND);
     } else if let Some(e) = err.find::<Unauthorized>() {
-        let generic_error = DevBoardGenericError {
-            success: false,
-            message: e.error_message.to_owned(),
-            code: -1,
-            err_type: DevBoardErrorType::Error,
-        };
-        let resp = json!(generic_error);
-        let res: String = resp.to_string();
-        let boxed = Box::leak(res.into_boxed_str());
-        Ok(reply::with_status(boxed, StatusCode::UNAUTHORIZED))
+        let message = e.error_message.to_owned();
+        return generate_response(message, StatusCode::UNAUTHORIZED);
     } else {
-        eprintln!("unhandled rejection: {:?}", err);
-        Ok(reply::with_status(
-            "INTERNAL_SERVER_ERROR",
+        return generate_response(
+            "Internal Server Error".to_string(),
             StatusCode::INTERNAL_SERVER_ERROR,
-        ))
+        );
     }
+}
+
+fn generate_response(
+    message: String,
+    status_code: StatusCode,
+) -> Result<warp::hyper::Response<warp::hyper::Body>, Rejection> {
+    let generic_error = DevBoardGenericError {
+        success: false,
+        message,
+        code: 0,
+        err_type: DevBoardErrorType::Error,
+    };
+    let json = warp::reply::json(&generic_error);
+    let reply_message = warp::reply::with_status(json, status_code);
+    Ok(reply_message.into_response())
 }
 
 pub async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
