@@ -3,8 +3,8 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
-use crate::structure::Structures::DaoError;
-use crate::structure::Structures::DaoErrorType;
+use crate::structure::Structures::DevBoardErrorType;
+use crate::structure::Structures::DevBoardGenericError;
 use crate::util::AuthenticationUtil::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;
@@ -32,9 +32,10 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
         .await;
     let user = user.unwrap();
     if user.is_none() {
-        let err = DaoError {
+        let err = DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", "Invalid username/password"),
         };
         let json = json!(err);
@@ -48,9 +49,10 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
         return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
 
-    let err = DaoError {
+    let err = DevBoardGenericError {
+        success: false,
         code: 1,
-        err_type: DaoErrorType::Error,
+        err_type: DevBoardErrorType::Error,
         message: format!("DB Error: {:?}", "Invalid username/password"),
     };
     let json = json!(err);
@@ -166,9 +168,10 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
             let json = json!(user_id);
             return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
         } else {
-            let err = DaoError {
+            let err = DevBoardGenericError {
+                success: false,
                 code: 1,
-                err_type: DaoErrorType::Error,
+                err_type: DevBoardErrorType::Error,
                 message: format!("DB Error: {:?}", result.1.unwrap()),
             };
             let json = json!(err);
@@ -176,9 +179,10 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         }
     }
 
-    let err = DaoError {
+    let err = DevBoardGenericError {
+        success: false,
         code: 1,
-        err_type: DaoErrorType::Error,
+        err_type: DevBoardErrorType::Error,
         message: format!("DB Error: {:?}", result.err().unwrap()),
     };
     let json = json!(err);

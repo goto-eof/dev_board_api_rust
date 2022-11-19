@@ -1,5 +1,5 @@
-use crate::structure::Structures::DaoError;
-use crate::structure::Structures::DaoErrorType;
+use crate::structure::Structures::DevBoardErrorType;
+use crate::structure::Structures::DevBoardGenericError;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
@@ -11,14 +11,15 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 
-pub async fn get_by_id(id: i32) -> Result<db_permission::Model, DaoError> {
+pub async fn get_by_id(id: i32) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -26,9 +27,10 @@ pub async fn get_by_id(id: i32) -> Result<db_permission::Model, DaoError> {
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -36,7 +38,7 @@ pub async fn get_by_id(id: i32) -> Result<db_permission::Model, DaoError> {
     Ok(opt.unwrap())
 }
 
-pub async fn get_by_name(name: &str) -> Result<Option<db_permission::Model>, DaoError> {
+pub async fn get_by_name(name: &str) -> Result<Option<db_permission::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_permission::Entity::find()
         .filter(db_permission::Column::Name.eq(name))
@@ -44,9 +46,10 @@ pub async fn get_by_name(name: &str) -> Result<Option<db_permission::Model>, Dao
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -54,7 +57,7 @@ pub async fn get_by_name(name: &str) -> Result<Option<db_permission::Model>, Dao
     Ok(result.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_permission::Model>, DaoError> {
+pub async fn get_all() -> Result<Vec<db_permission::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_permission::Entity::find()
@@ -63,9 +66,10 @@ pub async fn get_all() -> Result<Vec<db_permission::Model>, DaoError> {
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -75,14 +79,17 @@ pub async fn get_all() -> Result<Vec<db_permission::Model>, DaoError> {
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> Result<db_permission::Model, DaoError> {
+pub async fn create(
+    json_data: serde_json::Value,
+) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_permission::ActiveModel::from_json(json_data);
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -96,9 +103,10 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_permission::Model
     let result = model.insert(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -109,14 +117,15 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_permission::Model
 pub async fn update(
     id: i32,
     json_data: serde_json::Value,
-) -> Result<db_permission::Model, DaoError> {
+) -> Result<db_permission::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -124,9 +133,10 @@ pub async fn update(
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -136,9 +146,10 @@ pub async fn update(
     let result = item_active_model.set_from_json(json_data);
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -150,9 +161,10 @@ pub async fn update(
 
     if result.is_err() {
         if result.is_err() {
-            return Err(DaoError {
+            return Err(DevBoardGenericError {
+                success: false,
                 code: 1,
-                err_type: DaoErrorType::Error,
+                err_type: DevBoardErrorType::Error,
                 message: format!("DB Error: {:?}", result.err()),
             });
         }
@@ -161,15 +173,16 @@ pub async fn update(
     Ok(result.unwrap())
 }
 
-pub async fn delete(id: i32) -> Result<bool, DaoError> {
+pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_permission::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -177,9 +190,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -190,9 +204,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
         .await;
 
     if items_result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Error while retrieving items"),
         });
     }
@@ -202,9 +217,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     for item in items.into_iter() {
         let item_result = item.delete(db).await;
         if item_result.is_err() {
-            return Err(DaoError {
+            return Err(DevBoardGenericError {
+                success: false,
                 code: 2,
-                err_type: DaoErrorType::Warning,
+                err_type: DevBoardErrorType::Warning,
                 message: format!("Error while deleting item"),
             });
         }
@@ -213,9 +229,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let result = opt.unwrap().delete(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }

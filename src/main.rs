@@ -12,8 +12,14 @@ use log::debug;
 use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
 use sea_orm::Statement;
+use serde_json::json;
+use structure::Structures::DevBoardErrorType;
+use structure::Structures::DevBoardGenericError;
+use util::AuthenticationUtil::Unauthorized;
 use util::PermissionUtil::init_permissions;
 use warp::hyper::Method;
+use warp::hyper::StatusCode;
+use warp::reply;
 use warp::Filter;
 use warp::Rejection;
 use warp::Reply;
@@ -126,6 +132,7 @@ async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> +
         .or(get_user_routes().await)
         .or(get_role_routes().await)
         .or(get_permission_routes().await)
+        .recover(handle_rejection)
         .with(&any_origin_3)
         .with(warp::log("api"))
 }
@@ -135,4 +142,27 @@ async fn init_server() {
     warp::serve(init_routes().await)
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;
+}
+
+async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
+    if err.is_not_found() {
+        Ok(reply::with_status("NOT_FOUND", StatusCode::NOT_FOUND))
+    } else if let Some(e) = err.find::<Unauthorized>() {
+        let generic_error = DevBoardGenericError {
+            success: false,
+            message: e.error_message.to_owned(),
+            code: -1,
+            err_type: DevBoardErrorType::Error,
+        };
+        let resp = json!(generic_error);
+        let res: String = resp.to_string();
+        let boxed = Box::leak(res.into_boxed_str());
+        Ok(reply::with_status(boxed, StatusCode::BAD_REQUEST))
+    } else {
+        eprintln!("unhandled rejection: {:?}", err);
+        Ok(reply::with_status(
+            "INTERNAL_SERVER_ERROR",
+            StatusCode::INTERNAL_SERVER_ERROR,
+        ))
+    }
 }

@@ -2,14 +2,15 @@ use entity::{db_column, db_item};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug)]
-pub enum DaoErrorType {
+pub enum DevBoardErrorType {
     Error,
     Warning,
 }
 #[derive(Serialize, Debug)]
-pub struct DaoError {
+pub struct DevBoardGenericError {
+    pub(crate) success: bool,
     pub code: i32,
-    pub err_type: DaoErrorType,
+    pub err_type: DevBoardErrorType,
     pub message: String,
 }
 

@@ -1,5 +1,5 @@
-use crate::structure::Structures::DaoError;
-use crate::structure::Structures::DaoErrorType;
+use crate::structure::Structures::DevBoardErrorType;
+use crate::structure::Structures::DevBoardGenericError;
 use crate::structure::Structures::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
@@ -15,14 +15,15 @@ use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
 
-pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
+pub async fn get_by_id(id: i32) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -30,9 +31,10 @@ pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -40,7 +42,7 @@ pub async fn get_by_id(id: i32) -> Result<db_item::Model, DaoError> {
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_item::Model>, DaoError> {
+pub async fn get_all() -> Result<Vec<db_item::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_item::Entity::find()
@@ -49,9 +51,10 @@ pub async fn get_all() -> Result<Vec<db_item::Model>, DaoError> {
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -63,7 +66,7 @@ pub async fn get_all() -> Result<Vec<db_item::Model>, DaoError> {
     Ok(models)
 }
 
-pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, DaoError> {
+pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_item::Entity::find()
@@ -73,9 +76,10 @@ pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, Dao
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -85,14 +89,15 @@ pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, Dao
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoError> {
+pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::ActiveModel::from_json(json_data);
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -100,9 +105,10 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoE
     let next_order_number = get_next_order_number().await;
 
     if next_order_number.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error count2(): {:?}", next_order_number.err()),
         });
     }
@@ -129,9 +135,10 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DaoE
     let result = model.insert(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -144,7 +151,7 @@ struct CountResult {
     max: Option<i32>,
 }
 
-pub async fn get_max_id() -> Result<i32, DaoError> {
+pub async fn get_max_id() -> Result<i32, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_item::Entity::find()
@@ -155,9 +162,10 @@ pub async fn get_max_id() -> Result<i32, DaoError> {
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -170,14 +178,18 @@ pub async fn get_max_id() -> Result<i32, DaoError> {
     Ok(count.max.unwrap())
 }
 
-pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Model, DaoError> {
+pub async fn update(
+    id: i32,
+    json_data: serde_json::Value,
+) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -185,9 +197,10 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Mo
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -198,9 +211,10 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Mo
 
     if result.is_err() {
         if result.is_err() {
-            return Err(DaoError {
+            return Err(DevBoardGenericError {
+                success: false,
                 code: 1,
-                err_type: DaoErrorType::Error,
+                err_type: DevBoardErrorType::Error,
                 message: format!("DB Error: {:?}", result.err()),
             });
         }
@@ -213,9 +227,10 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Mo
 
     if result.is_err() {
         if result.is_err() {
-            return Err(DaoError {
+            return Err(DevBoardGenericError {
+                success: false,
                 code: 1,
-                err_type: DaoErrorType::Error,
+                err_type: DevBoardErrorType::Error,
                 message: format!("DB Error: {:?}", result.err()),
             });
         }
@@ -224,15 +239,16 @@ pub async fn update(id: i32, json_data: serde_json::Value) -> Result<db_item::Mo
     Ok(result.unwrap())
 }
 
-pub async fn delete(id: i32) -> Result<bool, DaoError> {
+pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_item::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -240,9 +256,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let opt = result.unwrap();
 
     if opt.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -250,9 +267,10 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     let result = opt.unwrap().delete(db).await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
@@ -262,42 +280,46 @@ pub async fn delete(id: i32) -> Result<bool, DaoError> {
     Ok(deletion_result.rows_affected == 1)
 }
 
-pub async fn swap(swap_request: SwapRequest) -> Result<bool, DaoError> {
+pub async fn swap(swap_request: SwapRequest) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     debug!("IN: {}:{} ", swap_request.id_a, swap_request.id_b);
     let result_a = db_item::Entity::find_by_id(swap_request.id_a).one(db).await;
     let result_b = db_item::Entity::find_by_id(swap_request.id_b).one(db).await;
 
     if result_a.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result_a.err()),
         });
     }
 
     if result_b.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result_b.err()),
         });
     }
 
     let opt_a = result_a.unwrap();
     if opt_a.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
 
     let opt_b = result_b.unwrap();
     if opt_b.is_none() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 2,
-            err_type: DaoErrorType::Warning,
+            err_type: DevBoardErrorType::Warning,
             message: format!("Item not found"),
         });
     }
@@ -316,17 +338,19 @@ pub async fn swap(swap_request: SwapRequest) -> Result<bool, DaoError> {
     active_model_b.order = sea_orm::Set(order_a);
     let result_a = active_model_a.update(db).await;
     if result_a.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result_a.err()),
         });
     }
     let result_b = active_model_b.update(db).await;
     if result_b.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result_b.err()),
         });
     }
@@ -339,7 +363,7 @@ struct OptionResult {
     value: Option<i64>,
 }
 
-pub async fn get_next_order_number() -> Result<i64, DaoError> {
+pub async fn get_next_order_number() -> Result<i64, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_item::Entity::find()
@@ -350,9 +374,10 @@ pub async fn get_next_order_number() -> Result<i64, DaoError> {
         .await;
 
     if result.is_err() {
-        return Err(DaoError {
+        return Err(DevBoardGenericError {
+            success: false,
             code: 1,
-            err_type: DaoErrorType::Error,
+            err_type: DevBoardErrorType::Error,
             message: format!("DB Error: {:?}", result.err()),
         });
     }
