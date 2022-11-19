@@ -9,6 +9,7 @@ pub struct Settings {
     pub db_uri: String,
     pub server_port: u16,
     pub jwt_secret: String,
+    pub jwt_ttl: i64,
 }
 impl Settings {
     pub fn init_configuration() -> Result<Self, ConfigError> {

@@ -354,7 +354,6 @@ pub async fn swap(swap_request: SwapRequest) -> Result<bool, DevBoardGenericErro
             message: format!("DB Error: {:?}", result_b.err()),
         });
     }
-    debug!("OOOOOOOOOOOK! {}:{}", order_a, order_b);
     Ok(true)
 }
 

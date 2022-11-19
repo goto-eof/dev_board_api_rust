@@ -25,7 +25,6 @@ pub async fn auth_validator(
         .and_then(
             move |token: Option<String>, authorization: Option<String>, permission_name| async move {
                 let tokeen = token.unwrap_or(authorization.unwrap_or("".to_string()));
-                println!("token: {}", tokeen,);
                 let decoded = decode::<Claims>(
                     &tokeen,
                     &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
@@ -61,13 +60,14 @@ if permission_name == user_permission.name   {
     return Ok(())
 }
 }
-return  Err(warp::reject::custom(Unauthorized{error_message: "Permission not found".to_string()}));},
+return  Err(warp::reject::custom(Unauthorized{error_message: "Permission not found".to_string()}));
+},
         );
 }
 
 pub fn generate_jwt(user_id: i32) -> Result<String, Error> {
     let expiration = Utc::now()
-        .checked_add_signed(chrono::Duration::seconds(60*100*5*10)).unwrap()
+        .checked_add_signed(chrono::Duration::seconds(SETTINGS.jwt_ttl)).unwrap()
         .timestamp();
 
     let claims = Claims {
