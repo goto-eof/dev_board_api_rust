@@ -1,13 +1,11 @@
 use crate::configuration::config_database;
 use crate::configuration::config_loader::Settings;
 use crate::route::routes_util::init_routes;
-use ::function_name::named;
 use async_once::AsyncOnce;
+use configuration::config_database::init_db;
 use dao::dao_common;
 use log::debug;
-use sea_orm::ConnectionTrait;
 use sea_orm::DbConn;
-use sea_orm::Statement;
 use util::util_permission::init_permissions;
 use warp::Rejection;
 mod configuration;
@@ -36,32 +34,11 @@ async fn main() {
     init_permissions(DB_POOL.get().await).await;
     dao_common::init_admin().await; // default superuser
     dao_common::init_user_role().await; // this role is assigned when a new user is created
-    init_test();
     init_server().await;
 }
 
-fn init_test() {}
-
 fn init_logging() {
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
-}
-
-#[named]
-async fn init_db() {
-    println!("FN: {:?}", function_name!());
-    debug!("Checking DB connection...");
-    let db = DB_POOL.get().await;
-    let result = db
-        .query_all(Statement::from_string(
-            sea_orm::DatabaseBackend::Postgres,
-            "SELECT 1 from db_column limit 1;".to_owned(),
-        ))
-        .await;
-    if result.is_err() {
-        debug!("[DB RESULT] Connection to [DB FAILED]: {:?}", result.err());
-    } else {
-        debug!("[DB RESULT] DB Connection [OK]")
-    }
 }
 
 async fn init_server() {
