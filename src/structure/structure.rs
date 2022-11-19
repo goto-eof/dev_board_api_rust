@@ -36,3 +36,11 @@ pub struct BoardFullResponse {
     pub column: db_column::Model,
     pub items: Vec<db_item::Model>,
 }
+
+#[derive(Serialize)]
+pub struct User {
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub username: String,
+}

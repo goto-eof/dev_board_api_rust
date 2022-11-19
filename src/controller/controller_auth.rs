@@ -5,6 +5,7 @@ pub struct LoginData {
 }
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::User;
 use crate::util::util_authentication::{self};
 use bcrypt::{hash, verify};
 use chrono::Utc;
@@ -45,7 +46,13 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
     let check_password = verify(login_data.password, &user.password).unwrap();
     if check_password {
         let jwt = util_authentication::generate_jwt(user.id).unwrap();
-        let json = json!(user.email);
+        let user = User {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            username: user.username,
+        };
+        let json = json!(user);
         return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
 
