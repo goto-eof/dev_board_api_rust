@@ -4,7 +4,7 @@ A dashboard for organizing software development tasks (Kanban flow) implemented 
 
 ### Front-end
 
-[here](https://github.com/goto-eof/dev_board_react) you can find the front-end application
+[Here](https://github.com/goto-eof/dev_board_react) you can find the front-end application.
 
 ### Run project
 
