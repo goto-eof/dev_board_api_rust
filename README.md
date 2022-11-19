@@ -72,5 +72,6 @@ password: password
 ### Post scriptum
 
 - this pplication was tested on macOS and Linux
+- remember to drop database if application not works (perhaps I made some DDL changes)
 
 
