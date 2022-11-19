@@ -51,7 +51,7 @@ Import postman collection file from test/postma.json in your postman workspace.
 
 ### DB schema
 
-![db schema](db-schema1.png)
+![db schema](db-schema.png)
 
 ### Default user
 
@@ -79,4 +79,10 @@ password: password
 - this pplication was tested on macOS and Linux
 - remember to drop database if application not works (perhaps I made some DDL changes)
 
+### Furthermore
 
+#### Generate entities from schema
+
+```
+sea-orm-cli generate entity -u postgres://postgres:postgres@127.0.0.1:5432/postgres -o entity/src
+```

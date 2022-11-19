@@ -1,3 +1,6 @@
+pub mod db_board;
+pub mod db_board_column;
+pub mod db_board_user;
 pub mod db_column;
 pub mod db_item;
 pub mod db_permission;
