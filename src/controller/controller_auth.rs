@@ -122,12 +122,28 @@ pub async fn invalidate_token() -> Result<impl Reply, Rejection> {
         "token={}; SameSite=None; expires=Fri, 31 Dec 1999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
         ""
     );
+    let cookie_jwt_str = format!(
+        "jwt={}; SameSite=None; expires=Fri, 31 Dec 1999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
+        ""
+    );
     cookies.append(
         "set-cookie",
         HeaderValue::from_str(cookie_str.as_str()).unwrap(),
     );
+    cookies.append(
+        "set-cookie",
+        HeaderValue::from_str(cookie_jwt_str.as_str()).unwrap(),
+    );
     let headers = response.headers_mut();
     headers.extend(cookies);
+    Ok(response)
+}
+
+pub async fn check_is_logged_in() -> Result<impl Reply, Rejection> {
+    let reply = warp::reply::json(&json!({ "success": true }));
+    let reply = warp::reply::with_status(reply, StatusCode::OK);
+
+    let mut response = reply.into_response();
     Ok(response)
 }
 

@@ -4,6 +4,7 @@ use entity::{db_user_role, db_role_permission, db_permission};
 use jsonwebtoken::{
     decode, encode, errors::Error, Algorithm, DecodingKey, EncodingKey, Header, Validation,
 };
+use log::debug;
 use migration::JoinType;
 use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, QuerySelect};
 use serde::{Deserialize, Serialize};
@@ -23,7 +24,7 @@ pub async fn auth_validator(
         .and(warp::header::optional::<String>("Authorization"))
         .and(permission_name)
         .and_then(
-            move |token: Option<String>, authorization: Option<String>, permission_name| async move {
+            move |token: Option<String>, authorization: Option<String>, permission_name: String| async move {
                 let tokeen = token.unwrap_or(authorization.unwrap_or("".to_string()));
                 let decoded = decode::<Claims>(
                     &tokeen,
@@ -59,11 +60,13 @@ pub async fn auth_validator(
                     ).filter(db_user_role::Column::UserId.eq(user_id))
                 .all(db).await.unwrap();
 
+                debug!("User permissions: {:?}", user_permissions);
 
 for user_permission in user_permissions {
-if permission_name == user_permission.name   {
-    return Ok(())
-}
+    if permission_name.eq(&user_permission.name)   {
+        debug!("Permission found: {:?}", permission_name);
+        return Ok(())
+    }
 }
 return  Err(warp::reject::custom(Unauthorized{error_message: "You have not permission to access to this resource".to_string()}));
 },

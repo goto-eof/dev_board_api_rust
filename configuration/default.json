@@ -71,6 +71,7 @@
         "insert_user",
         "update_user",
         "delete_user",
+        "check_is_logged_in",
 
         "get_board",
         "get_all_boards",
