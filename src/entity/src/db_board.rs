@@ -33,5 +33,10 @@ impl Related<super::db_board_user::Entity> for Entity {
         Relation::DbBoardUser.def()
     }
 }
+impl From<Model> for Entity {
+    fn from(from: Model) -> Self {
+        Self {}
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

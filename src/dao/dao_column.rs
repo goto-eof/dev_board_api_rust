@@ -292,7 +292,7 @@ pub async fn update(
         });
     }
 
-    let mut item_active_model: db_column::ActiveModel = opt.unwrap().into();
+    let mut item_active_model: db_column::ActiveModel = opt.unwrap().into_active_model();
 
     let result = item_active_model.set_from_json(json_data);
 

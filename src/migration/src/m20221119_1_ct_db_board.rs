@@ -19,8 +19,8 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(DbBoard::Name).string().not_null())
-                    .col(ColumnDef::new(DbBoard::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(DbBoard::UpdatedAt).timestamp().not_null())
+                    .col(ColumnDef::new(DbBoard::CreatedAt).timestamp())
+                    .col(ColumnDef::new(DbBoard::UpdatedAt).timestamp())
                     .to_owned(),
             )
             .await
