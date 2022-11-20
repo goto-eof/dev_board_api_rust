@@ -33,10 +33,15 @@ pub async fn auth_validator(
                 let db = DB_POOL.get().await;
 
                 if decoded.is_err() {
-                    return Err(reject::custom(Unauthorized{error_message: "Invalid token (0)".to_string()}));
+                    return Err(reject::custom(Unauthorized{error_message: "Invalid token".to_string()}));
                 }
-                let user_id = decoded.unwrap().claims.sub; 
-               
+                let decoded = decoded.unwrap();
+                let user_id = decoded.claims.sub; 
+               let exp = decoded.claims.exp;
+               let now = Utc::now().timestamp() as usize;
+               if exp < now{
+                return Err(reject::custom(Unauthorized{error_message: "Token expired".to_string()}));
+               }
              let user_permissions= db_permission::Entity::find()
                .join_rev(
                 JoinType::InnerJoin,
@@ -60,7 +65,7 @@ if permission_name == user_permission.name   {
     return Ok(())
 }
 }
-return  Err(warp::reject::custom(Unauthorized{error_message: "Permission not found".to_string()}));
+return  Err(warp::reject::custom(Unauthorized{error_message: "You have not permission to access to this resource".to_string()}));
 },
         );
 }

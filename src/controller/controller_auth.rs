@@ -5,6 +5,7 @@ pub struct LoginData {
 }
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::Response;
 use crate::structure::structure::User;
 use crate::util::util_authentication::{self};
 use bcrypt::{hash, verify};
@@ -52,7 +53,11 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
             email: user.email,
             username: user.username,
         };
-        let json = json!(user);
+        let response = Response {
+            success: true,
+            result: user,
+        };
+        let json = json!(response);
         return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
     }
 
@@ -178,7 +183,11 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         if result.0.is_some() {
             let user = result.0.unwrap();
             let jwt = util_authentication::generate_jwt(user.0).unwrap();
-            let json = json!(user.1);
+            let response = Response {
+                success: true,
+                result: user.1,
+            };
+            let json = json!(response);
             return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
         } else {
             let err = DevBoardGenericError {

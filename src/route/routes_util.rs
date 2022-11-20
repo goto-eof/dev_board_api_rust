@@ -12,14 +12,15 @@ use warp::{hyper::StatusCode, Filter, Rejection, Reply};
 
 pub(crate) async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
     if err.is_not_found() {
-        return generate_response("Not found".to_string(), StatusCode::NOT_FOUND);
+        return generate_response("Not found".to_string(), StatusCode::NOT_FOUND, 8563);
     } else if let Some(e) = err.find::<Unauthorized>() {
         let message = e.error_message.to_owned();
-        return generate_response(message, StatusCode::UNAUTHORIZED);
+        return generate_response(message, StatusCode::UNAUTHORIZED, 1579);
     } else {
         return generate_response(
             "Internal Server Error".to_string(),
             StatusCode::INTERNAL_SERVER_ERROR,
+            3748,
         );
     }
 }
@@ -27,11 +28,12 @@ pub(crate) async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejec
 fn generate_response(
     message: String,
     status_code: StatusCode,
+    code: i32,
 ) -> Result<warp::hyper::Response<warp::hyper::Body>, Rejection> {
     let generic_error = DevBoardGenericError {
         success: false,
         message,
-        code: 0,
+        code,
         err_type: DevBoardErrorType::Error,
     };
     let json = warp::reply::json(&generic_error);
