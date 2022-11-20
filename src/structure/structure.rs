@@ -44,3 +44,7 @@ pub struct User {
     pub email: String,
     pub username: String,
 }
+#[derive(Serialize)]
+pub struct LogoutResponse {
+    pub success: bool,
+}
