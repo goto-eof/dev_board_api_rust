@@ -74,6 +74,7 @@ password: password
 - be - association of kanban flow to user (wip)
 - ~~be/fe - check is logged in every x seconds~~
 - ~~be - fix column/item swapping~~;
+- refresh token;
 
 ### Post scriptum
 
