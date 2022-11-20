@@ -503,6 +503,167 @@
 			]
 		},
 		{
+			"name": "generic",
+			"item": [
+				{
+					"name": "get_all",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8013/generic/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"generic",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_by_id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8013/generic/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"generic",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkxMDUzOX0.1s0pJWP-TPZ_j6QDWb2f1Z8T6JPBQr8ElOoWMtFdc-A; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"board 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/generic",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"generic"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkxNjUyOX0.IB1wjzlEbnMWm8EJC35GGpNAu_UTPOLpisij0gH5GSc; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ciaociao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/generic/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"generic",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTY2ODkwMzA0M30.EG3M9DJJD4dfQ8xInNmtKoulu7M2SGnfMFI1V3_9A64; Path=/; Secure; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT;",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8013/generic/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8013",
+							"path": [
+								"generic",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "user",
 			"item": [
 				{
