@@ -2,7 +2,6 @@
 name = "dev-board"
 authors = ["Andrei Dodu"]
 description = "A dashboard for organizing software development tasks (Kanban flow)"
-webpage = "https://github.com/goto-eof/dev_board_api_rust"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
