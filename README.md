@@ -72,6 +72,7 @@ password: password
 - be - manage better code unwrapping;
 - be - improve security;
 - be - association of kanban flow to user (wip)
+- ~~be/fe - check is logged in every x seconds~~
 - ~~be - fix column/item swapping~~;
 
 ### Post scriptum
