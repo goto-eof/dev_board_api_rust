@@ -81,7 +81,6 @@ password: password
 + be/fe - check is logged in every x seconds
 + be - fix column/item swapping;
 + be - refresh token;
-@@ text in purple (and bold)@@
 ```
 
 ### Post scriptum
