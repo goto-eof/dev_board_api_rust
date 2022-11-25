@@ -97,20 +97,3 @@ pub struct Unauthorized{
     pub error_message: String
 }
 impl reject::Reject for Unauthorized {}
-
-
-
-
-
-
-// pub async fn renew_cookie() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Copy {
-//     warp::cookie::<String>("token").and_then(|token: String| async move {
-//         println!("token: {}", token);
-//         if let Some(true) = true {
-//             warp::reply::with_header(warp::reply, "".to_owned(), "".to_string());
-//         } else {
-//             warp::reply::with_header(warp::reply, "".to_owned(), "".to_string());
-//             // Err(warp::reject::custom(Unauthorized{ error_message: todo!() }))
-//         }
-//     })
-// }
