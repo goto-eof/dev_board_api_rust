@@ -90,7 +90,6 @@ pub fn generate_jwt(user_id: i32) -> Result<String, Error> {
     )
 }
 
-
 #[derive(Debug, Serialize)]
 pub struct Unauthorized{
     #[allow(dead_code)]// because is converted to json and sent to the fe 

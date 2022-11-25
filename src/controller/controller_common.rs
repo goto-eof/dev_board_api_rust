@@ -1,6 +1,6 @@
 use crate::{
     structure::structure::{DevBoardGenericError, Response},
-    util::util_authentication::{self, Claims},
+    util::util_authentication::{generate_jwt, Claims},
     SETTINGS,
 };
 use jsonwebtoken::{decode, DecodingKey, Validation};
@@ -30,7 +30,17 @@ pub fn generate_response<T: Serialize>(
         return Ok(reply.into_response());
     }
 
-    let new_jwt = generate_new_jwt(jwt.clone().unwrap().as_str());
+    let jwt = jwt.unwrap();
+
+    let decoded = decode::<Claims>(
+        &jwt,
+        &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
+        &Validation::new(jsonwebtoken::Algorithm::HS256),
+    );
+    let decoded = decoded.unwrap();
+    let user_id = decoded.claims.sub;
+
+    let new_jwt = generate_jwt(user_id).unwrap();
 
     let mut response = reply.into_response();
     let mut cookies = HeaderMap::new();
@@ -45,17 +55,4 @@ pub fn generate_response<T: Serialize>(
     let headers = response.headers_mut();
     headers.extend(cookies);
     Ok(response)
-}
-
-fn generate_new_jwt(jwt: &str) -> String {
-    let tokeen = jwt.clone();
-    let decoded = decode::<Claims>(
-        &tokeen,
-        &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
-        &Validation::new(jsonwebtoken::Algorithm::HS256),
-    );
-    let decoded = decoded.unwrap();
-    let user_id = decoded.claims.sub;
-    let jwt = util_authentication::generate_jwt(user_id).unwrap();
-    return jwt;
 }
