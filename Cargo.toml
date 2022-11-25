@@ -23,6 +23,7 @@ config = "0.13.2"
 jsonwebtoken = "8.1.1"
 url="2.3.1"
 bcrypt = "0.13.0"
+syn = "1.0.103"
 
 [workspace]
 members = [".", "src/entity", "src/migration"]

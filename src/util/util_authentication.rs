@@ -10,14 +10,14 @@ use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, QuerySelect};
 use serde::{Deserialize, Serialize};
 use warp::{self, reject, Filter, Rejection};
 #[derive(Debug, Deserialize, Serialize)]
-struct Claims {
-    sub: i32,
-    exp: usize,
+pub struct Claims {
+    pub sub: i32,
+    pub exp: usize,
 }
 
 pub async fn auth_validator(
     permission_name: String
-) -> impl Filter<Extract = ((),), Error = Rejection> + Clone {
+) -> impl Filter<Extract = (Option<String>,), Error = Rejection> + Clone {
     let permission_name = warp::any().map(move || permission_name.clone());
 
     return warp::cookie::optional::<String>("token")
@@ -65,7 +65,7 @@ pub async fn auth_validator(
 for user_permission in user_permissions {
     if permission_name.eq(&user_permission.name)   {
         debug!("Permission found: {:?}", permission_name);
-        return Ok(())
+        return Ok(Some(tokeen))
     }
 }
 return  Err(warp::reject::custom(Unauthorized{error_message: "You have not permission to access to this resource".to_string()}));
@@ -97,3 +97,20 @@ pub struct Unauthorized{
     pub error_message: String
 }
 impl reject::Reject for Unauthorized {}
+
+
+
+
+
+
+// pub async fn renew_cookie() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Copy {
+//     warp::cookie::<String>("token").and_then(|token: String| async move {
+//         println!("token: {}", token);
+//         if let Some(true) = true {
+//             warp::reply::with_header(warp::reply, "".to_owned(), "".to_string());
+//         } else {
+//             warp::reply::with_header(warp::reply, "".to_owned(), "".to_string());
+//             // Err(warp::reject::custom(Unauthorized{ error_message: todo!() }))
+//         }
+//     })
+// }

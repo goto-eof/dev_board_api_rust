@@ -1,15 +1,61 @@
-use crate::structure::structure::DevBoardGenericError;
-use crate::structure::structure::Response;
+use crate::{
+    structure::structure::{DevBoardGenericError, Response},
+    util::util_authentication::{self, Claims},
+    SETTINGS,
+};
+use jsonwebtoken::{decode, DecodingKey, Validation};
 use serde::Serialize;
-use warp::{reply::json, Reply};
+use warp::{
+    self,
+    http::HeaderValue,
+    hyper::{HeaderMap, StatusCode},
+    reply::json,
+    Reply,
+};
+
 pub fn generate_response<T: Serialize>(
-    data: Result<T, DevBoardGenericError>,
+    data_wrapped: Result<T, DevBoardGenericError>,
+    jwt: Option<String>,
 ) -> crate::GenericResult<impl Reply> {
-    match data {
-        Ok(result) => Ok(json::<_>(&Response {
+    let response = match data_wrapped {
+        Ok(result) => json::<_>(&Response {
             success: true,
             result: &result,
-        })),
-        Err(err) => Ok(json::<_>(&err)),
+        }),
+        Err(err) => json::<_>(&err),
+    };
+    let reply = warp::reply::with_status(response, StatusCode::OK);
+
+    if jwt.is_none() {
+        return Ok(reply.into_response());
     }
+
+    let new_jwt = generate_new_jwt(jwt.clone().unwrap().as_str());
+
+    let mut response = reply.into_response();
+    let mut cookies = HeaderMap::new();
+    let cookie_str = format!(
+        "token={}; SameSite=None; expires=Fri, 31 Dec 9999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
+        new_jwt
+    );
+    cookies.append(
+        "set-cookie",
+        HeaderValue::from_str(cookie_str.as_str()).unwrap(),
+    );
+    let headers = response.headers_mut();
+    headers.extend(cookies);
+    Ok(response)
+}
+
+fn generate_new_jwt(jwt: &str) -> String {
+    let tokeen = jwt.clone();
+    let decoded = decode::<Claims>(
+        &tokeen,
+        &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
+        &Validation::new(jsonwebtoken::Algorithm::HS256),
+    );
+    let decoded = decoded.unwrap();
+    let user_id = decoded.claims.sub;
+    let jwt = util_authentication::generate_jwt(user_id).unwrap();
+    return jwt;
 }

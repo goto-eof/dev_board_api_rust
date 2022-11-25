@@ -139,12 +139,11 @@ pub async fn invalidate_token() -> Result<impl Reply, Rejection> {
     Ok(response)
 }
 
-pub async fn check_is_logged_in() -> Result<impl Reply, Rejection> {
+pub async fn check_is_logged_in(_jwt_opt: Option<String>) -> Result<impl Reply, Rejection> {
     let reply = warp::reply::json(&json!({ "success": true }));
     let reply = warp::reply::with_status(reply, StatusCode::OK);
 
-    let mut response = reply.into_response();
-    Ok(response)
+    Ok(reply.into_response())
 }
 
 pub async fn register(registration_data: RegistrationData) -> Result<impl Reply, Rejection> {
