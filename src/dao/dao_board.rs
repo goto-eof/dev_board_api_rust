@@ -10,7 +10,6 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
-use entity::db_user;
 use migration::DbErr;
 use migration::JoinType;
 use sea_orm::ActiveModelTrait;
@@ -113,7 +112,7 @@ pub async fn get_by_id_all(
         let result: Result<Vec<(db_column::Model, Vec<db_item::Model>)>, DbErr> =
             db_column::Entity::find()
                 .join_rev(
-                    JoinType::Join,
+                    JoinType::InnerJoin,
                     db_board_column::Entity::belongs_to(db_column::Entity)
                         .from(db_board_column::Column::ColumnId)
                         .to(db_column::Column::Id)

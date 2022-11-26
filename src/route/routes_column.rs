@@ -23,6 +23,7 @@ pub async fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Re
             .and_then(controller_column::get_all_columns_with_items))
         .or(db_column
             .and(warp::post())
+            .and(warp::path::param::<i32>())
             .and(warp::path::end())
             .and(warp::body::json())
             .and(warp::body::content_length_limit(1024 * 16))

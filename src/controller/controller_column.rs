@@ -16,11 +16,12 @@ pub async fn get_all_columns_with_items(
     generate_response(dao_column::get_all_with_items().await, jwt_opt)
 }
 pub async fn insert_column(
+    board_id: i32,
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> crate::GenericResult<impl Reply> {
     generate_response(
-        dao_column::create(json_data, jwt_opt.clone()).await,
+        dao_column::create(board_id, json_data, jwt_opt.clone()).await,
         jwt_opt,
     )
 }

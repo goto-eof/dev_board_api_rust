@@ -3,8 +3,11 @@ use crate::structure::structure::BoardsFullResponse;
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::SwapRequest;
+use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
+use entity::db_board_column;
+use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
 use migration::DbErr;
@@ -137,13 +140,16 @@ pub async fn get_next_order_number() -> Result<i64, DevBoardGenericError> {
     Ok(count.value.unwrap() + 1)
 }
 
+// TODO make transactional
+// TODO make sure that the column is associated to the loggedin user
 pub async fn create(
+    board_id: i32,
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> Result<db_column::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_column::ActiveModel::from_json(json_data);
-
+    let user_id = extract_user_id(jwt_opt).unwrap();
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
@@ -184,7 +190,19 @@ pub async fn create(
         });
     }
 
-    Ok(result.unwrap())
+    let result = result.unwrap();
+
+    let board_user_am = db_board_column::ActiveModel {
+        board_id: sea_orm::Set(board_id),
+        column_id: sea_orm::Set(result.id),
+        created_at: sea_orm::Set(Some(dat)),
+        updated_at: sea_orm::Set(Some(dat)),
+        ..Default::default()
+    };
+
+    board_user_am.insert(db).await;
+
+    Ok(result)
 }
 
 pub async fn swap(swap_request: SwapRequest) -> Result<bool, DevBoardGenericError> {
