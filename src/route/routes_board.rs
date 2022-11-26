@@ -11,6 +11,13 @@ pub async fn get_board_routes() -> impl Filter<Extract = impl Reply, Error = Rej
         .and_then(controller_board::get_board)
         .or(db_column
             .and(warp::get())
+            .and(warp::path("get_board_with_all_data"))
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and(auth_validator("get_board_with_all_data".to_string()).await)
+            .and_then(controller_board::get_board_with_all_data))
+        .or(db_column
+            .and(warp::get())
             .and(warp::path("all"))
             .and(warp::path::end())
             .and(auth_validator("get_all_boards".to_string()).await)

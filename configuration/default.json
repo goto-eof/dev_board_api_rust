@@ -74,6 +74,7 @@
         "check_is_logged_in",
 
         "get_board",
+        "get_board_with_all_data",
         "get_all_boards",
         "insert_board",
         "update_board",

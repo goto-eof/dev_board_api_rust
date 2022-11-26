@@ -19,7 +19,10 @@ pub async fn insert_column(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> crate::GenericResult<impl Reply> {
-    generate_response(dao_column::create(json_data).await, jwt_opt)
+    generate_response(
+        dao_column::create(json_data, jwt_opt.clone()).await,
+        jwt_opt,
+    )
 }
 pub async fn update_column(
     id: i32,

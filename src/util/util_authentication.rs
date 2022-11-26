@@ -90,6 +90,18 @@ pub fn generate_jwt(user_id: i32) -> Result<String, Error> {
     )
 }
 
+pub fn extract_user_id(jwt_opt:  Option<String>)-> Option<i32>{
+if jwt_opt.is_some(){
+    let decoded = decode::<Claims>(
+        &jwt_opt.unwrap(),
+        &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
+        &Validation::new(jsonwebtoken::Algorithm::HS256),
+    );
+    return Some(decoded.unwrap().claims.sub);
+}
+return None;
+}
+
 #[derive(Debug, Serialize)]
 pub struct Unauthorized{
     #[allow(dead_code)]// because is converted to json and sent to the fe 

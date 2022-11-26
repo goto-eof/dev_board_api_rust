@@ -139,6 +139,7 @@ pub async fn get_next_order_number() -> Result<i64, DevBoardGenericError> {
 
 pub async fn create(
     json_data: serde_json::Value,
+    jwt_opt: Option<String>,
 ) -> Result<db_column::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_column::ActiveModel::from_json(json_data);

@@ -1,4 +1,4 @@
-use entity::{db_column, db_item};
+use entity::{db_board, db_column, db_item};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug)]
@@ -35,6 +35,12 @@ pub struct BoardsFullResponse {
 pub struct BoardFullResponse {
     pub column: db_column::Model,
     pub items: Vec<db_item::Model>,
+}
+
+#[derive(Serialize)]
+pub struct DashoardFullResponse {
+    pub(crate) board: db_board::Model,
+    pub columns: Vec<BoardFullResponse>,
 }
 
 #[derive(Serialize)]
