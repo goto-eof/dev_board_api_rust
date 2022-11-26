@@ -18,7 +18,7 @@ pub(crate) async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejec
         return generate_response(message, StatusCode::UNAUTHORIZED, 1579);
     } else {
         return generate_response(
-            "Internal Server Error".to_string(),
+            "Internal Server Error: path not found?".to_string(),
             StatusCode::INTERNAL_SERVER_ERROR,
             3748,
         );

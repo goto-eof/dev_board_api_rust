@@ -10,6 +10,7 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
+use entity::db_user;
 use migration::DbErr;
 use migration::JoinType;
 use sea_orm::ActiveModelTrait;
@@ -19,7 +20,6 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
-use sea_orm::RelationTrait;
 use sea_orm::TransactionTrait;
 
 pub async fn get_by_id(
@@ -76,9 +76,9 @@ pub async fn get_by_id_all(
         println!("{:?}", user_id);
         let dashboard_res_opt = db_board::Entity::find_by_id(id)
             .join_rev(
-                JoinType::Join,
+                JoinType::InnerJoin,
                 db_board_user::Entity::belongs_to(db_board::Entity)
-                    .from(db_board_user::Column::UserId)
+                    .from(db_board_user::Column::BoardId)
                     .to(db_board::Column::Id)
                     .into(),
             )
@@ -104,7 +104,7 @@ pub async fn get_by_id_all(
                 success: false,
                 code: 2,
                 err_type: DevBoardErrorType::Warning,
-                message: format!("Item not found"),
+                message: format!("Item not found (01)"),
             });
         }
 
