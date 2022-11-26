@@ -20,6 +20,7 @@ use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
 use sea_orm::RelationTrait;
+use sea_orm::TransactionTrait;
 
 pub async fn get_by_id(
     id: i32,
@@ -193,35 +194,44 @@ pub async fn get_all(
     Ok(vec![])
 }
 
-// TODO should be transactional
 pub async fn create(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> Result<db_board::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
-    let user_id = extract_user_id(jwt_opt);
-    let user_id = user_id.unwrap();
+    let result = db
+        .transaction::<_, db_board::Model, DbErr>(|txn| {
+            Box::pin(async move {
+                let user_id = extract_user_id(jwt_opt);
+                let user_id = user_id.unwrap();
 
-    let result = db_board::ActiveModel::from_json(json_data);
+                let result = db_board::ActiveModel::from_json(json_data);
 
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
+                let mut model = result.unwrap();
 
-    let mut model = result.unwrap();
+                let dat = Utc::now().naive_utc();
+                model.created_at = sea_orm::Set(Some(dat));
+                model.updated_at = sea_orm::Set(Some(dat));
 
-    let dat = Utc::now().naive_utc();
-    model.created_at = sea_orm::Set(Some(dat));
-    model.updated_at = sea_orm::Set(Some(dat));
+                let result = model.insert(txn).await;
 
-    let result = model.insert(db).await;
+                let result = result.unwrap();
 
+                let board_user = db_board_user::ActiveModel {
+                    board_id: sea_orm::Set(result.id),
+                    user_id: sea_orm::Set(user_id),
+                    created_at: sea_orm::Set(Some(dat)),
+                    updated_at: sea_orm::Set(Some(dat)),
+                    ..Default::default()
+                };
+
+                let _board_user = board_user.insert(txn).await;
+
+                return Ok(result);
+            })
+        })
+        .await;
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
@@ -230,29 +240,7 @@ pub async fn create(
             message: format!("DB Error: {:?}", result.err()),
         });
     }
-
-    let result = result.unwrap();
-
-    let board_user = db_board_user::ActiveModel {
-        board_id: sea_orm::Set(result.id),
-        user_id: sea_orm::Set(user_id),
-        created_at: sea_orm::Set(Some(dat)),
-        updated_at: sea_orm::Set(Some(dat)),
-        ..Default::default()
-    };
-
-    let board_user = board_user.insert(db).await;
-
-    if board_user.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 2,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", board_user.err()),
-        });
-    }
-
-    Ok(result)
+    Ok(result.unwrap())
 }
 
 pub async fn update(
