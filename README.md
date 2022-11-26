@@ -67,6 +67,7 @@ password: password
 
 
 ```diff
+- be - renew token only if it is expiring;
 - be - association of kanban flow to user (wip);
 - fe - association of kanban flow to user (wip);
 - be - improve security;
