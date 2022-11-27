@@ -108,7 +108,22 @@ pub async fn get_all_for_sharing(
 
     let models = result.unwrap();
 
-    Ok(models)
+    let mut users: Vec<db_user::Model> = vec![];
+
+    for model in models {
+        users.push(db_user::Model {
+            id: model.id,
+            created_at: model.created_at,
+            updated_at: model.updated_at,
+            email: model.email,
+            first_name: model.first_name,
+            last_name: model.last_name,
+            username: model.username,
+            password: "".to_string(),
+        })
+    }
+
+    Ok(users)
 }
 
 pub async fn create(json_data: serde_json::Value) -> Result<db_user::Model, DevBoardGenericError> {
