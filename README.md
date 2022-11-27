@@ -63,12 +63,12 @@ password: password
 ### TODO
 
 ```diff
-- be - association of kanban flow to user (wip);
-- fe - association of kanban flow to user (wip);
++ be - association of kanban flow to user (wip);
++ fe - association of kanban flow to user (wip);
 - be - improve security;
 - be - manage better code unwrapping;
 - fe - optimize login and registration forms;
-- fe - improve form validation
+- fe - improve form validation (currently validation not works, but it worked)
 + be/fe - optimize front-end/back-end in order to understand better if it is a server down issue or the user is not logged in (show a toast for example). Improve json response on the backend side (uniform responses);
 + fe - hide login and register buttons when user is logged in;
 + be - optimize server responses (CORS error when user is not authorized);
