@@ -29,7 +29,7 @@ impl Settings {
             .add_source(File::with_name(&filename).required(true))
             .build()?
             .try_deserialize();
-        debug!("Settings loaded correctly: {:?}", settings);
+        debug!("Settings loaded correctly");
         settings
     }
 }

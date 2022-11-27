@@ -60,7 +60,6 @@ pub async fn auth_validator(
                     ).filter(db_user_role::Column::UserId.eq(user_id))
                 .all(db).await.unwrap();
 
-                debug!("User permissions: {:?}", user_permissions);
 
 for user_permission in user_permissions {
     if permission_name.eq(&user_permission.name)   {
