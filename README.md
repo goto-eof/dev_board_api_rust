@@ -62,10 +62,6 @@ password: password
 
 ### TODO
 
-
-
-
-
 ```diff
 - be - association of kanban flow to user (wip);
 - fe - association of kanban flow to user (wip);

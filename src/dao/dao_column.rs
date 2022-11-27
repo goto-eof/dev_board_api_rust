@@ -176,6 +176,10 @@ pub async fn create(
                 };
 
                 let result_bu = board_user_am.insert(txn).await;
+                if result_bu.is_err() {
+                    return Err(result_bu.err().unwrap());
+                }
+
                 Ok(result)
             })
         })
