@@ -139,15 +139,47 @@ pub async fn get_next_order_number() -> Result<i64, DevBoardGenericError> {
     Ok(count.value.unwrap() + 1)
 }
 
-// TODO make transactional
 // TODO make sure that the column is associated to the loggedin user
 pub async fn create(
     board_id: i32,
     json_data: serde_json::Value,
     _jwt_opt: Option<String>,
 ) -> Result<db_column::Model, DevBoardGenericError> {
-    let db = DB_POOL.get().await;
-    let result = db_column::ActiveModel::from_json(json_data);
+    let db_conn = DB_POOL.get().await;
+
+    let result = db_conn
+        .transaction::<_, db_column::Model, DbErr>(|txn| {
+            Box::pin(async move {
+                let result = db_column::ActiveModel::from_json(json_data);
+
+                let next_order_number = get_next_order_number().await;
+
+                let count = next_order_number.unwrap();
+
+                let mut model = result.unwrap();
+
+                let dat = Utc::now().naive_utc();
+                model.created_at = sea_orm::Set(Some(dat));
+                model.updated_at = sea_orm::Set(Some(dat));
+                model.order = sea_orm::Set(count);
+
+                let result = model.insert(txn).await;
+
+                let result = result.unwrap();
+
+                let board_user_am = db_board_column::ActiveModel {
+                    board_id: sea_orm::Set(board_id),
+                    column_id: sea_orm::Set(result.id),
+                    created_at: sea_orm::Set(Some(dat)),
+                    updated_at: sea_orm::Set(Some(dat)),
+                    ..Default::default()
+                };
+
+                let result_bu = board_user_am.insert(txn).await;
+                Ok(result)
+            })
+        })
+        .await;
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
@@ -156,59 +188,7 @@ pub async fn create(
             message: format!("DB Error: {:?}", result.err()),
         });
     }
-
-    let next_order_number = get_next_order_number().await;
-
-    if next_order_number.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error count2(): {:?}", next_order_number.err()),
-        });
-    }
-
-    let count = next_order_number.unwrap();
-
-    let mut model = result.unwrap();
-
-    let dat = Utc::now().naive_utc();
-    model.created_at = sea_orm::Set(Some(dat));
-    model.updated_at = sea_orm::Set(Some(dat));
-    model.order = sea_orm::Set(count);
-
-    let result = model.insert(db).await;
-
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
-
-    let result = result.unwrap();
-
-    let board_user_am = db_board_column::ActiveModel {
-        board_id: sea_orm::Set(board_id),
-        column_id: sea_orm::Set(result.id),
-        created_at: sea_orm::Set(Some(dat)),
-        updated_at: sea_orm::Set(Some(dat)),
-        ..Default::default()
-    };
-
-    let result_bu = board_user_am.insert(db).await;
-    if result_bu.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result_bu.err()),
-        });
-    }
-
-    Ok(result)
+    Ok(result.unwrap())
 }
 
 pub async fn swap(swap_request: SwapRequest) -> Result<bool, DevBoardGenericError> {
