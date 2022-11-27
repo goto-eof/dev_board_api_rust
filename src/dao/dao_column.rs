@@ -19,6 +19,7 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
+use sea_orm::TransactionTrait;
 
 pub async fn get_by_id(id: i32) -> Result<db_column::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
@@ -343,60 +344,45 @@ pub async fn update(
 }
 
 pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
-    let db = DB_POOL.get().await;
+    let db_conn = DB_POOL.get().await;
 
-    let result = db_column::Entity::find_by_id(id).one(db).await;
+    let result = db_conn
+        .transaction::<_, bool, DbErr>(|txn| {
+            Box::pin(async move {
+                // deleting board-columns
+                let board_columns = db_board_column::Entity::find()
+                    .filter(db_board_column::Column::ColumnId.eq(id))
+                    .all(txn)
+                    .await;
 
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
+                for board_column in board_columns.unwrap() {
+                    board_column.delete(txn).await;
+                }
 
-    let opt = result.unwrap();
+                // deleting items
+                let items_result = db_item::Entity::find()
+                    .filter(db_item::Column::ColumnId.eq(id))
+                    .all(txn)
+                    .await;
 
-    if opt.is_none() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 2,
-            err_type: DevBoardErrorType::Warning,
-            message: format!("Item not found"),
-        });
-    }
+                let items = items_result.unwrap();
 
-    let items_result = db_item::Entity::find()
-        .filter(db_item::Column::ColumnId.eq(id))
-        .all(db)
+                for item in items.into_iter() {
+                    let item_result = item.delete(txn).await;
+                }
+
+                // deleting column
+                let column_result = db_column::Entity::find_by_id(id).one(txn).await;
+                let column_opt = column_result.unwrap();
+                let column_result = column_opt.unwrap().delete(txn).await;
+
+                let column_deletion_result = column_result.unwrap();
+                assert_eq!(column_deletion_result.rows_affected, 1);
+                Ok(column_deletion_result.rows_affected == 1)
+            })
+        })
         .await;
 
-    if items_result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 2,
-            err_type: DevBoardErrorType::Warning,
-            message: format!("Error while retrieving items"),
-        });
-    }
-
-    let items = items_result.unwrap();
-
-    for item in items.into_iter() {
-        let item_result = item.delete(db).await;
-        if item_result.is_err() {
-            return Err(DevBoardGenericError {
-                success: false,
-                code: 2,
-                err_type: DevBoardErrorType::Warning,
-                message: format!("Error while deleting item"),
-            });
-        }
-    }
-
-    let result = opt.unwrap().delete(db).await;
-
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
@@ -405,8 +391,5 @@ pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
             message: format!("DB Error: {:?}", result.err()),
         });
     }
-
-    let deletion_result = result.unwrap();
-    assert_eq!(deletion_result.rows_affected, 1);
-    Ok(deletion_result.rows_affected == 1)
+    Ok(result.unwrap())
 }

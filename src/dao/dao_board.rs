@@ -10,6 +10,7 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
+use entity::db_user;
 use log::debug;
 use migration::DbErr;
 use migration::JoinType;
@@ -31,9 +32,9 @@ pub async fn get_by_id(
         let db = DB_POOL.get().await;
         let result = db_board::Entity::find_by_id(id)
             .join_rev(
-                JoinType::Join,
+                JoinType::InnerJoin,
                 db_board_user::Entity::belongs_to(db_board::Entity)
-                    .from(db_board_user::Column::UserId)
+                    .from(db_board_user::Column::BoardId)
                     .to(db_board::Column::Id)
                     .into(),
             )
