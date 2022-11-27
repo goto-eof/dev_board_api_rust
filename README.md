@@ -65,7 +65,7 @@ password: password
 ```diff
 + be - association of kanban flow to user (wip);
 + fe - association of kanban flow to user (wip);
-+ share dasboard with users;
++ be/fe - share dasboard with other users;
 - be - renew token only if it is expiring;
 - be - improve security;
 - be - manage better code unwrapping;
