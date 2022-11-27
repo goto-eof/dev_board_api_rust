@@ -1,5 +1,4 @@
 use entity::{db_board, db_column, db_item};
-use serde::ser::StdError;
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Debug)]
 pub enum DevBoardErrorType {

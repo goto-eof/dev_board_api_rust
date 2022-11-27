@@ -303,7 +303,6 @@ pub async fn update(
     Ok(result.unwrap())
 }
 
-// TODO make it transactional
 // TODO manage better unwrapping
 // TODO in the future, use the DBMS to manage deletion (cascade: delete)
 pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
