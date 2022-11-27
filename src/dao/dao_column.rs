@@ -7,7 +7,6 @@ use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_board_column;
-use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
 use migration::DbErr;

@@ -302,9 +302,38 @@ pub async fn update(
     Ok(result.unwrap())
 }
 
-pub async fn delete(id: i32, json_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
+// TODO make it transactional
+// TODO manage better unwrapping
+// TODO in the future, use the DBMS to manage deletion (cascade: delete)
+pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
+    let user_id = extract_user_id(jwt_opt).unwrap();
+
+    // deleting board-user relationship
+    let result = db_board_user::Entity::find()
+        .filter(db_board_user::Column::BoardId.eq(id))
+        .filter(db_board_user::Column::UserId.eq(user_id))
+        .one(db)
+        .await;
+
+    result.unwrap().unwrap().delete(db).await;
+
+    // deleting board-column relationships
+    let result = db_board_column::Entity::find()
+        .filter(db_board_column::Column::BoardId.eq(id))
+        .all(db)
+        .await;
+    let mut columns_id: Vec<i32> = vec![];
+    for board_column in result.unwrap() {
+        let result = db_column::Entity::find_by_id(board_column.column_id)
+            .one(db)
+            .await;
+        columns_id.push(board_column.column_id);
+        result.unwrap().unwrap().delete(db).await;
+    }
+
+    // deleting board
     let result = db_board::Entity::find_by_id(id).one(db).await;
 
     if result.is_err() {
@@ -327,46 +356,27 @@ pub async fn delete(id: i32, json_opt: Option<String>) -> Result<bool, DevBoardG
         });
     }
 
-    let items_result = db_item::Entity::find()
-        .filter(db_item::Column::ColumnId.eq(id))
+    opt.unwrap().delete(db).await;
+
+    // deleting items relationships
+    let items = db_item::Entity::find()
+        .filter(db_item::Column::ColumnId.is_in(columns_id.clone()))
         .all(db)
         .await;
 
-    if items_result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 2,
-            err_type: DevBoardErrorType::Warning,
-            message: format!("Error while retrieving items"),
-        });
+    for column_item in items.unwrap() {
+        column_item.delete(db).await;
     }
 
-    let items = items_result.unwrap();
+    // deleting columns
+    let columns = db_column::Entity::find()
+        .filter(db_column::Column::Id.is_in(columns_id))
+        .all(db)
+        .await;
 
-    for item in items.into_iter() {
-        let item_result = item.delete(db).await;
-        if item_result.is_err() {
-            return Err(DevBoardGenericError {
-                success: false,
-                code: 2,
-                err_type: DevBoardErrorType::Warning,
-                message: format!("Error while deleting item"),
-            });
-        }
+    for column in columns.unwrap() {
+        column.delete(db).await;
     }
 
-    let result = opt.unwrap().delete(db).await;
-
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
-
-    let deletion_result = result.unwrap();
-    assert_eq!(deletion_result.rows_affected, 1);
-    Ok(deletion_result.rows_affected == 1)
+    Ok(true)
 }
