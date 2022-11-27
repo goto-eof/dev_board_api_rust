@@ -66,6 +66,63 @@ pub async fn get_by_id(
     return Ok(None);
 }
 
+pub async fn share(
+    board_id: i32,
+    target_user_id: i32,
+    jwt_opt: Option<String>,
+) -> Result<bool, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+
+    let dat = Utc::now().naive_utc();
+
+    let shared_board_user = db_board_user::ActiveModel {
+        board_id: sea_orm::Set(board_id),
+        user_id: sea_orm::Set(target_user_id),
+        created_at: sea_orm::Set(Some(dat)),
+        updated_at: sea_orm::Set(Some(dat)),
+        ..Default::default()
+    };
+    let result = shared_board_user.insert(db).await;
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    Ok(true)
+}
+
+pub async fn unshare(
+    board_id: i32,
+    target_user_id: i32,
+    jwt_opt: Option<String>,
+) -> Result<bool, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+
+    let board_user_result = db_board_user::Entity::find()
+        .filter(db_board_user::Column::UserId.eq(target_user_id))
+        .filter(db_board_user::Column::BoardId.eq(board_id))
+        .all(db)
+        .await;
+
+    for board_user in board_user_result.unwrap() {
+        let result = board_user.delete(db).await;
+        if result.is_err() {
+            return Err(DevBoardGenericError {
+                success: false,
+                code: 1,
+                err_type: DevBoardErrorType::Error,
+                message: format!("DB Error: {:?}", result.err()),
+            });
+        }
+    }
+
+    Ok(true)
+}
+
 pub async fn get_by_id_all(
     id: i32,
     jwt_opt: Option<String>,
@@ -192,6 +249,35 @@ pub async fn get_all(
         return Ok(models);
     }
     Ok(vec![])
+}
+
+pub async fn board_is_shared_with(
+    board_id: i32,
+    jwt_opt: Option<String>,
+) -> Result<Vec<i32>, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+    let user_id = extract_user_id(jwt_opt).unwrap();
+    let result = db_board_user::Entity::find()
+        .filter(db_board_user::Column::BoardId.eq(board_id))
+        // .filter(db_board_user::Column::UserId.ne(user_id))
+        .all(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+    let mut user_ids = vec![];
+
+    for item in result.unwrap() {
+        user_ids.push(item.user_id);
+    }
+
+    Ok(user_ids)
 }
 
 pub async fn create(

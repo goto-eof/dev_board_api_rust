@@ -68,6 +68,7 @@
         "get_user",
         "get_by_username",
         "get_all_users",
+        "get_all_users_for_sharing",
         "insert_user",
         "update_user",
         "delete_user",
@@ -78,7 +79,10 @@
         "get_all_boards",
         "insert_board",
         "update_board",
-        "delete_board"
+        "delete_board",
+        "share_board",
+        "unshare_board",
+        "board_is_shared_with"
     ],
     "admin_only_permissions": [
         "get_permission",

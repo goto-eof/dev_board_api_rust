@@ -1,9 +1,11 @@
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
 use entity::db_user;
+use log::debug;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -63,12 +65,38 @@ pub async fn get_by_username(
 
 pub async fn get_all() -> Result<Vec<db_user::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
-
+    debug!("searching for users...");
     let result = db_user::Entity::find()
         .order_by_asc(db_user::Column::Id)
         .all(db)
         .await;
+    debug!("all users: {:?}", result);
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
 
+    let models = result.unwrap();
+
+    Ok(models)
+}
+
+pub async fn get_all_for_sharing(
+    jwt_opt: Option<String>,
+) -> Result<Vec<db_user::Model>, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+    let user_id = extract_user_id(jwt_opt).unwrap();
+    debug!("searching for users...");
+    let result = db_user::Entity::find()
+        .filter(db_user::Column::Id.ne(user_id))
+        .order_by_asc(db_user::Column::Id)
+        .all(db)
+        .await;
+    debug!("all users: {:?}", result);
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,

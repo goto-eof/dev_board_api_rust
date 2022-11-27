@@ -39,6 +39,7 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and_then(controller_user::get_user))
         .or(db_column
             .and(warp::get())
+            .and(warp::path("get_by_username"))
             .and(warp::path::param::<String>())
             .and(warp::path::end())
             .and(auth_validator("get_by_username".to_string()).await)
@@ -49,6 +50,12 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and(warp::path::end())
             .and(auth_validator("get_all_users".to_string()).await)
             .and_then(controller_user::get_all_users))
+        .or(db_column
+            .and(warp::get())
+            .and(warp::path("all-for-share"))
+            .and(warp::path::end())
+            .and(auth_validator("get_all_users_for_sharing".to_string()).await)
+            .and_then(controller_user::get_all_users_for_sharing))
         .or(db_column
             .and(warp::post())
             .and(warp::path::end())

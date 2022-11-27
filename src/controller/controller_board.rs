@@ -17,8 +17,40 @@ pub async fn get_board_with_all_data(
     )
 }
 
+pub async fn share_board(
+    board_id: i32,
+    user_id: i32,
+    jwt_opt: Option<String>,
+) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(
+        dao_board::share(board_id, user_id, jwt_opt.clone()).await,
+        jwt_opt,
+    )
+}
+
+pub async fn unshare_board(
+    board_id: i32,
+    user_id: i32,
+    jwt_opt: Option<String>,
+) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(
+        dao_board::unshare(board_id, user_id, jwt_opt.clone()).await,
+        jwt_opt,
+    )
+}
+
 pub async fn get_all_boards(jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
     controller_common::generate_response(dao_board::get_all(jwt_opt.clone()).await, jwt_opt)
+}
+
+pub async fn board_is_shared_with(
+    board_id: i32,
+    jwt_opt: Option<String>,
+) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(
+        dao_board::board_is_shared_with(board_id, jwt_opt.clone()).await,
+        jwt_opt,
+    )
 }
 
 pub async fn insert_board(

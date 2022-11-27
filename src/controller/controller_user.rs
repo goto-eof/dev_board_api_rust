@@ -18,6 +18,15 @@ pub async fn get_all_users(jwt_opt: Option<String>) -> crate::GenericResult<impl
     controller_common::generate_response(dao_user::get_all().await, jwt_opt)
 }
 
+pub async fn get_all_users_for_sharing(
+    jwt_opt: Option<String>,
+) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(
+        dao_user::get_all_for_sharing(jwt_opt.clone()).await,
+        jwt_opt,
+    )
+}
+
 pub async fn insert_user(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
