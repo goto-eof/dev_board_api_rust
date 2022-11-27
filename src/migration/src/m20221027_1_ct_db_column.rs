@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(DbColumn::Name).string().not_null())
+                    .col(ColumnDef::new(DbColumn::Description).string())
                     .col(ColumnDef::new(DbColumn::Order).big_integer().not_null())
                     .col(ColumnDef::new(DbColumn::CreatedAt).timestamp().not_null())
                     .col(ColumnDef::new(DbColumn::UpdatedAt).timestamp().not_null())
@@ -39,6 +40,7 @@ enum DbColumn {
     Table,
     Id,
     Name,
+    Description,
     Order,
     CreatedAt,
     UpdatedAt,

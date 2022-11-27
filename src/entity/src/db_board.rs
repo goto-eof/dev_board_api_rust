@@ -10,6 +10,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub name: String,
+    pub description: Option<String>,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
 }

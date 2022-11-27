@@ -7,7 +7,8 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i32,
-    pub name: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
     pub order: i64,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
