@@ -10,6 +10,7 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
+use log::debug;
 use migration::DbErr;
 use migration::JoinType;
 use sea_orm::ActiveModelTrait;
@@ -306,77 +307,85 @@ pub async fn update(
 // TODO manage better unwrapping
 // TODO in the future, use the DBMS to manage deletion (cascade: delete)
 pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
-    let db = DB_POOL.get().await;
+    let db_conn = DB_POOL.get().await;
 
-    let user_id = extract_user_id(jwt_opt).unwrap();
+    let result = db_conn
+        .transaction::<_, (), DbErr>(|txn| {
+            Box::pin(async move {
+                let user_id = extract_user_id(jwt_opt).unwrap();
 
-    // deleting board-user relationship
-    let result = db_board_user::Entity::find()
-        .filter(db_board_user::Column::BoardId.eq(id))
-        .filter(db_board_user::Column::UserId.eq(user_id))
-        .one(db)
+                // deleting board-user relationship
+                let result = db_board_user::Entity::find()
+                    .filter(db_board_user::Column::BoardId.eq(id))
+                    .filter(db_board_user::Column::UserId.eq(user_id))
+                    .one(txn)
+                    .await;
+
+                result.unwrap().unwrap().delete(txn).await;
+
+                debug!("board-user deleted");
+
+                // deleting board-column relationships
+                let result = db_board_column::Entity::find()
+                    .filter(db_board_column::Column::BoardId.eq(id))
+                    .all(txn)
+                    .await;
+                let mut columns_id: Vec<i32> = vec![];
+                for board_column in result.unwrap() {
+                    columns_id.push(board_column.column_id);
+                    board_column.delete(txn).await;
+                }
+
+                debug!("board-column deleted");
+
+                // deleting board
+                debug!("board id: {}", id);
+
+                let result = db_board::Entity::find_by_id(id).one(txn).await;
+                debug!("board: {:?}", result);
+
+                let opt = result.unwrap();
+
+                opt.unwrap().delete(txn).await;
+
+                debug!("board deleted");
+
+                // deleting items relationships
+                let items = db_item::Entity::find()
+                    .filter(db_item::Column::ColumnId.is_in(columns_id.clone()))
+                    .all(txn)
+                    .await;
+
+                for column_item in items.unwrap() {
+                    column_item.delete(txn).await;
+                }
+
+                debug!("items deleted");
+
+                // deleting columns
+                let columns = db_column::Entity::find()
+                    .filter(db_column::Column::Id.is_in(columns_id))
+                    .all(txn)
+                    .await;
+
+                for column in columns.unwrap() {
+                    column.delete(txn).await;
+                }
+                debug!("columns deleted");
+
+                Ok(())
+            })
+        })
         .await;
-
-    result.unwrap().unwrap().delete(db).await;
-
-    // deleting board-column relationships
-    let result = db_board_column::Entity::find()
-        .filter(db_board_column::Column::BoardId.eq(id))
-        .all(db)
-        .await;
-    let mut columns_id: Vec<i32> = vec![];
-    for board_column in result.unwrap() {
-        let result = db_column::Entity::find_by_id(board_column.column_id)
-            .one(db)
-            .await;
-        columns_id.push(board_column.column_id);
-        result.unwrap().unwrap().delete(db).await;
-    }
-
-    // deleting board
-    let result = db_board::Entity::find_by_id(id).one(db).await;
-
     if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
+        if result.is_err() {
+            return Err(DevBoardGenericError {
+                success: false,
+                code: 1,
+                err_type: DevBoardErrorType::Error,
+                message: format!("DB Error: {:?}", result.err()),
+            });
+        }
     }
-
-    let opt = result.unwrap();
-
-    if opt.is_none() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 2,
-            err_type: DevBoardErrorType::Warning,
-            message: format!("Item not found"),
-        });
-    }
-
-    opt.unwrap().delete(db).await;
-
-    // deleting items relationships
-    let items = db_item::Entity::find()
-        .filter(db_item::Column::ColumnId.is_in(columns_id.clone()))
-        .all(db)
-        .await;
-
-    for column_item in items.unwrap() {
-        column_item.delete(db).await;
-    }
-
-    // deleting columns
-    let columns = db_column::Entity::find()
-        .filter(db_column::Column::Id.is_in(columns_id))
-        .all(db)
-        .await;
-
-    for column in columns.unwrap() {
-        column.delete(db).await;
-    }
-
     Ok(true)
 }
