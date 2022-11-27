@@ -10,7 +10,6 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
-use entity::db_user;
 use log::debug;
 use migration::DbErr;
 use migration::JoinType;
@@ -247,7 +246,7 @@ pub async fn create(
 pub async fn update(
     id: i32,
     json_data: serde_json::Value,
-    json_opt: Option<String>,
+    _json_opt: Option<String>,
 ) -> Result<db_board::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_board::Entity::find_by_id(id).one(db).await;
@@ -321,7 +320,10 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
                     .one(txn)
                     .await;
 
-                result.unwrap().unwrap().delete(txn).await;
+                let res = result.unwrap().unwrap().delete(txn).await;
+                if res.is_err() {
+                    return Err(res.err().unwrap());
+                }
 
                 debug!("board-user deleted");
 
@@ -333,7 +335,10 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
                 let mut columns_id: Vec<i32> = vec![];
                 for board_column in result.unwrap() {
                     columns_id.push(board_column.column_id);
-                    board_column.delete(txn).await;
+                    let res = board_column.delete(txn).await;
+                    if res.is_err() {
+                        return Err(res.err().unwrap());
+                    }
                 }
 
                 debug!("board-column deleted");
@@ -346,7 +351,10 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
 
                 let opt = result.unwrap();
 
-                opt.unwrap().delete(txn).await;
+                let res = opt.unwrap().delete(txn).await;
+                if res.is_err() {
+                    return Err(res.err().unwrap());
+                }
 
                 debug!("board deleted");
 
@@ -357,7 +365,10 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
                     .await;
 
                 for column_item in items.unwrap() {
-                    column_item.delete(txn).await;
+                    let res = column_item.delete(txn).await;
+                    if res.is_err() {
+                        return Err(res.err().unwrap());
+                    }
                 }
 
                 debug!("items deleted");
@@ -369,7 +380,10 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
                     .await;
 
                 for column in columns.unwrap() {
-                    column.delete(txn).await;
+                    let res = column.delete(txn).await;
+                    if res.is_err() {
+                        return Err(res.err().unwrap());
+                    }
                 }
                 debug!("columns deleted");
 

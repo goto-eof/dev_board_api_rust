@@ -3,7 +3,6 @@ use crate::structure::structure::BoardsFullResponse;
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::SwapRequest;
-use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_board_column;
@@ -145,11 +144,10 @@ pub async fn get_next_order_number() -> Result<i64, DevBoardGenericError> {
 pub async fn create(
     board_id: i32,
     json_data: serde_json::Value,
-    jwt_opt: Option<String>,
+    _jwt_opt: Option<String>,
 ) -> Result<db_column::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_column::ActiveModel::from_json(json_data);
-    let user_id = extract_user_id(jwt_opt).unwrap();
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
@@ -200,7 +198,15 @@ pub async fn create(
         ..Default::default()
     };
 
-    board_user_am.insert(db).await;
+    let result_bu = board_user_am.insert(db).await;
+    if result_bu.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result_bu.err()),
+        });
+    }
 
     Ok(result)
 }
@@ -356,7 +362,10 @@ pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
                     .await;
 
                 for board_column in board_columns.unwrap() {
-                    board_column.delete(txn).await;
+                    let res = board_column.delete(txn).await;
+                    if res.is_err() {
+                        return Err(res.err().unwrap());
+                    }
                 }
 
                 // deleting items
@@ -368,7 +377,10 @@ pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
                 let items = items_result.unwrap();
 
                 for item in items.into_iter() {
-                    let item_result = item.delete(txn).await;
+                    let res = item.delete(txn).await;
+                    if res.is_err() {
+                        return Err(res.err().unwrap());
+                    }
                 }
 
                 // deleting column
