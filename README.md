@@ -93,3 +93,9 @@ password: password
 ```
 sea-orm-cli generate entity -u postgres://postgres:postgres@127.0.0.1:5432/postgres -o entity/src
 ```
+
+### Rebuild docker image
+
+```
+docker-compose up -d --no-deps --build
+```
