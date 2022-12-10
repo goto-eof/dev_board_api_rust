@@ -61,14 +61,14 @@ pub async fn auth_validator(
                 .all(db).await.unwrap();
 
 
-for user_permission in user_permissions {
-    if permission_name.eq(&user_permission.name)   {
-        debug!("Permission found: {:?}", permission_name);
-        return Ok(Some(tokeen))
-    }
-}
-return  Err(warp::reject::custom(Unauthorized{error_message: "You have not permission to access to this resource".to_string()}));
-},
+                for user_permission in user_permissions {
+                    if permission_name.eq(&user_permission.name)   {
+                        debug!("Permission found: {:?}", permission_name);
+                        return Ok(Some(tokeen))
+                    }
+                }
+                return  Err(warp::reject::custom(Unauthorized{error_message: "You have not permission to access to this resource".to_string()}));
+                },
         );
 }
 
