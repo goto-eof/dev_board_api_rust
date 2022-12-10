@@ -5,3 +5,4 @@
 /migration/target
 .DS_Store
 src/.DS_Store
+postgres-data

@@ -5,3 +5,4 @@ logs
 test
 README.md
 migration/target
+postgres-data
