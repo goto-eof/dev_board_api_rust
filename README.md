@@ -21,7 +21,7 @@ Start server:
 
 Run RDBMS
 ```
-docker-compoer -f docker-compose-dbms.yml up
+docker-compose -f docker-compose-dbms.yml up
 ```
 
 Run application

@@ -21,13 +21,13 @@ appenders:
         count: 100
         pattern: 'logs/log{}.log'
 root:
-  level: debug
+  level: info
   appenders:
     - default
     - file_appender
 loggers:
   dev_board:
-    level: debug
+    level: info
     appenders:
       - default
       - file_appender
