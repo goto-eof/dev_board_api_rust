@@ -1,0 +1,13 @@
+version: '3.6'
+
+services:
+  dev-board:
+    container_name: dev_board_api_rust
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - '127.0.0.1:8013:8013'
+    networks:
+      - default
