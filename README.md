@@ -70,7 +70,7 @@ password: postgres
 + be - association of kanban flow to user (wip);
 + fe - association of kanban flow to user (wip);
 + be/fe - share dasboard with other users;
-- be - renew token only if it is expiring;
++ be - renew token only if it is expiring;
 - be - improve security;
 - be - manage better code unwrapping;
 - fe - optimize login and registration forms;
