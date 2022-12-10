@@ -1,0 +1,17 @@
+version: '3.6'
+
+services:
+  postgres-service:
+    container_name: postgres_service
+    image: postgres:15.1
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    restart: on-failure
+    networks:
+      - default
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data

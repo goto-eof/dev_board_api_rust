@@ -6,30 +6,27 @@ A dashboard for organizing software development tasks (Kanban flow) implemented 
 
 [Here](https://github.com/goto-eof/dev_board_react) you can find the front-end application.
 
-### Run project
+### Run project as docker container 
 
-Start DBMS container:
+Start DBMS container and API server:
 
 ```
+docker-compoer -f docker-compose-dbms.yml up
+
 docker-compose up
 ```
+### Run project for development
 
 Start server:
 
+Run RDBMS
+```
+docker-compoer -f docker-compose-dbms.yml up
+```
+
+Run application
 ```
 cargo run
-```
-
-The server will be reacheable at:
-
-```
-http://127.0.0.1:8013
-```
-
-### Docker (production)
-
-```
-docker-compoer -f docker-compose-production.yml up
 ```
 
 The server will be reacheable at:
@@ -58,6 +55,13 @@ Import postman collection file from test/postma.json in your postman workspace.
 ```
 username: admin
 password: password
+```
+
+### DB credentials
+```
+url: localhost:5432
+username: postgres
+password: postgres
 ```
 
 ### TODO

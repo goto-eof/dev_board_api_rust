@@ -1,6 +1,15 @@
-FROM rust:latest
-COPY ./ ./
+# Build stage
+FROM rust:latest as builder
+WORKDIR /app
+ADD . /app
 RUN cargo build --release
-EXPOSE 8000/tcp
+
+# Prod stage
+FROM gcr.io/distroless/cc
+# COPY configuration/* /
+COPY log4rs.yml /
+COPY configuration/default.json configuration/default.json
+COPY configuration/production.json configuration/production.json
+COPY --from=builder /app/target/release/dev-board /
 ENV DEV_BOARD_ENV production
-CMD ["./target/release/dev-board"]
+CMD ["./dev-board"]
