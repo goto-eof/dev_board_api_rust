@@ -9,7 +9,7 @@ FROM gcr.io/distroless/cc
 # COPY configuration/* /
 COPY log4rs.yml /
 COPY configuration/default.json configuration/default.json
-COPY configuration/production_aws.json configuration/production.json
+COPY configuration/production_local.json configuration/production.json
 COPY --from=builder /app/target/release/dev-board /
 ENV DEV_BOARD_ENV production
 CMD ["./dev-board"]

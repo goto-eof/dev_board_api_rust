@@ -5,7 +5,7 @@ services:
     container_name: dev_board_api_rust
     build:
       context: .
-      dockerfile: Dockerfile.aws
+      dockerfile: Dockerfile.local
     restart: on-failure
     ports:
       - '127.0.0.1:8013:8013'
