@@ -13,6 +13,13 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
         .and(warp::body::content_length_limit(1024 * 16))
         .and_then(controller_auth::register)
         .or(db_column
+            .and(warp::path("refreshToken"))
+            .and(warp::post())
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and(warp::body::content_length_limit(1024 * 16))
+            .and_then(controller_auth::refresh_jwt))
+        .or(db_column
             .and(warp::path("login"))
             .and(warp::post())
             .and(warp::path::end())
@@ -33,7 +40,14 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and_then(controller_auth::check_is_logged_in))
         .or(db_column
             .and(warp::get())
+            .and(warp::path("get_user_by_id"))
             .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and(auth_validator("get_user_by_id".to_string()).await)
+            .and_then(controller_user::get_user_by_id))
+        .or(db_column
+            .and(warp::get())
+            .and(warp::path("get_user"))
             .and(warp::path::end())
             .and(auth_validator("get_user".to_string()).await)
             .and_then(controller_user::get_user))

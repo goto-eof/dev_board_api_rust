@@ -17,6 +17,7 @@ pub struct DevBoardGenericError {
 pub struct Response<T> {
     pub success: bool,
     pub result: T,
+    pub refresh_token: bool,
 }
 
 #[derive(Clone, Deserialize)]
@@ -52,4 +53,14 @@ pub struct User {
 #[derive(Serialize)]
 pub struct LogoutResponse {
     pub success: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Jwt {
+    pub jwt: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct Message {
+    pub message: String,
 }

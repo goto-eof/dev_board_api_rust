@@ -3,15 +3,24 @@ pub struct LoginData {
     pub username: String,
     pub password: String,
 }
+
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::Jwt;
 use crate::structure::structure::LogoutResponse;
 use crate::structure::structure::Response;
 use crate::structure::structure::User;
+use crate::util::util_authentication::generate_jwt;
+use crate::util::util_authentication::Claims;
 use crate::util::util_authentication::{self};
+use crate::SETTINGS;
 use bcrypt::{hash, verify};
+use chrono::NaiveDateTime;
 use chrono::Utc;
 use entity::{db_role, db_user, db_user_role};
+use jsonwebtoken::decode;
+use jsonwebtoken::DecodingKey;
+use jsonwebtoken::Validation;
 use migration::DbErr;
 use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set,
@@ -42,24 +51,22 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
             message: format!("DB Error: {:?}", "Invalid username/password"),
         };
         let json = json!(err);
-        return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
+        return generate_response(json, StatusCode::UNAUTHORIZED);
     }
     let user = user.unwrap();
     let check_password = verify(login_data.password, &user.password).unwrap();
     if check_password {
         let jwt = util_authentication::generate_jwt(user.id).unwrap();
-        let user = User {
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            username: user.username,
+        let jwt_obj = Jwt {
+            jwt: Some(jwt.to_owned()),
         };
         let response = Response {
             success: true,
-            result: user,
+            result: jwt_obj,
+            refresh_token: false,
         };
         let json = json!(response);
-        return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
+        return generate_response(json, StatusCode::OK);
     }
 
     let err = DevBoardGenericError {
@@ -69,8 +76,9 @@ pub async fn login(login_data: LoginData) -> Result<impl Reply, Rejection> {
         message: format!("DB Error: {:?}", "Invalid username/password"),
     };
     let json = json!(err);
-    return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
+    return generate_response(json, StatusCode::UNAUTHORIZED);
 }
+
 #[derive(Debug, Serialize)]
 pub struct JwtReponse {
     pub jwt: String,
@@ -84,29 +92,47 @@ pub struct RegistrationData {
     pub last_name: Option<String>,
 }
 
-pub fn generate_response_with_cookie(
+pub async fn refresh_jwt(old_jwt: Jwt) -> Result<impl Reply, Rejection> {
+    let old_jwt = old_jwt.jwt.unwrap();
+    let decoded = decode::<Claims>(
+        &old_jwt,
+        &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),
+        &Validation::new(jsonwebtoken::Algorithm::HS256),
+    );
+    let decoded = decoded.unwrap();
+    let user_id = decoded.claims.sub;
+    let exp = decoded.claims.exp;
+    let datetime = NaiveDateTime::from_timestamp(exp.try_into().unwrap(), 0);
+    let now = Utc::now().naive_local();
+    let diff = datetime - now;
+    let minutes = diff.num_minutes();
+
+    let json = json!(match minutes {
+        0 => Response {
+            refresh_token: false,
+            success: true,
+            result: Jwt {
+                jwt: Some(generate_jwt(user_id).unwrap())
+            }
+        },
+        _ => Response {
+            refresh_token: false,
+            success: true,
+            result: Jwt { jwt: Some(old_jwt) }
+        },
+    });
+    return generate_response(json, StatusCode::OK);
+}
+
+pub fn generate_response(
     response: serde_json::Value,
-    jwt: Option<String>,
     status_code: StatusCode,
 ) -> Result<impl Reply, Rejection> {
     let reply = warp::reply::json(&response);
     let reply = warp::reply::with_status(reply, status_code);
 
-    let mut response = reply.into_response();
+    let response = reply.into_response();
 
-    if jwt.is_some() {
-        let mut cookies = HeaderMap::new();
-        let cookie_str = format!(
-            "token={}; SameSite=None; expires=Fri, 31 Dec 9999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
-            jwt.unwrap()
-        );
-        cookies.append(
-            "set-cookie",
-            HeaderValue::from_str(cookie_str.as_str()).unwrap(),
-        );
-        let headers = response.headers_mut();
-        headers.extend(cookies);
-    }
     Ok(response)
 }
 
@@ -219,13 +245,13 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         let result = result.unwrap();
         if result.0.is_some() {
             let user = result.0.unwrap();
-            let jwt = util_authentication::generate_jwt(user.0).unwrap();
             let response = Response {
                 success: true,
                 result: user.1,
+                refresh_token: false,
             };
             let json = json!(response);
-            return generate_response_with_cookie(json, Some(jwt), StatusCode::OK);
+            return generate_response(json, StatusCode::OK);
         } else {
             let err = DevBoardGenericError {
                 success: false,
@@ -234,7 +260,7 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
                 message: format!("DB Error: {:?}", result.1.unwrap()),
             };
             let json = json!(err);
-            return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
+            return generate_response(json, StatusCode::BAD_REQUEST);
         }
     }
 
@@ -245,5 +271,5 @@ pub async fn register(registration_data: RegistrationData) -> Result<impl Reply,
         message: format!("DB Error: {:?}", result.err().unwrap()),
     };
     let json = json!(err);
-    return generate_response_with_cookie(json, None, StatusCode::BAD_REQUEST);
+    return generate_response(json, StatusCode::BAD_REQUEST);
 }

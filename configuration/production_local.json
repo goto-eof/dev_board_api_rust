@@ -1,3 +1,4 @@
 {
+  "cors_allowed_origins": ["http://192.168.1.101:8082"],
   "db_uri": "postgres://postgres:postgres@192.168.1.101:5432/postgres"
 }

@@ -2,7 +2,7 @@
 FROM rust:latest as builder
 WORKDIR /app
 ADD . /app
-RUN cargo build --release
+RUN cargo build --release -j 4
 
 # Prod stage
 FROM gcr.io/distroless/cc

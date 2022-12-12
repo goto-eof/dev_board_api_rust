@@ -20,12 +20,13 @@ pub async fn auth_validator(
 ) -> impl Filter<Extract = (Option<String>,), Error = Rejection> + Clone {
     let permission_name = warp::any().map(move || permission_name.clone());
 
-    return warp::cookie::optional::<String>("token")
-        .and(warp::header::optional::<String>("Authorization"))
+    return 
+    // warp::cookie::optional::<String>("token")
+        warp::header::optional::<String>("Authorization")
         .and(permission_name)
         .and_then(
-            move |token: Option<String>, authorization: Option<String>, permission_name: String| async move {
-                let tokeen = token.unwrap_or(authorization.unwrap_or("".to_string()));
+            move | authorization: Option<String>, permission_name: String| async move {
+                let tokeen = authorization.unwrap_or("".to_string());
                 let decoded = decode::<Claims>(
                     &tokeen,
                     &DecodingKey::from_secret(SETTINGS.jwt_secret.as_bytes()),

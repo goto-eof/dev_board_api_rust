@@ -1,13 +1,14 @@
 version: '3.6'
 
 services:
-  dev-board:
-    container_name: dev_board_api_rust
+  dev-board-be:
+    container_name: dev_board_be
     build:
       context: .
       dockerfile: Dockerfile.local
-    restart: on-failure
+    restart: always
+    image: dev_board_be
     ports:
-      - '127.0.0.1:8013:8013'
+      - '8013:8013'
     networks:
       - default
