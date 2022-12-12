@@ -27,12 +27,6 @@ pub async fn get_user_routes() -> impl Filter<Extract = impl Reply, Error = Reje
             .and(warp::body::content_length_limit(1024 * 16))
             .and_then(controller_auth::login))
         .or(db_column
-            .and(warp::path("invalidate_token"))
-            .and(warp::post())
-            .and(warp::path::end())
-            .and(warp::body::content_length_limit(1024 * 16))
-            .and_then(controller_auth::invalidate_token))
-        .or(db_column
             .and(warp::path("check_is_logged_in"))
             .and(warp::get())
             .and(warp::path::end())

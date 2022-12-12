@@ -7,7 +7,6 @@ pub struct LoginData {
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::Jwt;
-use crate::structure::structure::LogoutResponse;
 use crate::structure::structure::Response;
 use crate::structure::structure::User;
 use crate::util::util_authentication::generate_jwt;
@@ -28,11 +27,7 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use warp::{
-    http::HeaderValue,
-    hyper::{HeaderMap, StatusCode},
-    Rejection, Reply,
-};
+use warp::{hyper::StatusCode, Rejection, Reply};
 
 use crate::DB_POOL;
 
@@ -133,35 +128,6 @@ pub fn generate_response(
 
     let response = reply.into_response();
 
-    Ok(response)
-}
-
-pub async fn invalidate_token() -> Result<impl Reply, Rejection> {
-    let logout_response = serde_json::json!(LogoutResponse { success: true });
-    let reply = warp::reply::json(&logout_response);
-    let reply = warp::reply::with_status(reply, StatusCode::OK);
-
-    let mut response = reply.into_response();
-
-    let mut cookies = HeaderMap::new();
-    let cookie_str = format!(
-        "token={}; SameSite=None; expires=Fri, 31 Dec 1999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
-        ""
-    );
-    let cookie_jwt_str = format!(
-        "jwt={}; SameSite=None; expires=Fri, 31 Dec 1999 23:59:59 GMT; Path=/; Secure; HttpOnly;",
-        ""
-    );
-    cookies.append(
-        "set-cookie",
-        HeaderValue::from_str(cookie_str.as_str()).unwrap(),
-    );
-    cookies.append(
-        "set-cookie",
-        HeaderValue::from_str(cookie_jwt_str.as_str()).unwrap(),
-    );
-    let headers = response.headers_mut();
-    headers.extend(cookies);
     Ok(response)
 }
 
