@@ -6,7 +6,8 @@
   "cors_allowed_origins": [
     "http://localhost:3000",
     "http://192.168.1.105:3000",
-    "http://192.168.1.101:8082"
+    "http://192.168.1.101:8082",
+    "http://localhost:8082"
   ],
   "cors_allowed_headers": [
     "Access-Control-Allow-Credentials",
