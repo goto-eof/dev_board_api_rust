@@ -2,7 +2,7 @@
   "db_uri": "postgres://postgres:postgres@127.0.0.1:5432/postgres",
   "server_port": 8013,
   "jwt_secret": "this_is_our_secret",
-  "jwt_ttl": 600,
+  "jwt_ttl": 72000,
   "cors_allowed_origins": [
     "http://localhost:3000",
     "http://192.168.1.105:3000",

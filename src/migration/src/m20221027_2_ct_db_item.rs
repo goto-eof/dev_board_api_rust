@@ -24,7 +24,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(DbItem::Code).string().not_null())
                     .col(ColumnDef::new(DbItem::Description).string())
                     .col(ColumnDef::new(DbItem::Order).big_integer().not_null())
-                    .col(ColumnDef::new(DbItem::Status).string())
+                    .col(ColumnDef::new(DbItem::Priority).integer())
                     .col(ColumnDef::new(DbItem::ColumnId).integer().not_null())
                     .foreign_key(
                         ForeignKey::create()
@@ -54,7 +54,7 @@ enum DbItem {
     Name,
     Order,
     TType,
-    Status,
+    Priority,
     Code,
     Description,
     CreatedAt,
