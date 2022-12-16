@@ -9,7 +9,7 @@ pub struct Model {
     pub id: i32,
     pub column_id: i32,
     pub name: String,
-    pub t_type: String,
+    pub environment: String,
     pub code: String,
     pub priority: i32,
     pub order: i64,
