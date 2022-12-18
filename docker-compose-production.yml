@@ -5,7 +5,7 @@ services:
     container_name: dev_board_be
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
     restart: always
     image: dev_board_be
     ports:
