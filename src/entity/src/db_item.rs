@@ -8,7 +8,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub column_id: i32,
-    pub assignee_id: i32,
+    pub assignee_id: Option<i32>,
     pub name: String,
     pub environment: String,
     pub code: String,

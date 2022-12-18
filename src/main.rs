@@ -8,6 +8,7 @@ use dao::dao_common;
 use log::debug;
 use sea_orm::DbConn;
 use util::util_permission::init_permissions;
+use warp::hyper::header::SERVER;
 use warp::Rejection;
 mod configuration;
 mod controller;
@@ -41,6 +42,7 @@ async fn main() {
 
 async fn init_server() {
     debug!("server is running on port {}", SETTINGS.server_port);
+    println!("db: {}", SETTINGS.db_uri);
     warp::serve(init_routes().await)
         .run(([0, 0, 0, 0], SETTINGS.server_port))
         .await;

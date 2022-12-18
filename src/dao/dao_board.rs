@@ -23,6 +23,7 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
+use sea_orm::RelationTrait;
 use sea_orm::TransactionTrait;
 
 pub async fn get_by_id(
@@ -170,21 +171,20 @@ pub async fn get_by_id_all(
 
         let dashboard_res_opt = dashboard_res_opt.unwrap();
 
-        let result: Result<Vec<(db_column::Model, Vec<db_item::Model>)>, DbErr> =
-            db_column::Entity::find()
-                .join_rev(
-                    JoinType::InnerJoin,
-                    db_board_column::Entity::belongs_to(db_column::Entity)
-                        .from(db_board_column::Column::ColumnId)
-                        .to(db_column::Column::Id)
-                        .into(),
-                )
-                .filter(db_board_column::Column::BoardId.eq(dashboard_res_opt.id))
-                .order_by_asc(db_column::Column::Order)
-                .find_with_related(db_item::Entity)
-                .order_by_asc(db_item::Column::Order)
-                .all(db)
-                .await;
+        let result: Result<Vec<db_column::Model>, DbErr> = db_column::Entity::find()
+            .join_rev(
+                JoinType::InnerJoin,
+                db_board_column::Entity::belongs_to(db_column::Entity)
+                    .from(db_board_column::Column::ColumnId)
+                    .to(db_column::Column::Id)
+                    .into(),
+            )
+            // .join(JoinType::InnerJoin, db_item::Relation::Column.def())
+            .filter(db_board_column::Column::BoardId.eq(dashboard_res_opt.id))
+            .order_by_asc(db_column::Column::Order)
+            // .order_by_asc(db_item::Column::Order)
+            .all(db)
+            .await;
 
         println!("{:?}", result);
         if result.is_err() {
@@ -199,10 +199,16 @@ pub async fn get_by_id_all(
         let models = result.unwrap();
 
         let mut boards_result: Vec<BoardFullResponse> = Vec::new();
-        for board_tuple in models {
+        for column in models {
+            let column_id = column.id;
             let board_struct: BoardFullResponse = BoardFullResponse {
-                column: board_tuple.0,
-                items: board_tuple.1,
+                column: column,
+                items: db_item::Entity::find()
+                    .filter(db_item::Column::ColumnId.eq(column_id))
+                    .order_by_asc(db_item::Column::Order)
+                    .all(db)
+                    .await
+                    .unwrap(),
             };
             boards_result.push(board_struct);
         }
