@@ -1,4 +1,4 @@
-use entity::{db_board, db_column, db_item};
+use entity::{db_board, db_column, db_item, db_user};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Debug)]
 pub enum DevBoardErrorType {
@@ -63,4 +63,19 @@ pub struct Jwt {
 #[derive(Serialize)]
 pub struct Message {
     pub message: String,
+}
+
+#[derive(Serialize)]
+pub struct SharedWithResponse {
+    pub board: db_board::Model,
+    pub users: Vec<UserReponse>,
+}
+
+#[derive(Serialize)]
+pub struct UserReponse {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub first_name: String,
+    pub last_name: String,
 }

@@ -18,6 +18,13 @@ pub async fn get_board_routes() -> impl Filter<Extract = impl Reply, Error = Rej
             .and_then(controller_board::get_board_with_all_data))
         .or(db_column
             .and(warp::get())
+            .and(warp::path("shared_with"))
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and(auth_validator("shared_with".to_string()).await)
+            .and_then(controller_board::shared_with))
+        .or(db_column
+            .and(warp::get())
             .and(warp::path("all"))
             .and(warp::path::end())
             .and(auth_validator("get_all_boards".to_string()).await)

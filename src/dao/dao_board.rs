@@ -2,6 +2,8 @@ use crate::structure::structure::BoardFullResponse;
 use crate::structure::structure::DashoardFullResponse;
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::SharedWithResponse;
+use crate::structure::structure::UserReponse;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
@@ -10,6 +12,7 @@ use entity::db_board_column;
 use entity::db_board_user;
 use entity::db_column;
 use entity::db_item;
+use entity::db_user;
 use log::debug;
 use migration::DbErr;
 use migration::JoinType;
@@ -386,6 +389,79 @@ pub async fn update(
     }
 
     Ok(result.unwrap())
+}
+
+pub async fn shared_with(
+    id: i32,
+    _jwt_opt: Option<String>,
+) -> Result<SharedWithResponse, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+
+    // retrieving board
+    let board_model = db_board::Entity::find_by_id(id).one(db).await;
+    if board_model.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", board_model.err()),
+        });
+    }
+    let board_model = board_model.unwrap();
+
+    if board_model.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("Item not found"),
+        });
+    }
+
+    let board_model = board_model.unwrap();
+
+    // retrieving users
+    let users_model = db_user::Entity::find()
+        .join_rev(
+            JoinType::InnerJoin,
+            db_board_user::Entity::belongs_to(db_user::Entity)
+                .from(db_board_user::Column::UserId)
+                .to(db_user::Column::Id)
+                .into(),
+        )
+        .filter(db_board_user::Column::BoardId.eq(id))
+        .all(db)
+        .await;
+
+    if users_model.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", users_model.err()),
+        });
+    }
+
+    let users_model = users_model.unwrap();
+
+    let users_model: Vec<UserReponse> = users_model
+        .into_iter()
+        .map(|user_model| UserReponse {
+            id: user_model.id,
+            username: user_model.username,
+            email: user_model.email,
+            first_name: user_model.first_name,
+            last_name: user_model.last_name,
+        })
+        .rev()
+        .collect();
+
+    let result = SharedWithResponse {
+        board: board_model,
+        users: users_model,
+    };
+
+    return Ok(result);
 }
 
 // TODO manage better unwrapping

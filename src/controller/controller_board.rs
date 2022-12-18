@@ -17,6 +17,10 @@ pub async fn get_board_with_all_data(
     )
 }
 
+pub async fn shared_with(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(dao_board::shared_with(id, jwt_opt.clone()).await, jwt_opt)
+}
+
 pub async fn share_board(
     board_id: i32,
     user_id: i32,
