@@ -105,7 +105,6 @@
     "delete_role",
 
     "get_by_username",
-    "get_all_users",
     "insert_user",
     "update_user",
     "delete_user"

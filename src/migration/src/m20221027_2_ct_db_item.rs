@@ -20,6 +20,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(DbItem::Name).string().not_null())
+                    .col(ColumnDef::new(DbItem::AssigneeId).integer())
                     .col(ColumnDef::new(DbItem::Environment).string().not_null())
                     .col(ColumnDef::new(DbItem::Code).string().not_null())
                     .col(ColumnDef::new(DbItem::Description).string())
@@ -50,6 +51,7 @@ impl MigrationTrait for Migration {
 enum DbItem {
     Table,
     Id,
+    AssigneeId,
     ColumnId,
     Name,
     Order,
