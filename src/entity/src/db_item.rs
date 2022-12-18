@@ -29,12 +29,27 @@ pub enum Relation {
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Product,
+    Column,
+
+    #[sea_orm(
+        from = "Column::AssigneeId",
+        belongs_to = "super::db_user::Entity",
+        to = "super::db_user::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Assignee,
 }
 
 impl Related<super::db_column::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Product.def()
+        Relation::Column.def()
+    }
+}
+
+impl Related<super::db_user::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Assignee.def()
     }
 }
 

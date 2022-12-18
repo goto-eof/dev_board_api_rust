@@ -1,8 +1,8 @@
 pub use sea_orm_migration::prelude::*;
 
+mod m20221026_1_ct_db_user;
 mod m20221027_1_ct_db_column;
 mod m20221027_2_ct_db_item;
-mod m20221105_1_ct_db_user;
 mod m20221105_2_create_table_db_role;
 mod m20221105_2_ct_db_permission;
 mod m20221105_4_ct_db_user_role;
@@ -16,9 +16,9 @@ pub struct Migrator;
 impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![
+            Box::new(m20221026_1_ct_db_user::Migration),
             Box::new(m20221027_1_ct_db_column::Migration),
             Box::new(m20221027_2_ct_db_item::Migration),
-            Box::new(m20221105_1_ct_db_user::Migration),
             Box::new(m20221105_2_ct_db_permission::Migration),
             Box::new(m20221105_2_create_table_db_role::Migration),
             Box::new(m20221105_4_ct_db_user_role::Migration),

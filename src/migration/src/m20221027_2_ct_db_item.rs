@@ -1,4 +1,4 @@
-use entity::{db_column, db_item};
+use entity::{db_column, db_item, db_user};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -21,6 +21,12 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(DbItem::Name).string().not_null())
                     .col(ColumnDef::new(DbItem::AssigneeId).integer())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_item_assegnee")
+                            .from(db_item::Entity, db_item::Column::AssigneeId)
+                            .to(db_user::Entity, db_user::Column::Id),
+                    )
                     .col(ColumnDef::new(DbItem::Environment).string().not_null())
                     .col(ColumnDef::new(DbItem::Code).string().not_null())
                     .col(ColumnDef::new(DbItem::Description).string())
