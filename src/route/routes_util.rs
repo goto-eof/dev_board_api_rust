@@ -42,11 +42,11 @@ fn generate_response(
 }
 
 pub async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    let cors_allowed_origins: Vec<&str> = SETTINGS
-        .cors_allowed_origins
-        .iter()
-        .map(|s| s as &str)
-        .collect();
+    // let cors_allowed_origins: Vec<&str> = SETTINGS
+    //     .cors_allowed_origins
+    //     .iter()
+    //     .map(|s| s as &str)
+    //     .collect();
 
     let cors_allowed_headers: Vec<&str> = SETTINGS
         .cors_allowed_headers
@@ -61,8 +61,8 @@ pub async fn init_routes() -> impl Filter<Extract = impl Reply, Error = Rejectio
         .collect();
 
     let any_origin_3 = warp::cors()
-        .allow_origins(cors_allowed_origins)
-        // .allow_any_origin()
+        // .allow_origins(cors_allowed_origins)
+        .allow_any_origin()
         .allow_headers(cors_allowed_headers)
         .allow_methods(cors_allowed_methods)
         .allow_credentials(true);
