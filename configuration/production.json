@@ -1,4 +1,4 @@
 {
-  "jwt_ttl": 900,
+  "jwt_ttl": 72000,
   "db_uri": "postgres://postgres:postgres@postgres_service:5432/postgres"
 }
