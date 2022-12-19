@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
                             .from(db_item::Entity, db_item::Column::AssigneeId)
                             .to(db_user::Entity, db_user::Column::Id),
                     )
-                    .col(ColumnDef::new(DbItem::Environment).string().not_null())
+                    .col(ColumnDef::new(DbItem::Environment).string())
                     .col(ColumnDef::new(DbItem::IssueType).integer())
                     .col(ColumnDef::new(DbItem::Description).string())
                     .col(ColumnDef::new(DbItem::Order).big_integer().not_null())
