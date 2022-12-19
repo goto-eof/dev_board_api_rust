@@ -45,6 +45,13 @@ pub async fn get_board_routes() -> impl Filter<Extract = impl Reply, Error = Rej
             .and(auth_validator("share_board".to_string()).await)
             .and_then(controller_board::share_board))
         .or(db_column
+            .and(warp::patch())
+            .and(warp::path("archive"))
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and(auth_validator("archive".to_string()).await)
+            .and_then(controller_board::archive))
+        .or(db_column
             .and(warp::post())
             .and(warp::path("unshare"))
             .and(warp::path::param::<i32>())

@@ -1,3 +1,5 @@
+use std::result;
+
 use crate::structure::structure::BoardFullResponse;
 use crate::structure::structure::DashoardFullResponse;
 use crate::structure::structure::DevBoardErrorType;
@@ -19,11 +21,53 @@ use migration::JoinType;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
+use sea_orm::IntoActiveModel;
 use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
+use sea_orm::Set;
 use sea_orm::TransactionTrait;
+
+pub async fn archive(id: i32, _jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+    let board = db_board::Entity::find_by_id(id).one(db).await;
+    if board.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", board.err()),
+        });
+    }
+
+    let board = board.unwrap();
+    if board.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let board = board.unwrap();
+
+    let mut board = board.into_active_model();
+
+    board.archived = Set(Some(true));
+
+    let resutl = board.save(db).await;
+    if resutl.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", resutl.err()),
+        });
+    }
+    return Ok(true);
+}
 
 pub async fn get_by_id(
     id: i32,
@@ -143,6 +187,11 @@ pub async fn get_by_id_all(
                     .into(),
             )
             .filter(db_board_user::Column::UserId.eq(user_id.unwrap()))
+            .filter(
+                db_board::Column::Archived
+                    .eq(false)
+                    .or(db_board::Column::Archived.is_null()),
+            )
             .one(db)
             .await;
 
@@ -239,6 +288,11 @@ pub async fn get_all(
                     .into(),
             )
             .filter(db_board_user::Column::UserId.eq(user_id))
+            .filter(
+                db_board::Column::Archived
+                    .eq(false)
+                    .or(db_board::Column::Archived.is_null()),
+            )
             .order_by_asc(db_board_user::Column::Id)
             .all(db)
             .await;
