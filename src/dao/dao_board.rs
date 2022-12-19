@@ -1,5 +1,3 @@
-use std::result;
-
 use crate::structure::structure::BoardFullResponse;
 use crate::structure::structure::DashoardFullResponse;
 use crate::structure::structure::DevBoardErrorType;
@@ -168,6 +166,47 @@ pub async fn unshare(
     }
 
     Ok(true)
+}
+
+pub async fn get_board_users(
+    board_id: i32,
+    _jwt_opt: Option<String>,
+) -> Result<Vec<UserReponse>, DevBoardGenericError> {
+    let db = DB_POOL.get().await;
+
+    let result = db_user::Entity::find()
+        .join_rev(
+            JoinType::InnerJoin,
+            db_board_user::Entity::belongs_to(db_user::Entity)
+                .from(db_board_user::Column::UserId)
+                .to(db_user::Column::Id)
+                .into(),
+        )
+        .filter(db_board_user::Column::BoardId.eq(board_id))
+        .all(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+    let users: Vec<UserReponse> = result
+        .unwrap()
+        .iter()
+        .map(|user: &db_user::Model| UserReponse {
+            email: user.email.to_owned(),
+            first_name: user.first_name.to_owned(),
+            id: user.id,
+            last_name: user.last_name.to_owned(),
+            username: user.username.to_owned(),
+        })
+        .collect::<Vec<UserReponse>>();
+
+    Ok(users)
 }
 
 pub async fn get_by_id_all(

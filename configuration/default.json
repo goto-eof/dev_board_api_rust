@@ -80,6 +80,7 @@
     "check_is_logged_in",
 
     "get_board",
+    "get_board_users",
     "archive",
     "get_board_with_all_data",
     "shared_with",

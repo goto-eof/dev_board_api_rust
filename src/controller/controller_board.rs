@@ -17,6 +17,13 @@ pub async fn get_board_with_all_data(
     )
 }
 
+pub async fn get_board_users(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
+    controller_common::generate_response(
+        dao_board::get_board_users(id, jwt_opt.clone()).await,
+        jwt_opt,
+    )
+}
+
 pub async fn archive(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
     controller_common::generate_response(dao_board::archive(id, jwt_opt.clone()).await, jwt_opt)
 }
