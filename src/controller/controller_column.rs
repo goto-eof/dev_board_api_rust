@@ -7,8 +7,11 @@ pub async fn get_column(id: i32, jwt_opt: Option<String>) -> crate::GenericResul
     generate_response(dao_column::get_by_id(id).await, jwt_opt)
 }
 
-pub async fn get_all_columns(jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
-    generate_response(dao_column::get_all().await, jwt_opt)
+pub async fn get_all_columns(
+    board_id: i32,
+    jwt_opt: Option<String>,
+) -> crate::GenericResult<impl Reply> {
+    generate_response(dao_column::get_all(Some(board_id)).await, jwt_opt)
 }
 pub async fn get_all_columns_with_items(
     jwt_opt: Option<String>,

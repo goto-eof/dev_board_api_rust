@@ -12,6 +12,7 @@ pub async fn get_column_routes() -> impl Filter<Extract = impl Reply, Error = Re
         .or(db_column
             .and(warp::get())
             .and(warp::path("all"))
+            .and(warp::path::param::<i32>())
             .and(warp::path::end())
             .and(auth_validator("get_all_columns".to_string()).await)
             .and_then(controller_column::get_all_columns))

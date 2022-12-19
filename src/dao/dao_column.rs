@@ -9,6 +9,7 @@ use entity::db_board_column;
 use entity::db_column;
 use entity::db_item;
 use migration::DbErr;
+use migration::JoinType;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -47,14 +48,31 @@ pub async fn get_by_id(id: i32) -> Result<db_column::Model, DevBoardGenericError
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_column::Model>, DevBoardGenericError> {
+pub async fn get_all(board_id: Option<i32>) -> Result<Vec<db_column::Model>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
-    let result = db_column::Entity::find()
-        .order_by_asc(db_column::Column::Order)
-        .all(db)
-        .await;
-
+    let result = match board_id {
+        Some(board_id) => {
+            db_column::Entity::find()
+                .join_rev(
+                    JoinType::InnerJoin,
+                    db_board_column::Entity::belongs_to(db_column::Entity)
+                        .from(db_board_column::Column::ColumnId)
+                        .to(db_column::Column::Id)
+                        .into(),
+                )
+                .filter(db_board_column::Column::BoardId.eq(board_id))
+                .order_by_asc(db_column::Column::Order)
+                .all(db)
+                .await
+        }
+        None => {
+            db_column::Entity::find()
+                .order_by_asc(db_column::Column::Order)
+                .all(db)
+                .await
+        }
+    };
     if result.is_err() {
         return Err(DevBoardGenericError {
             success: false,
