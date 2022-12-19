@@ -23,7 +23,6 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
-use sea_orm::RelationTrait;
 use sea_orm::TransactionTrait;
 
 pub async fn get_by_id(

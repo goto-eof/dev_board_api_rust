@@ -28,7 +28,7 @@ impl MigrationTrait for Migration {
                             .to(db_user::Entity, db_user::Column::Id),
                     )
                     .col(ColumnDef::new(DbItem::Environment).string().not_null())
-                    .col(ColumnDef::new(DbItem::Code).string().not_null())
+                    .col(ColumnDef::new(DbItem::IssueType).integer())
                     .col(ColumnDef::new(DbItem::Description).string())
                     .col(ColumnDef::new(DbItem::Order).big_integer().not_null())
                     .col(ColumnDef::new(DbItem::Priority).integer())
@@ -63,7 +63,7 @@ enum DbItem {
     Order,
     Environment,
     Priority,
-    Code,
+    IssueType,
     Description,
     CreatedAt,
     UpdatedAt,

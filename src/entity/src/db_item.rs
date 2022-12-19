@@ -11,7 +11,7 @@ pub struct Model {
     pub assignee_id: Option<i32>,
     pub name: String,
     pub environment: String,
-    pub code: String,
+    pub issue_type: Option<i32>,
     pub priority: i32,
     pub order: i64,
     #[sea_orm(column_type = "Text", nullable)]

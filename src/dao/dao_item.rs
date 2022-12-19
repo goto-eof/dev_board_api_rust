@@ -120,15 +120,6 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DevB
     model.updated_at = sea_orm::Set(Some(dat));
     model.order = sea_orm::Set(count);
 
-    let max_id_result = get_max_id().await;
-
-    match max_id_result {
-        Ok(value) => model.code = sea_orm::Set(format!("{}", value)),
-        Err(err) => {
-            return Err(err);
-        }
-    }
-
     let result = model.insert(db).await;
 
     if result.is_err() {
@@ -143,37 +134,37 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DevB
     Ok(result.unwrap())
 }
 
-#[derive(FromQueryResult, Debug)]
-struct CountResult {
-    max: Option<i32>,
-}
+// #[derive(FromQueryResult, Debug)]
+// struct CountResult {
+//     max: Option<i32>,
+// }
 
-pub async fn get_max_id() -> Result<i32, DevBoardGenericError> {
-    let db = DB_POOL.get().await;
+// pub async fn get_max_id() -> Result<i32, DevBoardGenericError> {
+//     let db = DB_POOL.get().await;
 
-    let result = db_item::Entity::find()
-        .select_only()
-        .column_as(db_item::Column::Id.max(), "max")
-        .into_model::<CountResult>()
-        .one(db)
-        .await;
+//     let result = db_item::Entity::find()
+//         .select_only()
+//         .column_as(db_item::Column::Id.max(), "max")
+//         .into_model::<CountResult>()
+//         .one(db)
+//         .await;
 
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
-    let count = result.unwrap().unwrap();
+//     if result.is_err() {
+//         return Err(DevBoardGenericError {
+//             success: false,
+//             code: 1,
+//             err_type: DevBoardErrorType::Error,
+//             message: format!("DB Error: {:?}", result.err()),
+//         });
+//     }
+//     let count = result.unwrap().unwrap();
 
-    if count.max.is_none() {
-        return Ok(0);
-    }
+//     if count.max.is_none() {
+//         return Ok(0);
+//     }
 
-    Ok(count.max.unwrap())
-}
+//     Ok(count.max.unwrap())
+// }
 
 pub async fn update(
     id: i32,

@@ -1,4 +1,4 @@
-use entity::{db_board, db_column, db_item, db_user};
+use entity::{db_board, db_column, db_item};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Debug)]
 pub enum DevBoardErrorType {

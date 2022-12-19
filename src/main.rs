@@ -8,7 +8,6 @@ use dao::dao_common;
 use log::debug;
 use sea_orm::DbConn;
 use util::util_permission::init_permissions;
-use warp::hyper::header::SERVER;
 use warp::Rejection;
 mod configuration;
 mod controller;
