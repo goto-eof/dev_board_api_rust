@@ -266,10 +266,8 @@ pub async fn get_by_id_all(
                     .to(db_column::Column::Id)
                     .into(),
             )
-            // .join(JoinType::InnerJoin, db_item::Relation::Column.def())
             .filter(db_board_column::Column::BoardId.eq(dashboard_res_opt.id))
             .order_by_asc(db_column::Column::Order)
-            // .order_by_asc(db_item::Column::Order)
             .all(db)
             .await;
 
