@@ -27,7 +27,7 @@ pub async fn get_user(jwt_opt: Option<String>) -> crate::GenericResult<impl Repl
             created_at: user.created_at,
             email: user.email,
             first_name: user.first_name,
-            id: -1,
+            id: user.id,
             last_name: user.last_name,
             password: "".to_owned(),
             updated_at: user.updated_at,

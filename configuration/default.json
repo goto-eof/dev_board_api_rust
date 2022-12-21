@@ -90,7 +90,14 @@
     "delete_board",
     "share_board",
     "unshare_board",
-    "board_is_shared_with"
+    "board_is_shared_with",
+
+    "get_by_item_id",
+    "get_message",
+    "get_messages",
+    "insert_message",
+    "update_message",
+    "delete_message"
   ],
   "admin_only_permissions": [
     "get_permission",

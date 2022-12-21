@@ -27,6 +27,13 @@ impl MigrationTrait for Migration {
                             .from(db_item::Entity, db_item::Column::AssigneeId)
                             .to(db_user::Entity, db_user::Column::Id),
                     )
+                    .col(ColumnDef::new(DbItem::ReporterId).integer())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_item_reporter")
+                            .from(db_item::Entity, db_item::Column::ReporterId)
+                            .to(db_user::Entity, db_user::Column::Id),
+                    )
                     .col(ColumnDef::new(DbItem::Environment).string())
                     .col(ColumnDef::new(DbItem::IssueType).integer())
                     .col(ColumnDef::new(DbItem::Description).string())
@@ -58,6 +65,7 @@ enum DbItem {
     Table,
     Id,
     AssigneeId,
+    ReporterId,
     ColumnId,
     Name,
     Order,

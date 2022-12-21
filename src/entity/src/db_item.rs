@@ -9,6 +9,7 @@ pub struct Model {
     pub id: i32,
     pub column_id: i32,
     pub assignee_id: Option<i32>,
+    pub reporter_id: Option<i32>,
     pub name: String,
     pub environment: Option<String>,
     pub issue_type: Option<i32>,

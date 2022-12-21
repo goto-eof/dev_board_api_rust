@@ -10,6 +10,7 @@ mod m20221105_5_ct_db_role_permission;
 mod m20221119_1_ct_db_board;
 mod m20221119_2_ct_db_board_column;
 mod m20221119_3_ct_db_board_user;
+mod m20221221_2_ct_db_message;
 pub struct Migrator;
 // sea-orm-cli generate entity -u postgres://postgres:postgres@localhost:5432/postgres -o entity/src
 #[async_trait::async_trait]
@@ -26,6 +27,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20221119_1_ct_db_board::Migration),
             Box::new(m20221119_2_ct_db_board_column::Migration),
             Box::new(m20221119_3_ct_db_board_user::Migration),
+            Box::new(m20221221_2_ct_db_message::Migration),
         ]
     }
 }
