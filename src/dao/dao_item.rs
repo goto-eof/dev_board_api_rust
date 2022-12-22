@@ -4,6 +4,7 @@ use crate::structure::structure::SwapRequest;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
+use entity::db_message;
 use log::debug;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
@@ -229,6 +230,34 @@ pub async fn update(
 
 pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
+
+    let messages = db_message::Entity::find()
+        .filter(db_message::Column::ItemId.eq(id))
+        .all(db)
+        .await;
+
+    if messages.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", messages.err()),
+        });
+    }
+
+    let messages = messages.unwrap();
+
+    for message in messages {
+        let result = message.delete(db).await;
+        if result.is_err() {
+            return Err(DevBoardGenericError {
+                success: false,
+                code: 1,
+                err_type: DevBoardErrorType::Error,
+                message: format!("DB Error: {:?}", result.err()),
+            });
+        }
+    }
 
     let result = db_item::Entity::find_by_id(id).one(db).await;
 
