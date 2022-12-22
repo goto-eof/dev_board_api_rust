@@ -11,9 +11,15 @@ dMMMMP" dMMMMMP    VP"  dMMMMP"  VMMMP" dMP dMP dMP dMP dMMMMP"
 
 A dashboard for organizing software development tasks (Kanban flow) implemented in Rust
 
+
 ### Front-end
 
 [Here](https://github.com/goto-eof/dev_board_react) you can find the front-end application.
+
+
+# Architecture
+
+![architecture](architecture.png)
 
 ### Run project as docker container 
 
