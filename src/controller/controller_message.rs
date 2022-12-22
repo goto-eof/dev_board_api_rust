@@ -6,10 +6,6 @@ pub async fn get_message(id: i32, jwt_opt: Option<String>) -> crate::GenericResu
     controller_common::generate_response(dao_message::get_by_id(id).await, jwt_opt)
 }
 
-pub async fn get_messages(jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
-    controller_common::generate_response(dao_message::get_all().await, jwt_opt)
-}
-
 pub async fn get_by_item_id(
     parent_id: i32,
     jwt_opt: Option<String>,

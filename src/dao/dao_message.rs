@@ -37,27 +37,6 @@ pub async fn get_by_id(id: i32) -> Result<db_message::Model, DevBoardGenericErro
     Ok(opt.unwrap())
 }
 
-pub async fn get_all() -> Result<Vec<db_message::Model>, DevBoardGenericError> {
-    let db = DB_POOL.get().await;
-
-    let result = db_message::Entity::find()
-        .order_by_asc(db_message::Column::Id)
-        .all(db)
-        .await;
-
-    if result.is_err() {
-        return Err(DevBoardGenericError {
-            success: false,
-            code: 1,
-            err_type: DevBoardErrorType::Error,
-            message: format!("DB Error: {:?}", result.err()),
-        });
-    }
-
-    let models = result.unwrap();
-    Ok(models)
-}
-
 pub async fn get_by_item_id(
     parent_id: i32,
 ) -> Result<Vec<db_message::Model>, DevBoardGenericError> {
