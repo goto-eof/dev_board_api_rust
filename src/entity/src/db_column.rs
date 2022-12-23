@@ -16,14 +16,22 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::db_item::Entity", on_delete = "Cascade")]
-    Item,
+    #[sea_orm(has_many = "super::db_board_column::Entity")]
+    DbBoardColumn,
+    #[sea_orm(has_many = "super::db_item::Entity")]
+    DbItem,
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+impl Related<super::db_board_column::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DbBoardColumn.def()
+    }
+}
 
 impl Related<super::db_item::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Item.def()
+        Relation::DbItem.def()
     }
 }
+
+impl ActiveModelBehavior for ActiveModel {}

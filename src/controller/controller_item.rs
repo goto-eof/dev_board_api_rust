@@ -22,7 +22,10 @@ pub async fn insert_item(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> crate::GenericResult<impl Reply> {
-    controller_common::generate_response(dao_item::create(json_data).await, jwt_opt)
+    controller_common::generate_response(
+        dao_item::create(json_data, jwt_opt.clone()).await,
+        jwt_opt,
+    )
 }
 
 pub async fn update_item(
@@ -41,5 +44,5 @@ pub async fn swap_items(
 }
 
 pub async fn delete_item(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
-    controller_common::generate_response(dao_item::delete(id).await, jwt_opt)
+    controller_common::generate_response(dao_item::delete(id, jwt_opt.clone()).await, jwt_opt)
 }

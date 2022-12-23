@@ -1,5 +1,6 @@
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_message;
@@ -159,10 +160,26 @@ pub async fn update(
     Ok(result.unwrap())
 }
 
-pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
+pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
-    let result = db_message::Entity::find_by_id(id).one(db).await;
+    let user_id = extract_user_id(jwt_opt.clone());
+
+    if user_id.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let user_id = user_id.unwrap();
+
+    let result = db_message::Entity::find_by_id(id)
+        .filter(db_message::Column::UserId.eq(user_id))
+        .one(db)
+        .await;
 
     if result.is_err() {
         return Err(DevBoardGenericError {

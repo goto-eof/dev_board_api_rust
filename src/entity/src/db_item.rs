@@ -8,6 +8,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub column_id: i32,
+    pub publisher_id: Option<i32>,
     pub assignee_id: Option<i32>,
     pub reporter_id: Option<i32>,
     pub name: String,
@@ -24,22 +25,40 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        from = "Column::ColumnId",
-        belongs_to = "super::db_column::Entity",
-        to = "super::db_column::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Cascade"
-    )]
-    Column,
-
-    #[sea_orm(
-        from = "Column::AssigneeId",
         belongs_to = "super::db_user::Entity",
+        from = "Column::AssigneeId",
         to = "super::db_user::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Cascade"
+        on_update = "NoAction",
+        on_delete = "NoAction"
     )]
     Assignee,
+    #[sea_orm(
+        belongs_to = "super::db_column::Entity",
+        from = "Column::ColumnId",
+        to = "super::db_column::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Column,
+    #[sea_orm(
+        belongs_to = "super::db_user::Entity",
+        from = "Column::PublisherId",
+        to = "super::db_user::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Publisher,
+    #[sea_orm(
+        belongs_to = "super::db_user::Entity",
+        from = "Column::ReporterId",
+        to = "super::db_user::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Reporter,
+
+    #[sea_orm(has_many = "super::db_message::Entity")]
+    Messages,
 }
 
 impl Related<super::db_column::Entity> for Entity {
@@ -48,9 +67,9 @@ impl Related<super::db_column::Entity> for Entity {
     }
 }
 
-impl Related<super::db_user::Entity> for Entity {
+impl Related<super::db_message::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Assignee.def()
+        Relation::Messages.def()
     }
 }
 

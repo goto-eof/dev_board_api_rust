@@ -18,21 +18,29 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::db_user_role::Entity")]
-    RoleUser,
     #[sea_orm(has_many = "super::db_board_user::Entity")]
-    BoardUser,
-}
-
-impl Related<super::db_user_role::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::RoleUser.def()
-    }
+    DbBoardUser,
+    #[sea_orm(has_many = "super::db_message::Entity")]
+    DbMessage,
+    #[sea_orm(has_many = "super::db_user_role::Entity")]
+    DbUserRole,
 }
 
 impl Related<super::db_board_user::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::BoardUser.def()
+        Relation::DbBoardUser.def()
+    }
+}
+
+impl Related<super::db_message::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DbMessage.def()
+    }
+}
+
+impl Related<super::db_user_role::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DbUserRole.def()
     }
 }
 

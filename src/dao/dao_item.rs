@@ -1,6 +1,7 @@
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::SwapRequest;
+use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
 use entity::db_item;
@@ -87,8 +88,25 @@ pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, Dev
     Ok(models)
 }
 
-pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DevBoardGenericError> {
+pub async fn create(
+    json_data: serde_json::Value,
+    jwt_opt: Option<String>,
+) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
+
+    let user_id = extract_user_id(jwt_opt.clone());
+
+    if user_id.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let user_id = user_id.unwrap();
+
     let result = db_item::ActiveModel::from_json(json_data);
 
     if result.is_err() {
@@ -119,6 +137,7 @@ pub async fn create(json_data: serde_json::Value) -> Result<db_item::Model, DevB
 
     model.created_at = sea_orm::Set(Some(dat));
     model.updated_at = sea_orm::Set(Some(dat));
+    model.publisher_id = sea_orm::Set(Some(user_id));
     model.order = sea_orm::Set(count);
 
     let result = model.insert(db).await;
@@ -228,11 +247,25 @@ pub async fn update(
     Ok(result.unwrap())
 }
 
-pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
+pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
+
+    let user_id = extract_user_id(jwt_opt.clone());
+
+    if user_id.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let user_id = user_id.unwrap();
 
     let messages = db_message::Entity::find()
         .filter(db_message::Column::ItemId.eq(id))
+        .filter(db_message::Column::UserId.eq(user_id))
         .all(db)
         .await;
 
@@ -259,7 +292,10 @@ pub async fn delete(id: i32) -> Result<bool, DevBoardGenericError> {
         }
     }
 
-    let result = db_item::Entity::find_by_id(id).one(db).await;
+    let result = db_item::Entity::find_by_id(id)
+        .one(db)
+        // TODO filter by board owners
+        .await;
 
     if result.is_err() {
         return Err(DevBoardGenericError {

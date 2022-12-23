@@ -22,7 +22,6 @@ extern crate lazy_static;
 
 lazy_static! {
     static ref SETTINGS: Settings = Settings::init_configuration().unwrap();
-    // it is not very elegant, but it works :)
     static ref DB_POOL: AsyncOnce<DbConn> = AsyncOnce::new(async {
         let db = config_database::establish_connection().await;
         db.unwrap()

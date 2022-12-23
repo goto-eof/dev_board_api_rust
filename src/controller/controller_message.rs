@@ -29,5 +29,5 @@ pub async fn update_message(
 }
 
 pub async fn delete_message(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
-    controller_common::generate_response(dao_message::delete(id).await, jwt_opt)
+    controller_common::generate_response(dao_message::delete(id, jwt_opt.clone()).await, jwt_opt)
 }
