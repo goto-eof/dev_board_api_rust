@@ -20,6 +20,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(DbItem::Name).string().not_null())
+                    .col(ColumnDef::new(DbItem::EstimatedTime).string())
                     .col(ColumnDef::new(DbItem::AssigneeId).integer())
                     .foreign_key(
                         ForeignKey::create()
@@ -76,6 +77,7 @@ enum DbItem {
     PublisherId,
     ColumnId,
     Name,
+    EstimatedTime,
     Order,
     Environment,
     Priority,

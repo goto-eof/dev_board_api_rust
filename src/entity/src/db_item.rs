@@ -12,6 +12,7 @@ pub struct Model {
     pub assignee_id: Option<i32>,
     pub reporter_id: Option<i32>,
     pub name: String,
+    pub estimated_time: Option<String>,
     pub environment: Option<String>,
     pub issue_type: Option<i32>,
     pub priority: i32,
