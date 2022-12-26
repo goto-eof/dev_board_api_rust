@@ -3,10 +3,12 @@ use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::SwapRequest;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
+use base64::decode;
 use chrono::Utc;
 use entity::db_item;
 use entity::db_message;
 use log::debug;
+use sea_orm::prelude::Uuid;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -88,6 +90,11 @@ pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, Dev
     Ok(models)
 }
 
+pub struct File {
+    file: String,
+    file_name: String,
+}
+
 pub async fn create(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
@@ -104,6 +111,8 @@ pub async fn create(
             message: format!("Item not found"),
         });
     }
+
+    save_files(json_data["files"].clone()).await;
 
     let user_id = user_id.unwrap();
 
@@ -152,6 +161,39 @@ pub async fn create(
     }
 
     Ok(result.unwrap())
+}
+
+async fn save_files(files: serde_json::Value) -> () {
+    println!("FILES: {:?}", files);
+    let files = files.as_array();
+    let files = files.unwrap();
+    for file in files {
+        let content = file["content"].as_str().unwrap();
+        println!("CONTENT: {:?}", content);
+        let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
+        let end_pos = content.chars().count();
+        println!("TEST: {:?} {:?}", start_pos, end_pos);
+        let decoded = &decode(&content[start_pos..end_pos]);
+        println!("DECODED: {:?}", decoded);
+        let decoded = decoded.clone().unwrap();
+        println!("File name: {:?}", file["name"].as_str().unwrap());
+        // println!("Content: {:?}", file["content"].as_str().unwrap());
+        // println!("File content: {:?}", decoded);
+
+        let file_name = format!(
+            "/Users/andrei/Desktop/{}.{}",
+            Uuid::new_v4().to_string(),
+            "png"
+        );
+        println!("NEW FILENAME: {:?}", file_name);
+        tokio::fs::write(&file_name, decoded)
+            .await
+            .map_err(|e| {
+                eprint!("error writing file: {}", e);
+                warp::reject::reject()
+            })
+            .unwrap();
+    }
 }
 
 // #[derive(FromQueryResult, Debug)]

@@ -30,7 +30,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    init_logging();
+    // init_logging();
     init_db().await;
     init_permissions(DB_POOL.get().await).await;
     dao_common::init_admin().await; // default superuser
