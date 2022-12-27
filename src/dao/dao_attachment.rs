@@ -1,3 +1,6 @@
+use std::ffi::OsStr;
+use std::path::Path;
+
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::extract_user_id;
@@ -270,7 +273,14 @@ pub async fn save_files(
             let decoded = &decode(&content[start_pos..end_pos]);
             let decoded = decoded.clone().unwrap();
 
-            let file_name = format!("/Users/andrei/Desktop/{}.{}", hashcode, "png");
+            let name_cloned = name.to_owned();
+            let file_extension = Path::new(&name_cloned).extension().and_then(OsStr::to_str);
+
+            let file_name = format!(
+                "/Users/andrei/Desktop/{}.{}",
+                hashcode,
+                file_extension.unwrap_or("")
+            );
             tokio::fs::write(&file_name, decoded)
                 .await
                 .map_err(|e| {
@@ -348,9 +358,16 @@ pub async fn download_file(
 
     let file_model = file_model.unwrap();
 
-    let file_name = file_model.name.clone();
+    let name_cloned = file_model.name.clone();
+    let file_extension = Path::new(&name_cloned).extension().and_then(OsStr::to_str);
 
-    let body_result = std::fs::read(format!("/Users/andrei/Desktop/{}", file_name));
+    let file_name = file_model.hashcode.clone();
+
+    let body_result = std::fs::read(format!(
+        "/Users/andrei/Desktop/{}.{}",
+        file_name,
+        file_extension.unwrap_or("")
+    ));
 
     let body_result = body_result.unwrap();
 
