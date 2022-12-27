@@ -6,3 +6,4 @@
 .DS_Store
 src/.DS_Store
 postgres-data
+data
