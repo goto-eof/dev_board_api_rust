@@ -2,12 +2,7 @@ use std::{convert::Infallible, fs, future::IntoFuture};
 
 use super::controller_common;
 use crate::{dao::dao_attachment, util::util_authentication::extract_user_id, GenericResult};
-use warp::{
-    filter::{FilterBase, FilterClone},
-    fs::File,
-    hyper::Response,
-    Filter, Rejection, Reply,
-};
+use warp::Reply;
 
 pub async fn get_attachment(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
     controller_common::generate_response(dao_attachment::get_by_id(id).await, jwt_opt)

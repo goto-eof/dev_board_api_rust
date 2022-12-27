@@ -7,7 +7,7 @@ use super::{
 use crate::{
     controller::controller_attachment,
     structure::structure::{DevBoardErrorType, DevBoardGenericError},
-    util::util_authentication::{auth_validator, Unauthorized},
+    util::util_authentication::Unauthorized,
     SETTINGS,
 };
 use warp::{hyper::StatusCode, Filter, Rejection, Reply};
