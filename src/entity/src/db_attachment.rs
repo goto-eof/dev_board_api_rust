@@ -8,7 +8,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub name: String,
-    pub hashcode: u64,
+    pub hashcode: String,
     pub user_id: i32,
     pub item_id: i32,
     pub created_at: Option<DateTime>,

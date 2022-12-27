@@ -19,6 +19,8 @@ use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
 
+use super::dao_attachment::save_files;
+
 pub async fn get_by_id(id: i32) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find_by_id(id).one(db).await;
@@ -156,31 +158,6 @@ pub async fn create(
     }
 
     Ok(result.unwrap())
-}
-
-async fn save_files(files: serde_json::Value) -> () {
-    let files = files.as_array();
-    let files = files.unwrap();
-    for file in files {
-        let content = file["content"].as_str().unwrap();
-        let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
-        let end_pos = content.chars().count();
-        let decoded = &decode(&content[start_pos..end_pos]);
-        let decoded = decoded.clone().unwrap();
-
-        let file_name = format!(
-            "/Users/andrei/Desktop/{}.{}",
-            Uuid::new_v4().to_string(),
-            "png"
-        );
-        tokio::fs::write(&file_name, decoded)
-            .await
-            .map_err(|e| {
-                eprint!("error writing file: {}", e);
-                warp::reject::reject()
-            })
-            .unwrap();
-    }
 }
 
 // #[derive(FromQueryResult, Debug)]

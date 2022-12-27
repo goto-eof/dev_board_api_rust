@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(DbAttachment::UserId).integer())
                     .col(ColumnDef::new(DbAttachment::Name).string())
-                    .col(ColumnDef::new(DbAttachment::Hashcode).unsigned())
+                    .col(ColumnDef::new(DbAttachment::Hashcode).string())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_att_user_id")

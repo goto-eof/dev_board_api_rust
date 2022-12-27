@@ -2,8 +2,10 @@ use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
+use base64::decode;
 use chrono::Utc;
 use entity::db_attachment;
+use sea_orm::prelude::Uuid;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
@@ -215,4 +217,27 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
     let deletion_result = result.unwrap();
     assert_eq!(deletion_result.rows_affected, 1);
     Ok(deletion_result.rows_affected == 1)
+}
+
+pub async fn save_files(files: serde_json::Value) -> () {
+    let files = files.as_array();
+    let files = files.unwrap();
+    for file in files {
+        let name = file["name"].as_str().unwrap();
+        let hashcode = file["hashcode"].as_str().unwrap();
+        let content = file["content"].as_str().unwrap();
+        let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
+        let end_pos = content.chars().count();
+        let decoded = &decode(&content[start_pos..end_pos]);
+        let decoded = decoded.clone().unwrap();
+
+        let file_name = format!("/Users/andrei/Desktop/{}.{}", hashcode, "png");
+        tokio::fs::write(&file_name, decoded)
+            .await
+            .map_err(|e| {
+                eprint!("error writing file: {}", e);
+                warp::reject::reject()
+            })
+            .unwrap();
+    }
 }
