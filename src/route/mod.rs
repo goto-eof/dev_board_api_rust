@@ -1,3 +1,4 @@
+pub mod routes_attachment;
 pub mod routes_board;
 pub mod routes_column;
 pub mod routes_item;

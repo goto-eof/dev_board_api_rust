@@ -97,7 +97,14 @@
     "get_messages",
     "insert_message",
     "update_message",
-    "delete_message"
+    "delete_message",
+
+    "get_attachment_by_item_id",
+    "get_attachment",
+    "get_attachments",
+    "insert_attachment",
+    "update_attachment",
+    "delete_attachment"
   ],
   "admin_only_permissions": [
     "get_permission",

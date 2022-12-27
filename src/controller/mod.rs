@@ -1,3 +1,4 @@
+pub mod controller_attachment;
 pub mod controller_auth;
 pub mod controller_board;
 pub mod controller_column;
