@@ -47,9 +47,7 @@ pub async fn get_by_id(id: i32) -> Result<db_attachment::Model, DevBoardGenericE
     Ok(opt.unwrap())
 }
 
-pub async fn get_by_item_id(
-    parent_id: i32,
-) -> Result<Vec<db_attachment::Model>, DevBoardGenericError> {
+pub async fn get_by_item_id(parent_id: i32) -> Result<Vec<FullAttachment>, DevBoardGenericError> {
     let db = DB_POOL.get().await;
 
     let result = db_attachment::Entity::find()
@@ -69,7 +67,32 @@ pub async fn get_by_item_id(
 
     let models = result.unwrap();
 
-    Ok(models)
+    let mut attachments: Vec<FullAttachment> = vec![];
+
+    for model in models {
+        let name_cloned = model.name.clone();
+        let file_extension = Path::new(&name_cloned).extension().and_then(OsStr::to_str);
+
+        let file_name = model.hashcode.clone();
+
+        let body_result = std::fs::read(format!(
+            "{}/{}.{}",
+            SETTINGS.issue_storage_path,
+            file_name,
+            file_extension.unwrap_or("")
+        ));
+
+        let body_result = body_result.unwrap();
+
+        let encoded = base64::encode(body_result);
+        let encoded = format!("data:{};base64,{}", model.file_type, encoded);
+        attachments.push(FullAttachment {
+            meta_information: model,
+            content: encoded,
+        });
+    }
+
+    Ok(attachments)
 }
 
 pub async fn create(
@@ -378,7 +401,7 @@ pub async fn download_file(
     let body_result = body_result.unwrap();
 
     let encoded = base64::encode(body_result);
-
+    let encoded = format!("data:{};base64,{}", file_model.file_type, encoded);
     Ok(FullAttachment {
         meta_information: file_model,
         content: encoded,

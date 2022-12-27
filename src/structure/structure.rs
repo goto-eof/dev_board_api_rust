@@ -1,5 +1,7 @@
 use entity::{db_attachment, db_board, db_column, db_item};
 use serde::{Deserialize, Serialize};
+
+use crate::dao::dao_attachment::FullAttachment;
 #[derive(Serialize, Debug)]
 pub enum DevBoardErrorType {
     Error,
@@ -83,5 +85,5 @@ pub struct UserReponse {
 #[derive(Serialize)]
 pub struct ItemAttachments {
     pub item: db_item::Model,
-    pub attachments: Vec<db_attachment::Model>,
+    pub attachments: Vec<FullAttachment>,
 }
