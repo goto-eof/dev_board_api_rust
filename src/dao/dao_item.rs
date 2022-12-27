@@ -164,28 +164,20 @@ pub async fn create(
 }
 
 async fn save_files(files: serde_json::Value) -> () {
-    println!("FILES: {:?}", files);
     let files = files.as_array();
     let files = files.unwrap();
     for file in files {
         let content = file["content"].as_str().unwrap();
-        println!("CONTENT: {:?}", content);
         let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
         let end_pos = content.chars().count();
-        println!("TEST: {:?} {:?}", start_pos, end_pos);
         let decoded = &decode(&content[start_pos..end_pos]);
-        println!("DECODED: {:?}", decoded);
         let decoded = decoded.clone().unwrap();
-        println!("File name: {:?}", file["name"].as_str().unwrap());
-        // println!("Content: {:?}", file["content"].as_str().unwrap());
-        // println!("File content: {:?}", decoded);
 
         let file_name = format!(
             "/Users/andrei/Desktop/{}.{}",
             Uuid::new_v4().to_string(),
             "png"
         );
-        println!("NEW FILENAME: {:?}", file_name);
         tokio::fs::write(&file_name, decoded)
             .await
             .map_err(|e| {
