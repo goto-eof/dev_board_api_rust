@@ -1,3 +1,4 @@
+pub mod db_attachment;
 pub mod db_board;
 pub mod db_board_column;
 pub mod db_board_user;

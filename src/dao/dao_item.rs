@@ -90,11 +90,6 @@ pub async fn get_by_parent_id(parent_id: i32) -> Result<Vec<db_item::Model>, Dev
     Ok(models)
 }
 
-pub struct File {
-    file: String,
-    file_name: String,
-}
-
 pub async fn create(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,

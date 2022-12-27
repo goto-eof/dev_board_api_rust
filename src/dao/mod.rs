@@ -1,3 +1,4 @@
+pub mod dao_attachment;
 pub mod dao_board;
 pub mod dao_column;
 pub mod dao_common;
