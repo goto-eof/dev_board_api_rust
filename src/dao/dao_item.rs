@@ -1,15 +1,15 @@
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
+use crate::structure::structure::ItemAttachments;
 use crate::structure::structure::SwapRequest;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
-use base64::decode;
 use chrono::Utc;
 use entity::db_item;
 use entity::db_message;
 use log::debug;
-use sea_orm::prelude::Uuid;
 use sea_orm::ActiveModelTrait;
+use sea_orm::ActiveValue::NotSet;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
 use sea_orm::FromQueryResult;
@@ -19,9 +19,10 @@ use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::QuerySelect;
 
+use super::dao_attachment;
 use super::dao_attachment::save_files;
 
-pub async fn get_by_id(id: i32) -> Result<db_item::Model, DevBoardGenericError> {
+pub async fn get_by_id(id: i32) -> Result<ItemAttachments, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find_by_id(id).one(db).await;
 
@@ -44,8 +45,13 @@ pub async fn get_by_id(id: i32) -> Result<db_item::Model, DevBoardGenericError> 
             message: format!("Item not found"),
         });
     }
+    let item = opt.unwrap();
 
-    Ok(opt.unwrap())
+    let result = ItemAttachments {
+        item,
+        attachments: dao_attachment::get_by_item_id(id).await.unwrap(),
+    };
+    Ok(result)
 }
 
 pub async fn get_all() -> Result<Vec<db_item::Model>, DevBoardGenericError> {
@@ -143,6 +149,7 @@ pub async fn create(
     model.updated_at = sea_orm::Set(Some(dat));
     model.publisher_id = sea_orm::Set(Some(user_id));
     model.order = sea_orm::Set(count);
+    model.id = NotSet;
 
     let result = model.insert(db).await;
 

@@ -1,5 +1,3 @@
-use std::result;
-
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::extract_user_id;

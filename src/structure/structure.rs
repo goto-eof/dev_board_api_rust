@@ -1,4 +1,4 @@
-use entity::{db_board, db_column, db_item};
+use entity::{db_attachment, db_board, db_column, db_item};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Debug)]
 pub enum DevBoardErrorType {
@@ -78,4 +78,10 @@ pub struct UserReponse {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
+}
+
+#[derive(Serialize)]
+pub struct ItemAttachments {
+    pub item: db_item::Model,
+    pub attachments: Vec<db_attachment::Model>,
 }
