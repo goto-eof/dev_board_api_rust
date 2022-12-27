@@ -1,7 +1,6 @@
 use super::controller_common;
 use crate::dao::dao_item;
 use crate::structure::structure::SwapRequest;
-use warp::multipart::FormData;
 use warp::Reply;
 
 pub async fn get_item(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {

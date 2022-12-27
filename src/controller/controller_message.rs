@@ -1,6 +1,6 @@
 use super::controller_common;
 use crate::dao::dao_message;
-use warp::Reply;
+use warp::{filter::FilterClone, fs::File, Rejection, Reply};
 
 pub async fn get_message(id: i32, jwt_opt: Option<String>) -> crate::GenericResult<impl Reply> {
     controller_common::generate_response(dao_message::get_by_id(id).await, jwt_opt)

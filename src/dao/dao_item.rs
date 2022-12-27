@@ -1,3 +1,5 @@
+use std::fs;
+
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::structure::structure::ItemAttachments;
@@ -164,7 +166,16 @@ pub async fn create(
     }
     let result = result.unwrap();
 
-    save_files(user_id, result.id, json_data["files"].clone()).await;
+    let save_result = save_files(user_id, result.id, json_data["files"].clone()).await;
+
+    if save_result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", save_result.err()),
+        });
+    }
 
     Ok(result)
 }

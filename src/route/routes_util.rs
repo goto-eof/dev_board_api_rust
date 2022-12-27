@@ -5,8 +5,9 @@ use super::{
     routes_role::get_role_routes, routes_user::get_user_routes,
 };
 use crate::{
+    controller::controller_attachment,
     structure::structure::{DevBoardErrorType, DevBoardGenericError},
-    util::util_authentication::Unauthorized,
+    util::util_authentication::{auth_validator, Unauthorized},
     SETTINGS,
 };
 use warp::{hyper::StatusCode, Filter, Rejection, Reply};

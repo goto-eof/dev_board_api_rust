@@ -14,6 +14,7 @@ use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
 use sea_orm::Set;
+use serde::Serialize;
 
 pub async fn get_by_id(id: i32) -> Result<db_attachment::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
@@ -306,4 +307,55 @@ pub async fn save_files(
     }
 
     return Ok(true);
+}
+
+#[derive(Serialize)]
+pub struct FullAttachment {
+    meta_information: db_attachment::Model,
+    content: String,
+}
+
+pub async fn download_file(
+    file_id: i32,
+    item_id: i32,
+) -> Result<FullAttachment, DevBoardGenericError> {
+    let body_result = std::fs::read("/Users/andrei/Desktop/kohn.jpg");
+
+    let body_result = body_result.unwrap();
+
+    let encoded = base64::encode(body_result);
+
+    let db = DB_POOL.get().await;
+
+    let file_model = db_attachment::Entity::find_by_id(file_id)
+        .filter(db_attachment::Column::ItemId.eq(item_id))
+        .one(db)
+        .await;
+
+    if file_model.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", file_model.err()),
+        });
+    }
+
+    let file_model = file_model.unwrap();
+
+    if file_model.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let file_model = file_model.unwrap();
+
+    Ok(FullAttachment {
+        meta_information: file_model,
+        content: encoded,
+    })
 }

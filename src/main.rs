@@ -3,7 +3,6 @@ use crate::configuration::config_loader::Settings;
 use crate::route::routes_util::init_routes;
 use async_once::AsyncOnce;
 use configuration::config_database::init_db;
-use configuration::config_logging::init_logging;
 use dao::dao_common;
 use log::debug;
 use sea_orm::DbConn;

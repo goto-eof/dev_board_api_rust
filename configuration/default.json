@@ -104,7 +104,8 @@
     "get_attachments",
     "insert_attachment",
     "update_attachment",
-    "delete_attachment"
+    "delete_attachment",
+    "download_attachment"
   ],
   "admin_only_permissions": [
     "get_permission",

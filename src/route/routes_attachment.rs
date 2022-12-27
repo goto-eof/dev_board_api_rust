@@ -12,6 +12,14 @@ pub async fn get_attachment_routes() -> impl Filter<Extract = impl Reply, Error 
         .and_then(controller_attachment::get_attachment)
         .or(db_column
             .and(warp::get())
+            .and(warp::path("download_attachment"))
+            .and(warp::path::param::<i32>())
+            .and(warp::path::param::<i32>())
+            .and(warp::path::end())
+            .and(auth_validator("download_attachment".to_string()).await)
+            .and_then(controller_attachment::download_attachment))
+        .or(db_column
+            .and(warp::get())
             .and(warp::path("get_by_item_id"))
             .and(warp::path::param::<i32>())
             .and(warp::path::end())
@@ -36,4 +44,5 @@ pub async fn get_attachment_routes() -> impl Filter<Extract = impl Reply, Error 
             .and(warp::path::end())
             .and(auth_validator("delete_attachment".to_string()).await)
             .and_then(controller_attachment::delete_attachment))
+    // .or(download)
 }
