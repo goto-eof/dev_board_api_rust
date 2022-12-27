@@ -1,3 +1,5 @@
+use std::result;
+
 use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::extract_user_id;
@@ -5,13 +7,15 @@ use crate::DB_POOL;
 use base64::decode;
 use chrono::Utc;
 use entity::db_attachment;
-use sea_orm::prelude::Uuid;
 use sea_orm::ActiveModelTrait;
+use sea_orm::ActiveValue::NotSet;
 use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
+use sea_orm::IntoActiveModel;
 use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::QueryOrder;
+use sea_orm::Set;
 
 pub async fn get_by_id(id: i32) -> Result<db_attachment::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
@@ -219,7 +223,8 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
     Ok(deletion_result.rows_affected == 1)
 }
 
-pub async fn save_files(files: serde_json::Value) -> () {
+pub async fn save_files(user_id: i32, item_id: i32, files: serde_json::Value) -> () {
+    let db = DB_POOL.get().await;
     let files = files.as_array();
     let files = files.unwrap();
     for file in files {
@@ -239,5 +244,24 @@ pub async fn save_files(files: serde_json::Value) -> () {
                 warp::reject::reject()
             })
             .unwrap();
+
+        let dat = Utc::now().naive_utc();
+
+        let result_attachments = db_attachment::ActiveModel {
+            created_at: Set(Some(dat)),
+            updated_at: Set(Some(dat)),
+            hashcode: Set(hashcode.to_owned()),
+            name: Set(name.to_owned()),
+            item_id: Set(item_id),
+            user_id: Set(user_id),
+            id: NotSet,
+            ..Default::default()
+        }
+        .into_active_model()
+        .insert(db)
+        .await;
+        if result_attachments.is_err() {
+            println!("{:?}", result_attachments.err());
+        }
     }
 }

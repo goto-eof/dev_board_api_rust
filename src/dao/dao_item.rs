@@ -109,11 +109,9 @@ pub async fn create(
         });
     }
 
-    save_files(json_data["files"].clone()).await;
-
     let user_id = user_id.unwrap();
 
-    let result = db_item::ActiveModel::from_json(json_data);
+    let result = db_item::ActiveModel::from_json(json_data.clone());
 
     if result.is_err() {
         return Err(DevBoardGenericError {
@@ -156,8 +154,11 @@ pub async fn create(
             message: format!("DB Error: {:?}", result.err()),
         });
     }
+    let result = result.unwrap();
 
-    Ok(result.unwrap())
+    save_files(user_id, result.id, json_data["files"].clone()).await;
+
+    Ok(result)
 }
 
 // #[derive(FromQueryResult, Debug)]

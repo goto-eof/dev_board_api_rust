@@ -19,32 +19,31 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(DbAttachment::UserId).integer())
-                    .col(ColumnDef::new(DbAttachment::Name).string())
-                    .col(ColumnDef::new(DbAttachment::Hashcode).string())
+                    .col(ColumnDef::new(DbAttachment::UserId).integer().not_null())
+                    .col(ColumnDef::new(DbAttachment::Name).string().not_null())
+                    .col(ColumnDef::new(DbAttachment::Hashcode).string().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_att_user_id")
                             .from(db_message::Entity, db_message::Column::UserId)
                             .to(db_user::Entity, db_user::Column::Id),
                     )
-                    .col(ColumnDef::new(DbAttachment::ItemId).integer())
+                    .col(ColumnDef::new(DbAttachment::ItemId).integer().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_att_item_id")
                             .from(db_message::Entity, db_message::Column::ItemId)
                             .to(db_item::Entity, db_item::Column::Id),
                     )
-                    .col(
-                        ColumnDef::new(DbAttachment::CreatedAt)
-                            .timestamp()
-                            .not_null(),
+                    .index(
+                        Index::create()
+                            .unique()
+                            .name("db_att_unq_item_hc")
+                            .col(DbAttachment::ItemId)
+                            .col(DbAttachment::Hashcode),
                     )
-                    .col(
-                        ColumnDef::new(DbAttachment::UpdatedAt)
-                            .timestamp()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(DbAttachment::CreatedAt).timestamp())
+                    .col(ColumnDef::new(DbAttachment::UpdatedAt).timestamp())
                     .to_owned(),
             )
             .await
@@ -65,7 +64,6 @@ enum DbAttachment {
     Hashcode,
     UserId,
     ItemId,
-    Message,
     CreatedAt,
     UpdatedAt,
 }

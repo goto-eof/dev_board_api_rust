@@ -54,8 +54,8 @@ impl MigrationTrait for Migration {
                             .from(db_item::Entity, db_item::Column::ColumnId)
                             .to(db_column::Entity, db_column::Column::Id),
                     )
-                    .col(ColumnDef::new(DbItem::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(DbItem::UpdatedAt).timestamp().not_null())
+                    .col(ColumnDef::new(DbItem::CreatedAt).timestamp())
+                    .col(ColumnDef::new(DbItem::UpdatedAt).timestamp())
                     .to_owned(),
             )
             .await
