@@ -22,6 +22,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(DbAttachment::UserId).integer().not_null())
                     .col(ColumnDef::new(DbAttachment::Name).string().not_null())
                     .col(ColumnDef::new(DbAttachment::Hashcode).string().not_null())
+                    .col(ColumnDef::new(DbAttachment::FileType).string().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_att_user_id")
@@ -61,6 +62,7 @@ enum DbAttachment {
     Table,
     Id,
     Name,
+    FileType,
     Hashcode,
     UserId,
     ItemId,

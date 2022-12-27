@@ -11,6 +11,7 @@ pub struct Model {
     pub id: i32,
     pub user_id: i32,
     pub name: String,
+    pub file_type: String,
     pub hashcode: String,
     pub item_id: i32,
     pub created_at: Option<DateTime>,

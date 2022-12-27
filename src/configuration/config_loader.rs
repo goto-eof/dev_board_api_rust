@@ -15,6 +15,7 @@ pub struct Settings {
     pub cors_allowed_methods: Vec<String>,
     pub application_permissions: Vec<String>,
     pub admin_only_permissions: Vec<String>,
+    pub issue_storage_path: String,
 }
 impl Settings {
     pub fn init_configuration() -> Result<Self, ConfigError> {

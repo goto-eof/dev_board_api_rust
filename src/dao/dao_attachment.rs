@@ -5,6 +5,7 @@ use crate::structure::structure::DevBoardErrorType;
 use crate::structure::structure::DevBoardGenericError;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
+use crate::SETTINGS;
 use base64::decode;
 use chrono::Utc;
 use entity::db_attachment;
@@ -277,19 +278,22 @@ pub async fn save_files(
             let file_extension = Path::new(&name_cloned).extension().and_then(OsStr::to_str);
 
             let file_name = format!(
-                "/Users/andrei/Desktop/{}.{}",
+                "{}/{}.{}",
+                SETTINGS.issue_storage_path,
                 hashcode,
                 file_extension.unwrap_or("")
             );
             tokio::fs::write(&file_name, decoded)
                 .await
                 .map_err(|e| {
-                    eprint!("error writing file: {}", e);
+                    print!("error writing file: {}", e);
                     warp::reject::reject()
                 })
                 .unwrap();
 
             let dat = Utc::now().naive_utc();
+
+            let file_type = file["file_type"].as_str().unwrap();
 
             let result_attachments = db_attachment::ActiveModel {
                 created_at: Set(Some(dat)),
@@ -298,6 +302,7 @@ pub async fn save_files(
                 name: Set(name.to_owned()),
                 item_id: Set(item_id),
                 user_id: Set(user_id),
+                file_type: Set(file_type.to_owned()),
                 id: NotSet,
                 ..Default::default()
             }
@@ -364,7 +369,8 @@ pub async fn download_file(
     let file_name = file_model.hashcode.clone();
 
     let body_result = std::fs::read(format!(
-        "/Users/andrei/Desktop/{}.{}",
+        "{}/{}.{}",
+        SETTINGS.issue_storage_path,
         file_name,
         file_extension.unwrap_or("")
     ));
