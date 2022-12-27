@@ -319,12 +319,6 @@ pub async fn download_file(
     file_id: i32,
     item_id: i32,
 ) -> Result<FullAttachment, DevBoardGenericError> {
-    let body_result = std::fs::read("/Users/andrei/Desktop/kohn.jpg");
-
-    let body_result = body_result.unwrap();
-
-    let encoded = base64::encode(body_result);
-
     let db = DB_POOL.get().await;
 
     let file_model = db_attachment::Entity::find_by_id(file_id)
@@ -353,6 +347,14 @@ pub async fn download_file(
     }
 
     let file_model = file_model.unwrap();
+
+    let file_name = file_model.name.clone();
+
+    let body_result = std::fs::read(format!("/Users/andrei/Desktop/{}", file_name));
+
+    let body_result = body_result.unwrap();
+
+    let encoded = base64::encode(body_result);
 
     Ok(FullAttachment {
         meta_information: file_model,
