@@ -5,6 +5,7 @@ use crate::structure::structure::SwapRequest;
 use crate::util::util_authentication::extract_user_id;
 use crate::DB_POOL;
 use chrono::Utc;
+use entity::db_attachment;
 use entity::db_item;
 use entity::db_message;
 use log::debug;
@@ -203,9 +204,22 @@ pub async fn create(
 pub async fn update(
     id: i32,
     json_data: serde_json::Value,
+    jwt_opt: Option<String>,
 ) -> Result<db_item::Model, DevBoardGenericError> {
     let db = DB_POOL.get().await;
     let result = db_item::Entity::find_by_id(id).one(db).await;
+    let user_id = extract_user_id(jwt_opt.clone());
+
+    if user_id.is_none() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 2,
+            err_type: DevBoardErrorType::Warning,
+            message: format!("Item not found"),
+        });
+    }
+
+    let user_id = user_id.unwrap();
 
     if result.is_err() {
         return Err(DevBoardGenericError {
@@ -229,7 +243,7 @@ pub async fn update(
 
     let mut item_active_model: db_item::ActiveModel = opt.unwrap().into();
 
-    let result = item_active_model.set_from_json(json_data);
+    let result = item_active_model.set_from_json(json_data.clone());
 
     if result.is_err() {
         if result.is_err() {
@@ -258,7 +272,21 @@ pub async fn update(
         }
     }
 
-    Ok(result.unwrap())
+    let result = result.unwrap();
+
+    let result_files = save_files(user_id, result.id, json_data["files"].clone()).await;
+    if result_files.is_err() {
+        if result_files.is_err() {
+            return Err(DevBoardGenericError {
+                success: false,
+                code: 1,
+                err_type: DevBoardErrorType::Error,
+                message: format!("DB Error: {:?}", result_files.err()),
+            });
+        }
+    }
+
+    Ok(result)
 }
 
 pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGenericError> {
@@ -304,6 +332,17 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
                 message: format!("DB Error: {:?}", result.err()),
             });
         }
+    }
+
+    let result = db_attachment::Entity::delete_many().exec(db).await;
+
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
     }
 
     let result = db_item::Entity::find_by_id(id)

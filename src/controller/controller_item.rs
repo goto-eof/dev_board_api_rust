@@ -34,7 +34,10 @@ pub async fn update_item(
     json_data: serde_json::Value,
     jwt_opt: Option<String>,
 ) -> crate::GenericResult<impl Reply> {
-    controller_common::generate_response(dao_item::update(id, json_data).await, jwt_opt)
+    controller_common::generate_response(
+        dao_item::update(id, json_data, jwt_opt.clone()).await,
+        jwt_opt,
+    )
 }
 
 pub async fn swap_items(

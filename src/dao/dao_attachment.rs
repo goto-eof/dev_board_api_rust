@@ -221,45 +221,89 @@ pub async fn delete(id: i32, jwt_opt: Option<String>) -> Result<bool, DevBoardGe
     Ok(deletion_result.rows_affected == 1)
 }
 
-pub async fn save_files(user_id: i32, item_id: i32, files: serde_json::Value) -> () {
+pub async fn save_files(
+    user_id: i32,
+    item_id: i32,
+    files: serde_json::Value,
+) -> Result<bool, DevBoardGenericError> {
     let db = DB_POOL.get().await;
+    let hashcodes: Vec<String> = files
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|item| item["hashcode"].as_str().unwrap().to_owned())
+        .collect();
+
+    let result = db_attachment::Entity::delete_many()
+        .filter(db_attachment::Column::Hashcode.is_not_in(hashcodes))
+        .exec(db)
+        .await;
+
+    if result.is_err() {
+        return Err(DevBoardGenericError {
+            success: false,
+            code: 1,
+            err_type: DevBoardErrorType::Error,
+            message: format!("DB Error: {:?}", result.err()),
+        });
+    }
+
+    let hashcodes_saved: Vec<String> = db_attachment::Entity::find()
+        .filter(db_attachment::Column::ItemId.eq(item_id))
+        .all(db)
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|item| item.hashcode)
+        .collect();
+
     let files = files.as_array();
     let files = files.unwrap();
     for file in files {
-        let name = file["name"].as_str().unwrap();
         let hashcode = file["hashcode"].as_str().unwrap();
-        let content = file["content"].as_str().unwrap();
-        let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
-        let end_pos = content.chars().count();
-        let decoded = &decode(&content[start_pos..end_pos]);
-        let decoded = decoded.clone().unwrap();
+        if !hashcodes_saved.contains(&hashcode.to_owned()) {
+            let name = file["name"].as_str().unwrap();
+            let content = file["content"].as_str().unwrap();
+            let start_pos = content.chars().position(|c| c == ',').unwrap() + 1;
+            let end_pos = content.chars().count();
+            let decoded = &decode(&content[start_pos..end_pos]);
+            let decoded = decoded.clone().unwrap();
 
-        let file_name = format!("/Users/andrei/Desktop/{}.{}", hashcode, "png");
-        tokio::fs::write(&file_name, decoded)
-            .await
-            .map_err(|e| {
-                eprint!("error writing file: {}", e);
-                warp::reject::reject()
-            })
-            .unwrap();
+            let file_name = format!("/Users/andrei/Desktop/{}.{}", hashcode, "png");
+            tokio::fs::write(&file_name, decoded)
+                .await
+                .map_err(|e| {
+                    eprint!("error writing file: {}", e);
+                    warp::reject::reject()
+                })
+                .unwrap();
 
-        let dat = Utc::now().naive_utc();
+            let dat = Utc::now().naive_utc();
 
-        let result_attachments = db_attachment::ActiveModel {
-            created_at: Set(Some(dat)),
-            updated_at: Set(Some(dat)),
-            hashcode: Set(hashcode.to_owned()),
-            name: Set(name.to_owned()),
-            item_id: Set(item_id),
-            user_id: Set(user_id),
-            id: NotSet,
-            ..Default::default()
-        }
-        .into_active_model()
-        .insert(db)
-        .await;
-        if result_attachments.is_err() {
-            println!("{:?}", result_attachments.err());
+            let result_attachments = db_attachment::ActiveModel {
+                created_at: Set(Some(dat)),
+                updated_at: Set(Some(dat)),
+                hashcode: Set(hashcode.to_owned()),
+                name: Set(name.to_owned()),
+                item_id: Set(item_id),
+                user_id: Set(user_id),
+                id: NotSet,
+                ..Default::default()
+            }
+            .into_active_model()
+            .insert(db)
+            .await;
+
+            if result_attachments.is_err() {
+                return Err(DevBoardGenericError {
+                    success: false,
+                    code: 1,
+                    err_type: DevBoardErrorType::Error,
+                    message: format!("DB Error: {:?}", result_attachments.err()),
+                });
+            }
         }
     }
+
+    return Ok(true);
 }
