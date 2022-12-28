@@ -4,12 +4,7 @@
   "jwt_secret": "this_is_our_secret",
   "jwt_ttl": 72000,
   "issue_storage_path": "./data",
-  "cors_allowed_origins": [
-    "http://localhost:3000",
-    "http://192.168.1.105:3000",
-    "http://192.168.1.101:8082",
-    "http://localhost:8082"
-  ],
+  "cors_allowed_origins": ["http://localhost:3000", "http://localhost:8082"],
   "cors_allowed_headers": [
     "Access-Control-Allow-Credentials",
     "Access-Control-Allow-Headers",
