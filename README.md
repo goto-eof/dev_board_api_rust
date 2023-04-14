@@ -98,4 +98,4 @@ sea-orm-cli generate entity -u postgres://postgres:postgres@127.0.0.1:5432/postg
 docker-compose up -d --no-deps --build
 ```
 
-if any problems arise, feel free to [contact me](https://andre-i.dev/#contactme).
+if any problems arise, feel free to [contact me](http://andre-i.eu/#contactme).
